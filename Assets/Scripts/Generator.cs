@@ -13,6 +13,8 @@ public class Generator : MonoBehaviour
     public GameObject Dirt;
     public GameObject Stone;
 
+    public GameObject _tileContainer;
+
     public float heightpoint;
     public float heightpoint2;
 
@@ -34,13 +36,16 @@ public class Generator : MonoBehaviour
 
             for (int j=0; j<stonespace; j++)
             {
-                Instantiate(Stone, new Vector3(w, j), Quaternion.identity);
+                GameObject newStoneTile = Instantiate(Stone, new Vector3(w, j), Quaternion.identity);
+                newStoneTile.transform.parent = _tileContainer.transform;
             }
             for (int j=stonespace; j<distance; j++)
             {
-                Instantiate(Dirt, new Vector3(w, j), Quaternion.identity);
+                GameObject newDirtTile = Instantiate(Dirt, new Vector3(w, j), Quaternion.identity);
+                newDirtTile.transform.parent = _tileContainer.transform;
             }
-            Instantiate(Grass, new Vector3(w, distance), Quaternion.identity);
+            GameObject newGrassTile = Instantiate(Grass, new Vector3(w, distance), Quaternion.identity);
+            newGrassTile.transform.parent = _tileContainer.transform;
         }
     }
 }
