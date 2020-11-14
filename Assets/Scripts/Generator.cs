@@ -53,7 +53,7 @@ public class Generator : MonoBehaviour
     }
     int NoiseInt(int x, int y, float scale, float mag, float exp)
     {
-        return (int)(Mathf.Pow((Mathf.PerlinNoise(x / scale, y / scale) * mag), (exp)));
+        return (int)Mathf.Pow((Mathf.PerlinNoise(x / scale, y / scale) * mag), (exp));
     }
 
     void GenTerrain()
@@ -84,11 +84,7 @@ public class Generator : MonoBehaviour
 
             for (int py = 0; py < blocks.GetLength(1); py++)
             {
-                if (py < grass)
-                {
-                    blocks[px, py] = 3;
-                }
-                else if (py < stone)
+                if (py < stone)
                 {
                     blocks[px, py] = 1;
                     //The next three lines make dirt spots in random places
@@ -108,7 +104,6 @@ public class Generator : MonoBehaviour
                 {
                     blocks[px, py] = 2;
                 }
-                
             }
         }
     }

@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
             rb2d.velocity = Vector2.up * jumpVelocity;
         }
 
-        Debug.Log(IsGrounded());
+        //Debug.Log(IsGrounded());
     }
 
     bool IsGrounded()

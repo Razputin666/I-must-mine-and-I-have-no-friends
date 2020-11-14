@@ -160,8 +160,6 @@ public class PolygonGenerator : MonoBehaviour
 
     void GenCollider(int x, int y)
     {
-
-
         //Top
         if (Block(x, y + 1) == 0)
         {
@@ -246,7 +244,6 @@ public class PolygonGenerator : MonoBehaviour
         newUV.Add(new Vector2(tUnit * texture.x, tUnit * texture.y));
 
         squareCount++;
-
     }
 
     void UpdateMesh()
