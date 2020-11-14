@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 8974958328932037929}
   - component: {fileID: 8974958328932037933}
   - component: {fileID: 8974958328932037934}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Gubb
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -165,7 +165,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 935f4392b2091124685e55dd48f55d8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blockLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
   speed: 100
+  jumpVelocity: 80
   _camera: {fileID: 0}
 --- !u!50 &8974958328932037933
 Rigidbody2D:
@@ -182,7 +186,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 5
+  m_GravityScale: 20
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
