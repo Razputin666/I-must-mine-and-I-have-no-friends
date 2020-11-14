@@ -162,8 +162,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbd91a74f4b5aac4d9640579569e58b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _position: {x: 0, y: 0, z: 0}
-  _speed: 0
+  _position: {x: 0, y: 0, z: -1}
+  _speed: 50
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -191,7 +191,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -313,8 +313,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _distance: 10
   _space: 5
-  _width: 100
-  _height: 25
+  _width: 50
+  _height: 10
   _tilePrefabs:
   - {fileID: 3537926155126650661, guid: 012c3ec496b0e2f4e8c4a1eed42063dd, type: 3}
   - {fileID: 3034879164794033841, guid: afb11680ee6ec3c4889e4c314a3fec8c, type: 3}

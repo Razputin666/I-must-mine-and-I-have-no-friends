@@ -30,6 +30,6 @@ public class CameraMovement : MonoBehaviour
         {
             _position.x -= _speed * Time.deltaTime; 
         }
-        _camera.transform.position = _position;
+        //_camera.transform.position = _position;
     }
 }
