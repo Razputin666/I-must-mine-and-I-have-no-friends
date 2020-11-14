@@ -4,32 +4,32 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public Vector3 pos;
+    public Vector3 _position;
 
-    public float speed;
-    Camera cam;
+    public float _speed;
+    Camera _camera;
     void Start()
     {
-        cam = GetComponent<Camera>();
+        _camera = GetComponent<Camera>();
     }
     void Update()
     {
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            pos.y += speed * Time.deltaTime; 
+            _position.y += _speed * Time.deltaTime; 
         }
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            pos.y -= speed * Time.deltaTime; 
+            _position.y -= _speed * Time.deltaTime; 
         }
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            pos.x += speed * Time.deltaTime;
+            _position.x += _speed * Time.deltaTime;
         }
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            pos.x -= speed * Time.deltaTime; 
+            _position.x -= _speed * Time.deltaTime; 
         }
-        cam.transform.position = pos;
+        _camera.transform.position = _position;
     }
 }
