@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class clickDestroy : MonoBehaviour
 {
-    int i = 0;
-    void OnMouseDown()
-    {
-            i++;
-        if(i==2)
-        Destroy(gameObject);
-    }
+    //int i = 0;
+    //void OnMouseDown()
+    //{
+    //        i++;
+    //    if(i==2)
+    //    Destroy(gameObject);
+    //}
 }
