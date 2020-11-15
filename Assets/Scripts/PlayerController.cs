@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,13 +13,17 @@ public class PlayerController : MonoBehaviour
     {
         Mining, Combat
     }
-
+    private Collider2D targetedBlock;
     private UnitMode unitMode;
     public float speed;                //Floating point variable to store the player's movement speed.
     public float jumpVelocity;
     private Rigidbody2D rb2d;        //Store a reference to the Rigidbody2D component required to use 2D Physics.
     private BoxCollider2D boxCollider2d;
     Vector3 worldPosition;
+    private float distanceFromPlayerx;
+    private float distanceFromPlayery;
+    private bool inPrecisionMode;
+    private bool inFreeMode;
 
     public Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
 
@@ -65,21 +70,44 @@ public class PlayerController : MonoBehaviour
         {
             case UnitMode.Mining:
              
-                    RaycastHit2D hit;
-                    Vector3 mousePos = Input.mousePosition;
-                    mousePos.z = Camera.main.nearClipPlane;
-                    worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
+                    
+                Vector3 mousePos = Input.mousePosition;
+                mousePos.z = Camera.main.nearClipPlane;
+                worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
+                Ray whereMouseIs = _camera.ScreenPointToRay((worldPosition - transform.position) - worldPosition);
+                RaycastHit2D precisionModeRay = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+                RaycastHit2D FreeModeRay = Physics2D.Raycast(transform.position, worldPosition - transform.position, 6f);
 
-                    RaycastHit2D ray = Physics2D.Raycast(transform.position, worldPosition - transform.position, 10f);
-                    Debug.DrawRay(transform.position, worldPosition - transform.position, Color.red);
+                TargetedBlock = precisionModeRay.collider;
+                if (TargetedBlock != null)
+                { 
+                float playerPositionX = Mathf.Abs(transform.position.x);
+                float playerPositionY = Mathf.Abs(transform.position.y);
 
-                    if (ray && Input.GetMouseButton(0) && ray.collider.tag == "BlockTier1")
-                    {
-                     Destroy(ray.collider.gameObject);
-                     Debug.Log(ray.collider);
-                   // coroutineQueue.Enqueue(MineBlock(ray.collider));
+                float blockPositionX = Mathf.Abs(TargetedBlock.transform.position.x);
+                float blockPositionY = Mathf.Abs(TargetedBlock.transform.position.y);
 
-                    }
+                DistanceFromPlayerX = Mathf.Abs(playerPositionX - blockPositionX);
+                DistanceFromPlayerY = Mathf.Abs(playerPositionY - blockPositionY);
+
+                }
+          
+                if (FreeModeRay && Input.GetMouseButton(0) && Input.GetKey("left shift"))
+                {
+                    RaycastHit2D freeMode = Physics2D.BoxCast(boxCollider2d.bounds.center, boxCollider2d.bounds.size *1.5f, 0f, boxCollider2d.bounds.center, .1f);
+
+                     TargetedBlock = FreeModeRay.collider;
+                    // coroutineQueue.Enqueue(MineBlock());
+                    StartCoroutine(MineBlock());
+
+                }
+
+                else if (DistanceFromPlayerX < 7f && DistanceFromPlayerY < 7f && Input.GetMouseButton(0) && !Input.GetKey("left shift"))
+                {
+                   // coroutineQueue.Enqueue(MineBlock());
+                    StartCoroutine(MineBlock());
+
+                }
                 
 
                 break;
@@ -96,6 +124,11 @@ public class PlayerController : MonoBehaviour
         return raycastHit2D.collider != null;
         
              
+        
+    }
+
+    private void OnMouseOver()
+    {
         
     }
     #region GameLogic
@@ -121,19 +154,50 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    IEnumerator MineBlock(Collider2D block)
+    IEnumerator MineBlock()
     {
-       // yield return new WaitForSeconds(0.5f);
 
-        if (block.gameObject != null)
-        { 
-            Destroy(block.gameObject);
-            
+        int blockHP = 1;
+        Collider2D thisTargetedBlock = TargetedBlock;
+        while (Input.GetMouseButton(0) && TargetedBlock == thisTargetedBlock && TargetedBlock != null)
+        {   
+                if(blockHP == 0)
+                {
+                    Destroy(TargetedBlock.gameObject);
+                }
+                blockHP -= 1;
+                yield return new WaitForSeconds(0.05f);          
         }
-
-        yield return null;
+             
     }
 
+    public Collider2D TargetedBlock
+    {
+        get 
+        {
+            return targetedBlock; 
+
+        }
+
+        set 
+        {
+            targetedBlock = value;
+        }
+    }
+
+    public float DistanceFromPlayerX
+    {
+        get { return distanceFromPlayerx; }
+
+        set { distanceFromPlayerx = value; }
+    }
+
+    public float DistanceFromPlayerY
+    {
+        get { return distanceFromPlayery; }
+
+        set { distanceFromPlayery = value; }
+    }
     #endregion
 
 }
