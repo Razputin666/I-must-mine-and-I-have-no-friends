@@ -157,7 +157,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fbd91a74f4b5aac4d9640579569e58b5, type: 3}
   m_Name: 
@@ -425,10 +425,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cd6e2f0f2c99ee43bc925844273ab21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _width: 200
+  _height: 50
   _distance: 10
   _space: 5
-  _width: 200
-  _height: 25
   _tilePrefabs:
   - {fileID: 3537926155126650661, guid: 012c3ec496b0e2f4e8c4a1eed42063dd, type: 3}
   - {fileID: 3034879164794033841, guid: afb11680ee6ec3c4889e4c314a3fec8c, type: 3}
