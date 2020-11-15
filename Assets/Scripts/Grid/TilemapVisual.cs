@@ -23,14 +23,12 @@ public class TilemapVisual : MonoBehaviour
     private Grid<Tilemap.TilemapObject> grid;
     private Mesh mesh;
     private bool updateMesh;
-
     private Dictionary<Tilemap.TilemapObject.TilemapSprite, UVCoords> uvCoordsDictionary;
 
     private void Awake()
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-
         //Get the width and height from material.
         Texture texture = GetComponent<MeshRenderer>().material.mainTexture;
         float textureWidth = texture.width;
@@ -47,12 +45,19 @@ public class TilemapVisual : MonoBehaviour
         }
     }
 
-    public void SetGrid(Grid<Tilemap.TilemapObject> grid)
+    public void SetGrid(Tilemap tilemap, Grid<Tilemap.TilemapObject> grid)
     {
         this.grid = grid;
         UpdateTilemapVisual();
 
         grid.OnGridObjectChanged += Grid_OnGridValueChanged;
+        //Subscribe to event
+        tilemap.OnLoaded += Tilemap_OnLoaded;
+    }
+
+    public void Tilemap_OnLoaded(object sender, System.EventArgs e)
+    {
+        updateMesh = true;
     }
 
     private void Grid_OnGridValueChanged(object sender, Grid<Tilemap.TilemapObject>.OnGridObjectChangedEventArgs e)
@@ -68,9 +73,28 @@ public class TilemapVisual : MonoBehaviour
             UpdateTilemapVisual();
         }
     }
+    IEnumerator BoxColliderCreator()
+    {
+        for (int x = 0; x < grid.GetWidth(); x++)
+        {
+            for (int y = 0; y < grid.GetHeight(); y++)
+            {
+                Tilemap.TilemapObject gridObject = grid.GetGridObject(x, y);
+
+                if (gridObject.GetBoxCollider2D() == null)
+                {
+                    BoxCollider2D boxColl = gameObject.AddComponent<BoxCollider2D>();
+                    gridObject.SetBoxCollider2D(boxColl);
+                    Debug.Log(boxColl);
+                }
+            }
+        }
+        yield return null;
+    }
 
     private void UpdateTilemapVisual()
     {
+        //StartCoroutine(BoxColliderCreator());
         MeshUtils.CreateEmptyMeshArrays(grid.GetWidth() * grid.GetHeight(), out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
 
         for(int x = 0; x < grid.GetWidth(); x++)
@@ -83,6 +107,7 @@ public class TilemapVisual : MonoBehaviour
 
                 Tilemap.TilemapObject gridObject = grid.GetGridObject(x, y);
                 Tilemap.TilemapObject.TilemapSprite tilemapSprite = gridObject.GetTilemapSprite();
+
                 Vector2 gridUV00, gridUV11;
                 if(tilemapSprite == Tilemap.TilemapObject.TilemapSprite.None)
                 {
