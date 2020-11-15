@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Generator : MonoBehaviour
+public class TerrainGenerator : MonoBehaviour
 {
     //Used in v1
     public int _width;

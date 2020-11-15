@@ -17,7 +17,7 @@ public class TilemapVisual : MonoBehaviour
         public Vector2 uv00;
         public Vector2 uv11;
     }
-    
+ 
     [SerializeField]
     private TilemapSpriteUV[] tilemapSpriteUVArray;
     private Grid<Tilemap.TilemapObject> grid;
@@ -39,8 +39,8 @@ public class TilemapVisual : MonoBehaviour
         {
             uvCoordsDictionary[tilemapSpriteUV._tilemapSprite] = new UVCoords
             {
-                uv00 = new Vector2(tilemapSpriteUV.uv00Pixels.x / textureWidth, tilemapSpriteUV.uv00Pixels.y / textureHeight),
-                uv11 = new Vector2(tilemapSpriteUV.uv11Pixels.x / textureWidth, tilemapSpriteUV.uv11Pixels.y / textureHeight)
+                uv00 = new Vector2((float)tilemapSpriteUV.uv00Pixels.x / textureWidth, (float)tilemapSpriteUV.uv00Pixels.y / textureHeight),
+                uv11 = new Vector2((float)tilemapSpriteUV.uv11Pixels.x / textureWidth, (float)tilemapSpriteUV.uv11Pixels.y / textureHeight)
             };
         }
     }
@@ -73,24 +73,26 @@ public class TilemapVisual : MonoBehaviour
             UpdateTilemapVisual();
         }
     }
-    IEnumerator BoxColliderCreator()
-    {
-        for (int x = 0; x < grid.GetWidth(); x++)
-        {
-            for (int y = 0; y < grid.GetHeight(); y++)
-            {
-                Tilemap.TilemapObject gridObject = grid.GetGridObject(x, y);
+    //IEnumerator BoxColliderCreator()
+    //{
+    //    Collider2D coll = gameObject.AddComponent<Collider2D>();
+        
+    //    for (int x = 0; x < grid.GetWidth(); x++)
+    //    {
+    //        for (int y = 0; y < grid.GetHeight(); y++)
+    //        {
+    //            Tilemap.TilemapObject gridObject = grid.GetGridObject(x, y);
 
-                if (gridObject.GetBoxCollider2D() == null)
-                {
-                    BoxCollider2D boxColl = gameObject.AddComponent<BoxCollider2D>();
-                    gridObject.SetBoxCollider2D(boxColl);
-                    Debug.Log(boxColl);
-                }
-            }
-        }
-        yield return null;
-    }
+    //            if (gridObject.GetBoxCollider2D() == null)
+    //            {
+    //                BoxCollider2D boxColl = gameObject.AddComponent<BoxCollider2D>();
+    //                gridObject.SetBoxCollider2D(boxColl);
+    //                Debug.Log(boxColl);
+    //            }
+    //        }
+    //    }
+    //    yield return null;
+    //}
 
     private void UpdateTilemapVisual()
     {
@@ -102,7 +104,7 @@ public class TilemapVisual : MonoBehaviour
             for(int y = 0; y < grid.GetHeight(); y++)
             {
                 int index = x * grid.GetHeight() + y;
-
+                
                 Vector3 quadSize = new Vector3(1, 1) * grid.GetCellSize();
 
                 Tilemap.TilemapObject gridObject = grid.GetGridObject(x, y);
@@ -122,13 +124,11 @@ public class TilemapVisual : MonoBehaviour
                     gridUV00 = uvCoords.uv00;
                     gridUV11 = uvCoords.uv11;
                 }
-                MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, grid.GetWorldPosition(x, y) + quadSize * .5f, 0f, quadSize, gridUV00, gridUV11);
+                MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, grid.GetWorldPosition(x, y) + quadSize * 0.5f, 0f, quadSize, gridUV00, gridUV11);
             }
         }
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = triangles;
     }
-
 }
-

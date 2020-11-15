@@ -121,15 +121,17 @@ public class Tilemap
         public void SetTilemapSprite(TilemapSprite tilemapSprite)
         {
             this.tilemapSprite = tilemapSprite;
-            if (tilemapSprite != TilemapSprite.None)
+            if(this.boxCollider2D != null)
             {
-                this.boxCollider2D.enabled = true;
+                if (tilemapSprite != TilemapSprite.None)
+                {
+                    this.boxCollider2D.enabled = true;
+                }
+                else
+                {
+                    this.boxCollider2D.enabled = false;
+                }
             }
-            else
-            {
-                this.boxCollider2D.enabled = false;
-            }
-
             grid.TriggerGridObjectChanged(x, y);
         }
 
@@ -148,8 +150,6 @@ public class Tilemap
             public TilemapSprite _tilemapSprite;
             public int x;
             public int y;
-
-            
         }
         // Save - Load
         public SaveObject Save()
