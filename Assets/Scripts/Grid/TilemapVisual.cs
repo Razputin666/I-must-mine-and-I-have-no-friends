@@ -33,12 +33,12 @@ public class TilemapVisual : MonoBehaviour
         Texture texture = GetComponent<MeshRenderer>().material.mainTexture;
         float textureWidth = texture.width;
         float textureHeight = texture.height;
-
         uvCoordsDictionary = new Dictionary<Tilemap.TilemapObject.TilemapSprite, UVCoords>();
         foreach (TilemapSpriteUV tilemapSpriteUV in tilemapSpriteUVArray)
         {
             uvCoordsDictionary[tilemapSpriteUV._tilemapSprite] = new UVCoords
             {
+                //Normalize the Uv Coordinates
                 uv00 = new Vector2((float)tilemapSpriteUV.uv00Pixels.x / textureWidth, (float)tilemapSpriteUV.uv00Pixels.y / textureHeight),
                 uv11 = new Vector2((float)tilemapSpriteUV.uv11Pixels.x / textureWidth, (float)tilemapSpriteUV.uv11Pixels.y / textureHeight)
             };
@@ -98,27 +98,29 @@ public class TilemapVisual : MonoBehaviour
     {
         //StartCoroutine(BoxColliderCreator());
         MeshUtils.CreateEmptyMeshArrays(grid.GetWidth() * grid.GetHeight(), out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
-
-        for(int x = 0; x < grid.GetWidth(); x++)
+        
+        for (int x = 0; x < grid.GetWidth(); x++)
         {
             for(int y = 0; y < grid.GetHeight(); y++)
             {
                 int index = x * grid.GetHeight() + y;
                 
                 Vector3 quadSize = new Vector3(1, 1) * grid.GetCellSize();
-
+                Vector3 baseSize = quadSize;
                 Tilemap.TilemapObject gridObject = grid.GetGridObject(x, y);
                 Tilemap.TilemapObject.TilemapSprite tilemapSprite = gridObject.GetTilemapSprite();
 
                 Vector2 gridUV00, gridUV11;
                 if(tilemapSprite == Tilemap.TilemapObject.TilemapSprite.None)
                 {
+                    //if no tile set the texture coordinates to 0 and dont render
                     gridUV00 = Vector2.zero;
                     gridUV11 = Vector2.zero;
                     quadSize = Vector3.zero;
                 }
                 else
                 {
+                    //Lookup the uv Coordinates for the tilemapSprite.
                     UVCoords uvCoords = uvCoordsDictionary[tilemapSprite];
 
                     gridUV00 = uvCoords.uv00;
@@ -127,6 +129,7 @@ public class TilemapVisual : MonoBehaviour
                 MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, grid.GetWorldPosition(x, y) + quadSize * 0.5f, 0f, quadSize, gridUV00, gridUV11);
             }
         }
+
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = triangles;

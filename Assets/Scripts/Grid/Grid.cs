@@ -29,12 +29,13 @@ public class Grid<TGridObject>
 
         for (int x = 0; x < gridArray.GetLength(0); x++) 
         {
-            for (int y = 0; y < gridArray.GetLength(1); y++) {
+            for (int y = 0; y < gridArray.GetLength(1); y++) 
+            {
                 gridArray[x, y] = createGridObject(this, x, y);
             }
         }
 
-        bool showDebug = true;
+        bool showDebug = false;
         if (showDebug) 
         {
             TextMesh[,] debugTextArray = new TextMesh[width, height];

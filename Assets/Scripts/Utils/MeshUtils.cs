@@ -110,14 +110,13 @@ public static class MeshUtils {
     public static void AddToMeshArrays(Vector3[] vertices, Vector2[] uvs, int[] triangles, int index, Vector3 pos, float rot, Vector3 baseSize, Vector2 uv00, Vector2 uv11) 
 	{
 		//Relocate vertices
-		int vIndex = index*4;
+		int vIndex = index * 4;
 		int vIndex0 = vIndex;
 		int vIndex1 = vIndex+1;
 		int vIndex2 = vIndex+2;
 		int vIndex3 = vIndex+3;
-		
-        baseSize *= .5f;
 
+        baseSize *= .5f;
 		bool skewed =  baseSize.x != baseSize.y;
         if (skewed) 
 		{
@@ -132,7 +131,6 @@ public static class MeshUtils {
             vertices[vIndex1] = pos + GetQuaternionEuler(rot - 180) * baseSize;
             vertices[vIndex2] = pos + GetQuaternionEuler(rot - 90) * baseSize;
             vertices[vIndex3] = pos + GetQuaternionEuler(rot - 0) * baseSize;
-
         }
 		
 		//Relocate UVs
@@ -144,12 +142,28 @@ public static class MeshUtils {
 		//Create triangles
 		int tIndex = index*6;
 
-        triangles[tIndex + 0] = vIndex0;
-        triangles[tIndex + 1] = vIndex3;
-        triangles[tIndex + 2] = vIndex1;
+        // lower left triangle
+        //0, 2, 1,
+        // upper right triangle
+        //2, 3, 1
 
-        triangles[tIndex + 3] = vIndex1;
-        triangles[tIndex + 4] = vIndex3;
-        triangles[tIndex + 5] = vIndex2;
+        triangles[tIndex + 0] = vIndex1;
+        triangles[tIndex + 1] = vIndex0;
+        triangles[tIndex + 2] = vIndex3;
+
+        triangles[tIndex + 3] = vIndex3;
+        triangles[tIndex + 4] = vIndex2;
+        triangles[tIndex + 5] = vIndex1;
+
+        // Default generation of triangles
+
+        //triangles[tIndex + 0] = vIndex0;
+        //triangles[tIndex + 1] = vIndex3;
+        //triangles[tIndex + 2] = vIndex1;
+
+        //triangles[tIndex + 3] = vIndex1;
+        //triangles[tIndex + 4] = vIndex3;
+        //triangles[tIndex + 5] = vIndex2;
+
     }
 }

@@ -5,10 +5,18 @@ using UnityEngine;
 public class TerrainGenerator : MonoBehaviour
 {
     //Used in v1
-    public int _width;
-    public int _height;
+    [SerializeField]
+    private int _width;
+    [SerializeField]
+    private int _height;
     public int _distance;
     public int _space;
+    [SerializeField]
+    private float _cellsize = 5f;
+    [SerializeField]
+    private int _chunkWidth = 10;
+    [SerializeField]
+    private int _chunkHeight = 10;
 
     [SerializeField]
     public GameObject[] _tilePrefabs;
@@ -17,6 +25,7 @@ public class TerrainGenerator : MonoBehaviour
     //Used in v2
     private Tilemap _tilemap;
 
+    private TilemapChunks _tilemapChunks;
     [SerializeField]
     private TilemapVisual _tilemapVisual;
 
@@ -37,8 +46,9 @@ public class TerrainGenerator : MonoBehaviour
         {
             GenerateTilesV2();
 
-            _tilemap = new Tilemap(_width, _height, 5f, Vector3.zero, tilemapSpritearray);
-            _tilemap.SetTilemapVisual(_tilemapVisual);
+            _tilemapChunks = new TilemapChunks(_width, _height, _chunkWidth, _chunkHeight, _cellsize, Vector3.zero, tilemapSpritearray, _tilemapVisual);
+            //_tilemap = new Tilemap(_width, _height, 5f, Vector3.zero, tilemapSpritearray);
+            //_tilemap.SetTilemapVisual(_tilemapVisual);
         }
         else
         {
@@ -88,7 +98,6 @@ public class TerrainGenerator : MonoBehaviour
                 Debug.Log("Loaded!");
             }
         }
-        
     }
 
     int NoiseInt(int x, int y, float scale, float mag, float exp)
@@ -99,6 +108,30 @@ public class TerrainGenerator : MonoBehaviour
     private void GenerateTilesV2()
     {
         tilemapSpritearray = new Tilemap.TilemapObject.TilemapSprite[_width, _height];
+
+        //int w = _width / 4;
+        //for(int x = 0; x < tilemapSpritearray.GetLength(0);  x++)
+        //{
+        //    for (int y = 0; y < tilemapSpritearray.GetLength(1); y++)
+        //    {
+        //        if(x < w)
+        //        {
+        //            tilemapSpritearray[x, y] = Tilemap.TilemapObject.TilemapSprite.Grass;
+        //        }
+        //        else if(x < w * 2)
+        //        {
+        //            tilemapSpritearray[x, y] = Tilemap.TilemapObject.TilemapSprite.Dirt;
+        //        }
+        //        else if(x < w * 3)
+        //        {
+        //            tilemapSpritearray[x, y] = Tilemap.TilemapObject.TilemapSprite.Stone;
+        //        }
+        //        else
+        //        {
+        //            tilemapSpritearray[x, y] = Tilemap.TilemapObject.TilemapSprite.None;
+        //        }
+        //    }
+        //}
 
         for (int px = 0; px < tilemapSpritearray.GetLength(0); px++)
         {
