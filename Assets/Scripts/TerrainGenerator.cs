@@ -21,7 +21,8 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField]
     public GameObject[] _tilePrefabs;
     public GameObject _tileContainer;
-    
+
+
     //Used in v2
     private Tilemap _tilemap;
 
@@ -164,13 +165,11 @@ public class TerrainGenerator : MonoBehaviour
                     if (NoiseInt(px, py, 12, 16, 1) > 10)
                     {  //dirt spots
                         tilemapSpritearray[px, py] = Tilemap.TilemapObject.TilemapSprite.Dirt;
-
                     }
                     //The next three lines remove dirt and rock to make caves in certain places
                     if (NoiseInt(px, py * 2, 16, 14, 1) > 10)
                     { //Caves
                         tilemapSpritearray[px, py] = Tilemap.TilemapObject.TilemapSprite.None;
-
                     }
                 }
                 else if (py < dirt)
@@ -180,4 +179,6 @@ public class TerrainGenerator : MonoBehaviour
             }
         }
     }
+
+
 }
