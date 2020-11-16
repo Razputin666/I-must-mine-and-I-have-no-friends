@@ -165,5 +165,13 @@ public class TilemapVisual : MonoBehaviour
        // gameObject.GetComponent<MeshRenderer>().transform.position
     }
 
+    public Tilemap.TilemapObject GetGridObjectAtXY(int x, int y)
+    {
+        return grid.GetGridObject(x, y);
+    }
+    public Tilemap.TilemapObject GetGridObjectAtXY(Vector3 position)
+    {
+        return grid.GetGridObject(position);
+    }
 
 }

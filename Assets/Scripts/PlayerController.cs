@@ -153,13 +153,21 @@ public class PlayerController : MonoBehaviour
         int blockHP = 1;
         Collider2D thisTargetedBlock = TargetedBlock;
         while (Input.GetMouseButton(0) && TargetedBlock == thisTargetedBlock && TargetedBlock != null)
-        {   
-                if(blockHP == 0)
-                {
-                    Destroy(TargetedBlock.gameObject);
-                }
-                blockHP -= 1;
-                yield return new WaitForSeconds(0.05f);          
+        {
+            
+            if(blockHP == 0)
+            {
+                TilemapVisual tilemapVisual = targetedBlock.transform.parent.GetComponent<TilemapVisual>();
+                if (tilemapVisual != null)
+                    Debug.Log("not null");
+                Tilemap.TilemapObject tilemapObject = tilemapVisual.GetGridObjectAtXY(targetedBlock.transform.position);
+                if (tilemapObject != null)
+                    tilemapObject.SetTilemapSprite(Tilemap.TilemapObject.TilemapSprite.None);
+
+                Destroy(TargetedBlock.gameObject);
+            }
+            blockHP -= 1;
+            yield return new WaitForSeconds(0.05f);          
         }
              
     }
