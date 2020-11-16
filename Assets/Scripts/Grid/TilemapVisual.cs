@@ -25,6 +25,14 @@ public class TilemapVisual : MonoBehaviour
     private bool updateMesh;
     private Dictionary<Tilemap.TilemapObject.TilemapSprite, UVCoords> uvCoordsDictionary;
 
+    [SerializeField]
+    private TerrainGenerator terrainGenerator;
+
+
+    [SerializeField]
+    public GameObject tileBlock;
+    
+
     private void Awake()
     {
         mesh = new Mesh();
@@ -76,7 +84,7 @@ public class TilemapVisual : MonoBehaviour
     //IEnumerator BoxColliderCreator()
     //{
     //    Collider2D coll = gameObject.AddComponent<Collider2D>();
-        
+
     //    for (int x = 0; x < grid.GetWidth(); x++)
     //    {
     //        for (int y = 0; y < grid.GetHeight(); y++)
@@ -98,7 +106,6 @@ public class TilemapVisual : MonoBehaviour
     {
         //StartCoroutine(BoxColliderCreator());
         MeshUtils.CreateEmptyMeshArrays(grid.GetWidth() * grid.GetHeight(), out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
-        
         for (int x = 0; x < grid.GetWidth(); x++)
         {
             for(int y = 0; y < grid.GetHeight(); y++)
@@ -108,7 +115,18 @@ public class TilemapVisual : MonoBehaviour
                 Vector3 quadSize = new Vector3(1, 1) * grid.GetCellSize();
                 Vector3 baseSize = quadSize;
                 Tilemap.TilemapObject gridObject = grid.GetGridObject(x, y);
+
                 Tilemap.TilemapObject.TilemapSprite tilemapSprite = gridObject.GetTilemapSprite();
+
+
+                //GameObject newBlock =  tileBlock;
+               // if(terrainGenerator.BlockSpawnAble)
+               // Instantiate(tileBlock, grid.GetWorldPosition(x,y), Quaternion.identity, gameObject.transform);
+
+                //if(newBlock.transform.position != tileBlock.transform.position || tileBlock == null)
+                //{
+                //    Instantiate(newBlock, gameObject.transform, false);
+                //}
 
                 Vector2 gridUV00, gridUV11;
                 if(tilemapSprite == Tilemap.TilemapObject.TilemapSprite.None)
@@ -123,6 +141,7 @@ public class TilemapVisual : MonoBehaviour
                     //Lookup the uv Coordinates for the tilemapSprite.
                     UVCoords uvCoords = uvCoordsDictionary[tilemapSprite];
 
+                    Instantiate(tileBlock, grid.GetWorldPosition(x, y), Quaternion.identity, gameObject.transform);
                     gridUV00 = uvCoords.uv00;
                     gridUV11 = uvCoords.uv11;
                 }
@@ -133,5 +152,18 @@ public class TilemapVisual : MonoBehaviour
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = triangles;
+
+        Grid theGrid = gameObject.GetComponent<Grid>();
+        Vector3 sizeOfCell = new Vector3(grid.GetCellSize(), grid.GetCellSize());
+        theGrid.cellSize = sizeOfCell;
+        BoxCollider2D collider = gameObject.GetComponent<BoxCollider2D>();
+       // CompositeCollider2D tileCollider = gameObject.GetComponent<CompositeCollider2D>();
+        Vector2 sizeOfMap = new Vector2(250, 250);
+      //  Tilemap tilemap = gameObject.GetComponent<Tilemap>();
+       // Instantiate(tileBlock,)
+        collider.size = sizeOfMap /100;
+       // gameObject.GetComponent<MeshRenderer>().transform.position
     }
+
+
 }
