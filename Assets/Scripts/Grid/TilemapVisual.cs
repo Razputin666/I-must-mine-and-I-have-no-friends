@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class TilemapVisual : MonoBehaviour 
 {
@@ -25,13 +26,21 @@ public class TilemapVisual : MonoBehaviour
     private bool updateMesh;
     private Dictionary<Tilemap.TilemapObject.TilemapSprite, UVCoords> uvCoordsDictionary;
 
+    private bool colliderHasGenerated;
+
+
     [SerializeField]
     private TerrainGenerator terrainGenerator;
+
+    [SerializeField]
+    private ColliderManager colliderManager;
 
 
     [SerializeField]
     public GameObject tileBlock;
-    
+    GameObject[,] tileBlocks;
+
+
 
     private void Awake()
     {
@@ -106,6 +115,13 @@ public class TilemapVisual : MonoBehaviour
     {
         //StartCoroutine(BoxColliderCreator());
         MeshUtils.CreateEmptyMeshArrays(grid.GetWidth() * grid.GetHeight(), out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
+
+        if (tileBlocks != null)
+            Array.Clear(tileBlocks, 0, tileBlocks.Length - 1);
+
+        if (!colliderHasGenerated)
+            tileBlocks = new GameObject[grid.GetWidth(),grid.GetHeight()];
+
         for (int x = 0; x < grid.GetWidth(); x++)
         {
             for(int y = 0; y < grid.GetHeight(); y++)
@@ -118,15 +134,14 @@ public class TilemapVisual : MonoBehaviour
 
                 Tilemap.TilemapObject.TilemapSprite tilemapSprite = gridObject.GetTilemapSprite();
 
+                if (!colliderHasGenerated) 
+                {
 
-                //GameObject newBlock =  tileBlock;
-               // if(terrainGenerator.BlockSpawnAble)
-               // Instantiate(tileBlock, grid.GetWorldPosition(x,y), Quaternion.identity, gameObject.transform);
+                     tileBlocks[x, y] = Instantiate(tileBlock, grid.GetWorldPosition(x, y), Quaternion.identity, gameObject.transform);  
 
-                //if(newBlock.transform.position != tileBlock.transform.position || tileBlock == null)
-                //{
-                //    Instantiate(newBlock, gameObject.transform, false);
-                //}
+                }
+            
+
 
                 Vector2 gridUV00, gridUV11;
                 if(tilemapSprite == Tilemap.TilemapObject.TilemapSprite.None)
@@ -135,18 +150,21 @@ public class TilemapVisual : MonoBehaviour
                     gridUV00 = Vector2.zero;
                     gridUV11 = Vector2.zero;
                     quadSize = Vector3.zero;
+                    tileBlocks[x, y].SetActive(false);
                 }
                 else
                 {
                     //Lookup the uv Coordinates for the tilemapSprite.
                     UVCoords uvCoords = uvCoordsDictionary[tilemapSprite];
 
-                    Instantiate(tileBlock, grid.GetWorldPosition(x, y), Quaternion.identity, gameObject.transform);
+                    //Instantiate(tileBlock, grid.GetWorldPosition(x, y), Quaternion.identity, gameObject.transform);
                     gridUV00 = uvCoords.uv00;
                     gridUV11 = uvCoords.uv11;
+                    tileBlocks[x, y].SetActive(true);
                 }
                 MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, grid.GetWorldPosition(x, y) + quadSize * 0.5f, 0f, quadSize, gridUV00, gridUV11);
             }
+            
         }
 
         mesh.vertices = vertices;
@@ -158,12 +176,15 @@ public class TilemapVisual : MonoBehaviour
         theGrid.cellSize = sizeOfCell;
         BoxCollider2D collider = gameObject.GetComponent<BoxCollider2D>();
        // CompositeCollider2D tileCollider = gameObject.GetComponent<CompositeCollider2D>();
-        Vector2 sizeOfMap = new Vector2(250, 250);
-      //  Tilemap tilemap = gameObject.GetComponent<Tilemap>();
-       // Instantiate(tileBlock,)
+        Vector2 sizeOfMap = new Vector2(250, 250); // sizeOfMap ska vara (width * 10) / 2, (height * 10) / 2
         collider.size = sizeOfMap /100;
-       // gameObject.GetComponent<MeshRenderer>().transform.position
+        // gameObject.GetComponent<MeshRenderer>().transform.position
+        colliderHasGenerated = true;
+        // colliderManager.bwatevs(tileBlocks, grid.GetWidth(), grid.GetHeight());
+        
     }
+
+
 
     public Tilemap.TilemapObject GetGridObjectAtXY(int x, int y)
     {

@@ -99,6 +99,11 @@ public class Grid<TGridObject>
         return cellSize;
     }
 
+    public Vector2 GetCellSizeAsVector2()
+    {
+        return new Vector2(cellSize,cellSize);
+    }
+
     public Vector3 GetWorldPosition(int x, int y) 
     {
         return new Vector3(x, y) * cellSize + originPosition;
