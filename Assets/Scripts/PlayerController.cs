@@ -80,14 +80,14 @@ public class PlayerController : MonoBehaviour
                 TargetedBlock = precisionModeRay.collider;
                 if (TargetedBlock != null)
                 { 
-                float playerPositionX = Mathf.Abs(transform.position.x);
-                float playerPositionY = Mathf.Abs(transform.position.y);
+                    float playerPositionX = Mathf.Abs(transform.position.x);
+                    float playerPositionY = Mathf.Abs(transform.position.y);
 
-                float blockPositionX = Mathf.Abs(TargetedBlock.transform.position.x);
-                float blockPositionY = Mathf.Abs(TargetedBlock.transform.position.y);
+                    float blockPositionX = Mathf.Abs(TargetedBlock.transform.position.x);
+                    float blockPositionY = Mathf.Abs(TargetedBlock.transform.position.y);
 
-                DistanceFromPlayerX = Mathf.Abs(playerPositionX - blockPositionX);
-                DistanceFromPlayerY = Mathf.Abs(playerPositionY - blockPositionY);
+                    DistanceFromPlayerX = Mathf.Abs(playerPositionX - blockPositionX);
+                    DistanceFromPlayerY = Mathf.Abs(playerPositionY - blockPositionY);
 
                 }
           
@@ -147,22 +147,25 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator MineBlock()
     {
-
         int blockHP = 1;
         Collider2D thisTargetedBlock = TargetedBlock;
         while (Input.GetMouseButton(0) && TargetedBlock == thisTargetedBlock && TargetedBlock != null)
         {
-            
             if(blockHP == 0)
             {
                 TilemapVisual tilemapVisual = targetedBlock.transform.parent.GetComponent<TilemapVisual>();
                 if (tilemapVisual != null)
-                    Debug.Log("not null");
-                Tilemap.TilemapObject tilemapObject = tilemapVisual.GetGridObjectAtXY(targetedBlock.transform.position);
-                if (tilemapObject != null)
-                    tilemapObject.SetTilemapSprite(Tilemap.TilemapObject.TilemapSprite.None);
+                {
+                    Tilemap.TilemapObject tilemapObject = tilemapVisual.GetGridObjectAtXY(targetedBlock.transform.position);
+                    if (tilemapObject != null)
+                    {
+                        tilemapObject.SetTilemapSprite(Tilemap.TilemapObject.TilemapSprite.None);
 
-                Destroy(TargetedBlock.gameObject);
+
+                        Destroy(TargetedBlock.gameObject);
+                    }  
+                }
+                
             }
             blockHP -= 1;
             yield return new WaitForSeconds(0.05f);          
