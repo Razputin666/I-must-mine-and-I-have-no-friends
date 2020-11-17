@@ -31,7 +31,8 @@ public class TilemapVisual : MonoBehaviour
 
     [SerializeField]
     public GameObject tileBlock;
-    
+
+    bool created;
 
     private void Awake()
     {
@@ -81,6 +82,36 @@ public class TilemapVisual : MonoBehaviour
             UpdateTilemapVisual();
         }
     }
+
+    //private void Update()
+    //{
+
+    //    if (created)
+    //    {
+    //        float x = Camera.main.transform.position.x;
+    //        float y = Camera.main.transform.position.x;
+
+    //        Vector3 worldPosBL = grid.GetWorldPosition(0, 0);
+    //        Vector3 worldPosBR = grid.GetWorldPosition(grid.GetWidth(), 0);
+    //        Vector3 worldPosTL = grid.GetWorldPosition(0, grid.GetHeight());
+    //        Vector3 worldPosTR = grid.GetWorldPosition(grid.GetWidth(), grid.GetHeight());
+
+    //        //Debug.LogError("1: " + worldPosBL + " : " + worldPosBR);
+    //        //Debug.LogError("2: " + worldPosTL + " : " + worldPosTR);
+
+    //        if ((x >= worldPosBL.x && x <= worldPosTR.x) && (y >= worldPosBL.y && y <= worldPosTR.y))
+    //        {
+    //            Debug.Log("1: " + worldPosBL + " : " + worldPosTR);
+    //            Debug.Log("2: " + x + " : " + y);
+    //            GetComponent<MeshRenderer>().enabled = true;
+    //        }
+    //        else
+    //        {
+    //            GetComponent<MeshRenderer>().enabled = false;
+    //        }
+    //    }
+    //}
+
     //IEnumerator BoxColliderCreator()
     //{
     //    Collider2D coll = gameObject.AddComponent<Collider2D>();
@@ -118,7 +149,6 @@ public class TilemapVisual : MonoBehaviour
 
                 Tilemap.TilemapObject.TilemapSprite tilemapSprite = gridObject.GetTilemapSprite();
 
-
                 //GameObject newBlock =  tileBlock;
                // if(terrainGenerator.BlockSpawnAble)
                // Instantiate(tileBlock, grid.GetWorldPosition(x,y), Quaternion.identity, gameObject.transform);
@@ -149,6 +179,7 @@ public class TilemapVisual : MonoBehaviour
             }
         }
 
+
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = triangles;
@@ -162,7 +193,9 @@ public class TilemapVisual : MonoBehaviour
       //  Tilemap tilemap = gameObject.GetComponent<Tilemap>();
        // Instantiate(tileBlock,)
         collider.size = sizeOfMap /100;
-       // gameObject.GetComponent<MeshRenderer>().transform.position
+        // gameObject.GetComponent<MeshRenderer>().transform.position
+
+        created = true;
     }
 
     public Tilemap.TilemapObject GetGridObjectAtXY(int x, int y)

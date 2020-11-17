@@ -46,6 +46,7 @@ public class TilemapChunks
                 
                 //Clone the tilemapvisual for the tilemap
                 TilemapVisual tilemapVisualClone = TilemapVisual.Instantiate(tilemapVisual);
+                //tilemapVisualClone.transform.parent = tilemapVisual.transform;
                 Tilemap.TilemapObject.TilemapSprite[,] tilemapSpriteArrayCopy = GenerateSpriteCopy(x, y, tilemapSpritearray);
                 //Create a new tilemap chunk
                 Tilemap tilemap = new Tilemap(_chunkWidth, _chunkHeight, cellSize, chunkStartPosition, tilemapSpriteArrayCopy);
