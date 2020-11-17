@@ -116,8 +116,8 @@ public class TilemapVisual : MonoBehaviour
         //StartCoroutine(BoxColliderCreator());
         MeshUtils.CreateEmptyMeshArrays(grid.GetWidth() * grid.GetHeight(), out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
 
-        if (tileBlocks != null)
-            Array.Clear(tileBlocks, 0, tileBlocks.Length - 1);
+        //if (tileBlocks != null)
+        //    Array.Clear(tileBlocks, 0, tileBlocks.Length - 1);
 
         if (!colliderHasGenerated)
             tileBlocks = new GameObject[grid.GetWidth(),grid.GetHeight()];
@@ -134,13 +134,13 @@ public class TilemapVisual : MonoBehaviour
 
                 Tilemap.TilemapObject.TilemapSprite tilemapSprite = gridObject.GetTilemapSprite();
 
-                if (!colliderHasGenerated) 
+                if (!colliderHasGenerated)
                 {
 
-                     tileBlocks[x, y] = Instantiate(tileBlock, grid.GetWorldPosition(x, y), Quaternion.identity, gameObject.transform);  
+                    tileBlocks[x, y] = Instantiate(tileBlock, grid.GetWorldPosition(x, y), Quaternion.identity, gameObject.transform);
 
                 }
-            
+
 
 
                 Vector2 gridUV00, gridUV11;
@@ -150,14 +150,14 @@ public class TilemapVisual : MonoBehaviour
                     gridUV00 = Vector2.zero;
                     gridUV11 = Vector2.zero;
                     quadSize = Vector3.zero;
-                    tileBlocks[x, y].SetActive(false);
+                   tileBlocks[x, y].SetActive(false);
                 }
                 else
                 {
                     //Lookup the uv Coordinates for the tilemapSprite.
                     UVCoords uvCoords = uvCoordsDictionary[tilemapSprite];
 
-                    //Instantiate(tileBlock, grid.GetWorldPosition(x, y), Quaternion.identity, gameObject.transform);
+                  //  Instantiate(tileBlock, grid.GetWorldPosition(x, y), Quaternion.identity, gameObject.transform);
                     gridUV00 = uvCoords.uv00;
                     gridUV11 = uvCoords.uv11;
                     tileBlocks[x, y].SetActive(true);
