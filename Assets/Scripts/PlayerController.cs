@@ -162,7 +162,7 @@ public class PlayerController : MonoBehaviour
                         tilemapObject.SetTilemapSprite(Tilemap.TilemapObject.TilemapSprite.None);
 
 
-                        Destroy(TargetedBlock.gameObject);
+                        //Destroy(TargetedBlock.gameObject);
                     }  
                 }
                 
