@@ -64,8 +64,6 @@ public class PlayerController : MonoBehaviour
             rb2d.velocity = Vector2.up * jumpVelocity;
         }
 
-        if (Input.GetKey(KeyCode.Space))
-            unitMode = UnitMode.Mining;
 
         switch(unitMode)
         {
