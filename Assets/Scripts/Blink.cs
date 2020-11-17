@@ -24,18 +24,18 @@ public class Blink : MonoBehaviour
         {
             flashingText.text = "Blackened Stars";
             int i = 255;
-            for (; i > 100; i--)
+            for (; i > 50; i--)
             {
                 float j =(float)i / (float)255;
                 flashingText.color = new Color(1, 1, 1, j);
-                Debug.Log(j);
+               // Debug.Log(j);
                 yield return new WaitForSeconds(0.01f);
             }
             for (; i < 249; i++)
             {
                 float j = (float)i / (float)255;
                 flashingText.color = new Color(1, 1, 1, j);
-                Debug.Log(j);
+               // Debug.Log(j);
                 yield return new WaitForSeconds(0.01f);
             }
           //  for (; i == 254; i++)
