@@ -34,14 +34,10 @@ public class TilemapVisual : MonoBehaviour
 
     //[SerializeField]
     //private ColliderManager colliderManager;
-
-
+    
     [SerializeField]
     public GameObject tileBlock;
     GameObject[,] tileBlocks;
-
-
-
     private void Awake()
     {
         mesh = new Mesh();
@@ -170,9 +166,6 @@ public class TilemapVisual : MonoBehaviour
                     tileBlocks[x, y] = Instantiate(tileBlock, grid.GetWorldPosition(x, y), Quaternion.identity, gameObject.transform);
 
                 }
-
-
-
                 Vector2 gridUV00, gridUV11;
                 if(tilemapSprite == Tilemap.TilemapObject.TilemapSprite.None)
                 {
@@ -180,7 +173,8 @@ public class TilemapVisual : MonoBehaviour
                     gridUV00 = Vector2.zero;
                     gridUV11 = Vector2.zero;
                     quadSize = Vector3.zero;
-                   tileBlocks[x, y].SetActive(false);
+                    tileBlocks[x, y].SetActive(false);
+                    tileBlocks[x, y].GetComponent<BoxCollider2D>().enabled = false;
                 }
                 else
                 {
@@ -191,13 +185,12 @@ public class TilemapVisual : MonoBehaviour
                     gridUV00 = uvCoords.uv00;
                     gridUV11 = uvCoords.uv11;
                     tileBlocks[x, y].SetActive(true);
+                    tileBlocks[x, y].GetComponent<BoxCollider2D>().enabled = true;
                 }
                 MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, grid.GetWorldPosition(x, y) + quadSize * 0.5f, 0f, quadSize, gridUV00, gridUV11);
             }
             
         }
-
-
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = triangles;
@@ -212,7 +205,6 @@ public class TilemapVisual : MonoBehaviour
         // gameObject.GetComponent<MeshRenderer>().transform.position
         colliderHasGenerated = true;
         // colliderManager.bwatevs(tileBlocks, grid.GetWidth(), grid.GetHeight());
-        
     }
 
 
