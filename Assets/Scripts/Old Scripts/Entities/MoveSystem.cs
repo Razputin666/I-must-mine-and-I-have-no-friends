@@ -42,13 +42,14 @@ using Unity.Transforms;
 //    }
 //}
 
-public class AABBCollisionSystem : SystemBase
-{
-    protected override void OnUpdate()
-    {
-        Entities.ForEach((Entity entity, in AABBComponent aabb) =>
-        {
-
-        }).Run();
-    }
-}
+//public class AABBCollisionSystem : SystemBase
+//{
+//    protected override void OnUpdate()
+//    {
+//NativeQueue<Entity> entities = new NativeQueue<Entity>(Allocator.TempJob);
+//Entities.ForEach((Entity entity, in AABBComponent aabb) =>
+//{
+//    entities.Enqueue(entity);
+//}).Run();
+//    }
+//}
