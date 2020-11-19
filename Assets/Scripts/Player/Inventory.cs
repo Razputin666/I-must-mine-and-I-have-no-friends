@@ -17,8 +17,6 @@ public class Inventory : MonoBehaviour
     private void Start()
     {
         numberOfSlots = inventoryUI.GetMaxSlots();
-        AddItem(0);
-        AddItem(1);
     }
 
     private void Update()

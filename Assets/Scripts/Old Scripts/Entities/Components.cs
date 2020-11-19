@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Entities;
-//public struct LevelComponent : IComponentData
-//{
-//    public float level;
-//}
+using Unity.Mathematics;
+
+public struct AABBComponent : IComponentData
+{
+    //AABB box;
+    public float3 min;
+    public float3 max;
+}

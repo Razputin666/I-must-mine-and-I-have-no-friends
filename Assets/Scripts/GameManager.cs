@@ -5,7 +5,7 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Collections;
 using Unity.Rendering;
-using Unity.Jobs;
+using Unity.Mathematics;
 
 public class GameManager : MonoBehaviour
 {
@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
         generatedTiles = terrainGenerator.GetGeneratedTiles();
         entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-        NativeArray<Entity> entityArray = new NativeArray<Entity>(width * height, Allocator.Temp);
+        //NativeArray<Entity> entityArray = new NativeArray<Entity>(width * height, Allocator.Temp);
 
         //EntityArchetype entityArchetype = entityManager.CreateArchetype(
         //    typeof(RenderMesh),
@@ -60,40 +60,27 @@ public class GameManager : MonoBehaviour
         Mesh mesh = CreateMesh(cellSize, cellSize);
         
         //entityManager.CreateEntity(entityArchetype, entityArray);
-        Unity.Mathematics.float3 originPos = Unity.Mathematics.float3.zero;
-        int index = 0;
+        float3 originPos = Unity.Mathematics.float3.zero;
+
         for (int x = 0; x < width; x++)
         {
             StartCoroutine(CreateEntities(mesh, originPos, x, height));
-
-            index += height;
-            //for (int y = 0; y < height; y++)
-            //{
-            //    Unity.Mathematics.float3 startPos = new Unity.Mathematics.float3(x * cellSize, y * cellSize, 0) + originPos;
-
-            //    Entity entity = entityArray[index++];
-
-            //    int matIndex = (int)generatedTiles[x, y];
-
-            //    Material material = materials[matIndex];
-
-            //    entityManager.SetSharedComponentData(entity, new RenderMesh
-            //    {
-            //        mesh = mesh,
-            //        material = material,
-            //    });
-
-            //    entityManager.SetComponentData(entity, new Translation
-            //    {
-            //        Value = startPos
-            //    });
-            //}
         }
-        Debug.Log(index);
-        entityArray.Dispose();
+        //SystemTest();
     }
 
-    IEnumerator CreateEntities(Mesh mesh, Unity.Mathematics.float3 originPosition, int x, int height)
+    //private void SystemTest()
+    //{
+        //World defaultWorld = World.DefaultGameObjectInjectionWorld;
+        //create or get a system group (initialization, Simulation, Presentation)
+        //SimulationSystemGroup systemGroup = defaultWorld.GetOrCreateSystem<SimulationSystemGroup>();
+        //Create system and add to update list
+        //systemGroup.AddSystemToUpdateList(defaultWorld.GetOrCreateSystem<EntityTileCreationJob>());
+        //Remove system from update and destroy it
+        //systemGroup.RemoveSystemFromUpdateList(defaultWorld.GetOrCreateSystem<EntityTileCreationJob>());
+        //defaultWorld.DestroySystem(defaultWorld.GetExistingSystem<EntityTileCreationJob>());
+    //}
+    IEnumerator CreateEntities(Mesh mesh, float3 originPosition, int x, int height)
     {
         NativeArray<Entity> entityArray = new NativeArray<Entity>(height, Allocator.Temp);
 
@@ -101,7 +88,8 @@ public class GameManager : MonoBehaviour
             typeof(RenderMesh),
             typeof(LocalToWorld),
             typeof(Translation),
-            typeof(RenderBounds)
+            typeof(RenderBounds),
+            typeof(AABBComponent)
             );
 
         int index = 0;
@@ -126,6 +114,12 @@ public class GameManager : MonoBehaviour
             entityManager.SetComponentData(entity, new Translation
             {
                 Value = startPos
+            });
+
+            entityManager.SetComponentData(entity, new AABBComponent
+            {
+                min = startPos,
+                max = startPos + cellSize
             });
         }
 
