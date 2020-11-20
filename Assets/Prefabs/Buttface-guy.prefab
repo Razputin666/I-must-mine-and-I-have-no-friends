@@ -129,7 +129,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 6
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -151,8 +151,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   unitMode: 0
-  speed: 15
-  jumpVelocity: 15
+  speed: 1.5
+  maxSpeed: 0
+  jumpVelocity: 25
+  maxFallSpeed: 0
   _camera: {fileID: 0}
 --- !u!114 &1398906492
 MonoBehaviour:
@@ -303,7 +305,7 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -321,3 +323,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b24d205d4d844374589ce3a7fc066643, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentTilemap: {fileID: 0}
