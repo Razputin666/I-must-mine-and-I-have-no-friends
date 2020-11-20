@@ -198,13 +198,20 @@ public class TilemapVisual : MonoBehaviour
         Grid theGrid = gameObject.GetComponent<Grid>();
         Vector3 sizeOfCell = new Vector3(grid.GetCellSize(), grid.GetCellSize());
         theGrid.cellSize = sizeOfCell;
-        BoxCollider2D collider = gameObject.GetComponent<BoxCollider2D>();
+       // BoxCollider2D collider = gameObject.GetComponent<BoxCollider2D>();
        // CompositeCollider2D tileCollider = gameObject.GetComponent<CompositeCollider2D>();
         Vector2 sizeOfMap = new Vector2(250, 250); // sizeOfMap ska vara (width * 10) / 2, (height * 10) / 2
-        collider.size = sizeOfMap /100;
-        // gameObject.GetComponent<MeshRenderer>().transform.position
+                                                   //  collider.size = sizeOfMap /100;
+       // gameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
+
         colliderHasGenerated = true;
         // colliderManager.bwatevs(tileBlocks, grid.GetWidth(), grid.GetHeight());
+<<<<<<< Updated upstream:Assets/Scripts/Old Scripts/Grid/TilemapVisual.cs
+=======
+        
+        
+        
+>>>>>>> Stashed changes:Assets/Scripts/Grid/TilemapVisual.cs
     }
 
 

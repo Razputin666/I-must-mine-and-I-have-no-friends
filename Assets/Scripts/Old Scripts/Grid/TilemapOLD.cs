@@ -86,7 +86,9 @@ public class TilemapOLD
 
         private TilemapSprite tilemapSprite;
 
-        private BoxCollider2D boxCollider2D;
+        // private BoxCollider2D boxCollider2D;
+        private byte collisionDetect;
+
 
         public TilemapObject(Grid<TilemapObject> grid, int x, int y, TilemapSprite tilemapSprite = TilemapSprite.None)
         {
@@ -94,43 +96,62 @@ public class TilemapOLD
             this.x = x;
             this.y = y;
             this.tilemapSprite = tilemapSprite;
-        }
-
-        public BoxCollider2D GetBoxCollider2D()
-        {
-            if (boxCollider2D != null)
-                return boxCollider2D;
-            else
-                return null;
-        }
-
-        public void SetBoxCollider2D(BoxCollider2D boxCollider2D)
-        {
-            this.boxCollider2D = boxCollider2D;
-
-            this.boxCollider2D.size = new Vector2(grid.GetCellSize(), grid.GetCellSize());
-            this.boxCollider2D.transform.position = grid.GetWorldPosition(this.x, this.y);
-
-            //Debug.Log(this.boxCollider2D.transform.position + " : " + grid.GetWorldPosition(this.x, this.y));
-            if (tilemapSprite != TilemapSprite.None)
+            if(tilemapSprite == TilemapSprite.None)
             {
-               this.boxCollider2D.enabled = true;
+                collisionDetect = 0;
+            }
+
+            else
+            {
+                collisionDetect = 1;
             }
         }
+
+        //public BoxCollider2D GetBoxCollider2D()
+        //{
+        //    if (boxCollider2D != null)
+        //        return boxCollider2D;
+        //    else
+        //        return null;
+        //}
+
+        //public void SetBoxCollider2D(BoxCollider2D boxCollider2D)
+        //{
+        //    this.boxCollider2D = boxCollider2D;
+
+        //    this.boxCollider2D.size = new Vector2(grid.GetCellSize(), grid.GetCellSize());
+        //    this.boxCollider2D.transform.position = grid.GetWorldPosition(this.x, this.y);
+
+        //    //Debug.Log(this.boxCollider2D.transform.position + " : " + grid.GetWorldPosition(this.x, this.y));
+        //    if (tilemapSprite != TilemapSprite.None)
+        //    {
+        //       this.boxCollider2D.enabled = true;
+        //    }
+        //}
 
         public void SetTilemapSprite(TilemapSprite tilemapSprite)
         {
             this.tilemapSprite = tilemapSprite;
-            if(this.boxCollider2D != null)
+            //if(this.boxCollider2D != null)
+            //{
+            //    if (tilemapSprite != TilemapSprite.None)
+            //    {
+            //        this.boxCollider2D.enabled = true;
+            //    }
+            //    else
+            //    {
+            //        this.boxCollider2D.enabled = false;
+            //    }
+            // }
+
+            if (tilemapSprite == TilemapSprite.None)
             {
-                if (tilemapSprite != TilemapSprite.None)
-                {
-                    this.boxCollider2D.enabled = true;
-                }
-                else
-                {
-                    this.boxCollider2D.enabled = false;
-                }
+                collisionDetect = 0;
+            }
+
+            else
+            {
+                collisionDetect = 1;
             }
             grid.TriggerGridObjectChanged(x, y);
         }
@@ -138,6 +159,11 @@ public class TilemapOLD
         public TilemapSprite GetTilemapSprite()
         {
             return tilemapSprite;
+        }
+
+        public byte CollisionDetect
+        {
+            get { return collisionDetect; }
         }
 
         public override string ToString()
