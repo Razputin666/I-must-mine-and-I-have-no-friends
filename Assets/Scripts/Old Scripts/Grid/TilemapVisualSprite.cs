@@ -17,8 +17,8 @@ public class TilemapChunksSprite : MonoBehaviour
     private int _chunkWidth;
     private int _chunkHeight;
     //Contains all the tilemap chunks
-    private Tilemap[] _tilemapChunks;
-    public TilemapChunksSprite(int width, int height, int chunkWidth, int chunkHeight, float cellSize, Vector3 originPosition, Tilemap.TilemapObject.TilemapSprite[,] tilemapSpritearray, TilemapVisual tilemapVisual)
+    private TilemapOLD[] _tilemapChunks;
+    public TilemapChunksSprite(int width, int height, int chunkWidth, int chunkHeight, float cellSize, Vector3 originPosition, TilemapOLD.TilemapObject.TilemapSprite[,] tilemapSpritearray, TilemapVisual tilemapVisual)
     {
         //Total width and height of the terrain.
         this._width = width;
@@ -32,7 +32,7 @@ public class TilemapChunksSprite : MonoBehaviour
         this._numberOfchunksHeight = _height / _chunkWidth;
 
         //Create a new tilemap array to hold the chunks
-        _tilemapChunks = new Tilemap[this._numberOfchunksWidth * this._numberOfchunksHeight];
+        _tilemapChunks = new TilemapOLD[this._numberOfchunksWidth * this._numberOfchunksHeight];
 
         Vector3 chunkStartPosition;
 

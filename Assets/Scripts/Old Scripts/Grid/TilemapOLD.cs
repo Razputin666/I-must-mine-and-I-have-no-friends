@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tilemap
+public class TilemapOLD
 {
     public event EventHandler OnLoaded;
 
     private Grid<TilemapObject> grid;
-    public Tilemap(int width, int height, float cellSize, Vector3 originPosition, Tilemap.TilemapObject.TilemapSprite[,] tilemapSpritearray)
+    public TilemapOLD(int width, int height, float cellSize, Vector3 originPosition, TilemapOLD.TilemapObject.TilemapSprite[,] tilemapSpritearray)
     {
         grid = new Grid<TilemapObject>(width, height, cellSize, originPosition, (Grid<TilemapObject> g, int x, int y) => new TilemapObject(g, x, y, tilemapSpritearray[x,y]));
     }

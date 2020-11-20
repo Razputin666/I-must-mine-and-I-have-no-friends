@@ -8,7 +8,7 @@ public class TilemapVisual : MonoBehaviour
     [System.Serializable]
     public struct TilemapSpriteUV
     {
-        public Tilemap.TilemapObject.TilemapSprite _tilemapSprite;
+        public TilemapOLD.TilemapObject.TilemapSprite _tilemapSprite;
         public Vector2Int uv00Pixels;
         public Vector2Int uv11Pixels;
     }
@@ -21,10 +21,10 @@ public class TilemapVisual : MonoBehaviour
  
     [SerializeField]
     private TilemapSpriteUV[] tilemapSpriteUVArray;
-    private Grid<Tilemap.TilemapObject> grid;
+    private Grid<TilemapOLD.TilemapObject> grid;
     private Mesh mesh;
     private bool updateMesh;
-    private Dictionary<Tilemap.TilemapObject.TilemapSprite, UVCoords> uvCoordsDictionary;
+    private Dictionary<TilemapOLD.TilemapObject.TilemapSprite, UVCoords> uvCoordsDictionary;
 
     private bool colliderHasGenerated;
 
@@ -46,7 +46,7 @@ public class TilemapVisual : MonoBehaviour
         Texture texture = GetComponent<MeshRenderer>().material.mainTexture;
         float textureWidth = texture.width;
         float textureHeight = texture.height;
-        uvCoordsDictionary = new Dictionary<Tilemap.TilemapObject.TilemapSprite, UVCoords>();
+        uvCoordsDictionary = new Dictionary<TilemapOLD.TilemapObject.TilemapSprite, UVCoords>();
         foreach (TilemapSpriteUV tilemapSpriteUV in tilemapSpriteUVArray)
         {
             uvCoordsDictionary[tilemapSpriteUV._tilemapSprite] = new UVCoords
@@ -58,7 +58,7 @@ public class TilemapVisual : MonoBehaviour
         }
     }
 
-    public void SetGrid(Tilemap tilemap, Grid<Tilemap.TilemapObject> grid)
+    public void SetGrid(TilemapOLD tilemap, Grid<TilemapOLD.TilemapObject> grid)
     {
         this.grid = grid;
         UpdateTilemapVisual();
@@ -73,7 +73,7 @@ public class TilemapVisual : MonoBehaviour
         updateMesh = true;
     }
 
-    private void Grid_OnGridValueChanged(object sender, Grid<Tilemap.TilemapObject>.OnGridObjectChangedEventArgs e)
+    private void Grid_OnGridValueChanged(object sender, Grid<TilemapOLD.TilemapObject>.OnGridObjectChangedEventArgs e)
     {
         updateMesh = true;
     }
@@ -156,9 +156,9 @@ public class TilemapVisual : MonoBehaviour
                 
                 Vector3 quadSize = new Vector3(1, 1) * grid.GetCellSize();
                 Vector3 baseSize = quadSize;
-                Tilemap.TilemapObject gridObject = grid.GetGridObject(x, y);
+                TilemapOLD.TilemapObject gridObject = grid.GetGridObject(x, y);
 
-                Tilemap.TilemapObject.TilemapSprite tilemapSprite = gridObject.GetTilemapSprite();
+                TilemapOLD.TilemapObject.TilemapSprite tilemapSprite = gridObject.GetTilemapSprite();
 
                 if (!colliderHasGenerated)
                 {
@@ -167,7 +167,7 @@ public class TilemapVisual : MonoBehaviour
 
                 }
                 Vector2 gridUV00, gridUV11;
-                if(tilemapSprite == Tilemap.TilemapObject.TilemapSprite.None)
+                if(tilemapSprite == TilemapOLD.TilemapObject.TilemapSprite.None)
                 {
                     //if no tile set the texture coordinates to 0 and dont render
                     gridUV00 = Vector2.zero;
@@ -209,11 +209,11 @@ public class TilemapVisual : MonoBehaviour
 
 
 
-    public Tilemap.TilemapObject GetGridObjectAtXY(int x, int y)
+    public TilemapOLD.TilemapObject GetGridObjectAtXY(int x, int y)
     {
         return grid.GetGridObject(x, y);
     }
-    public Tilemap.TilemapObject GetGridObjectAtXY(Vector3 position)
+    public TilemapOLD.TilemapObject GetGridObjectAtXY(Vector3 position)
     {
         return grid.GetGridObject(position);
     }
