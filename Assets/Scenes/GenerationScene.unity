@@ -322,6 +322,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: "Karakt\xE4r 1"
       objectReference: {fileID: 0}
+    - target: {fileID: 703896098548027680, guid: 6c83ebada94772f4d8ccbebf4a528563,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3524118139176207565, guid: 6c83ebada94772f4d8ccbebf4a528563,
         type: 3}
       propertyPath: m_GravityScale
@@ -713,6 +718,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2414022555270311552, guid: fff657ab7d5a5504784f3cbc679a6659,
         type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2414022555270311552, guid: fff657ab7d5a5504784f3cbc679a6659,
+        type: 3}
       propertyPath: m_ShapeTexture
       value: 
       objectReference: {fileID: 0}
@@ -790,6 +800,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Gubb Variant 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2414022555270311615, guid: fff657ab7d5a5504784f3cbc679a6659,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fff657ab7d5a5504784f3cbc679a6659, type: 3}
