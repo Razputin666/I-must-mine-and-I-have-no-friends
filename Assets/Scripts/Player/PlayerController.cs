@@ -17,9 +17,8 @@ public class PlayerController : MonoBehaviour
     public UnitMode unitMode;
     public float speed;                //Floating point variable to store the player's movement speed.
     public float jumpVelocity;
-<<<<<<< Updated upstream
-=======
     public float maxFallSpeed;
+    private float maxSpeed;
     Vector2 horizontalSpeed;
     Vector2 verticalSpeed;
     float heightTimer;
@@ -27,7 +26,6 @@ public class PlayerController : MonoBehaviour
     float jumpTimer;
 
 
->>>>>>> Stashed changes
     private Rigidbody2D rb2d;        //Store a reference to the Rigidbody2D component required to use 2D Physics.
     private BoxCollider2D boxCollider2d;
     private bool facingRight;
@@ -38,7 +36,7 @@ public class PlayerController : MonoBehaviour
     private bool inFreeMode;
     private Tilemap blockTile;
     Vector3Int targetBlockIntPos;
-   
+
 
     public Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
 
@@ -59,7 +57,7 @@ public class PlayerController : MonoBehaviour
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     void FixedUpdate()
     {
-        
+
         //Store the current horizontal input in the float moveHorizontal.
         float moveHorizontal = Input.GetAxis("Horizontal");
         Flip(moveHorizontal);
@@ -69,13 +67,12 @@ public class PlayerController : MonoBehaviour
         //Use the two store floats to create a new Vector2 variable movement.
         Vector2 movement = new Vector2(moveHorizontal, 0);
 
-        
+
 
         //Call the AddForce function of our Rigidbody2D rb2d supplying movement multiplied by speed to move our player.
         rb2d.AddForce(movement * speed);
         _camera.transform.position = new Vector3(rb2d.transform.position.x, rb2d.transform.position.y, -1);
-<<<<<<< Updated upstream
-=======
+
 
 
         if(Input.GetKey(KeyCode.D))
@@ -90,14 +87,11 @@ public class PlayerController : MonoBehaviour
             Flip(Vector2.left.x);
         }
         
->>>>>>> Stashed changes
         if (Input.GetKey(KeyCode.Space) && IsGrounded())
         {
             rb2d.velocity += Vector2.up * jumpVelocity;
 
         }
-<<<<<<< Updated upstream
-=======
         
         if (rb2d.velocity.y < -25f)
         {
@@ -127,14 +121,13 @@ public class PlayerController : MonoBehaviour
             if (maxSpeed > 30f)
                 widthTimer = 1f;
         }
->>>>>>> Stashed changes
 
 
-        switch(unitMode)
+        switch (unitMode)
         {
             case UnitMode.Mining:
-             
-                    
+
+
                 //Vector3 mousePos = Input.mousePosition;
                 //mousePos.z = Camera.main.nearClipPlane;
                 //worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
@@ -157,7 +150,7 @@ public class PlayerController : MonoBehaviour
                 //    DistanceFromPlayerY = Mathf.Abs(playerPositionY - blockPositionY);
 
                 //}
-          
+
                 //if (FreeModeRay && Input.GetMouseButton(0) && Input.GetKey("left shift"))
                 //{
                 //    RaycastHit2D freeMode = Physics2D.BoxCast(boxCollider2d.bounds.center, boxCollider2d.bounds.size *1.5f, 0f, boxCollider2d.bounds.center, .1f);
@@ -174,7 +167,7 @@ public class PlayerController : MonoBehaviour
                 //    StartCoroutine(MineBlock());
 
                 //}
-                
+
                 break;
             case UnitMode.Combat:
                 break;
@@ -183,8 +176,8 @@ public class PlayerController : MonoBehaviour
 
     bool IsGrounded()
     {
-       RaycastHit2D raycastHit2D = Physics2D.BoxCast(boxCollider2d.bounds.center, boxCollider2d.bounds.size, 0f, Vector2.down, .1f);
-       // Debug.Log(raycastHit2D.collider);
+        RaycastHit2D raycastHit2D = Physics2D.BoxCast(boxCollider2d.bounds.center, boxCollider2d.bounds.size, 0f, Vector2.down, .1f);
+        // Debug.Log(raycastHit2D.collider);
         return raycastHit2D.collider != null;
     }
 
@@ -216,27 +209,27 @@ public class PlayerController : MonoBehaviour
     //IEnumerator MineBlock()
     //{
     //    int blockHP = 1;
-       
+
     //    while (Input.GetMouseButton(0) && TargetedBlock != null)
     //    {
     //        if(blockHP == 0)
     //        {
     //            blockTile = TargetedBlock.GetComponent<Tilemap>();
-                
-                
+
+
 
     //            Vector3Int targetBlockIntPos = Vector3Int.FloorToInt(worldPosition);
     //            targetBlockIntPos.z = 0;
     //            Debug.Log(targetBlockIntPos);
-                
+
     //            blockTile.SetTile(targetBlockIntPos, null);
 
-                
+
     //        }
     //        blockHP -= 1;
     //        yield return new WaitForSeconds(0.1f);          
     //    }
-             
+
     //}
 
     //public Tilemap TargetedBlock
@@ -296,7 +289,7 @@ public class PlayerController : MonoBehaviour
     #endregion
     private void Flip(float horizontal)
     {
-        if(horizontal > 0 && !facingRight || horizontal < 0 && facingRight)
+        if (horizontal > 0 && !facingRight || horizontal < 0 && facingRight)
         {
             facingRight = !facingRight;
 
