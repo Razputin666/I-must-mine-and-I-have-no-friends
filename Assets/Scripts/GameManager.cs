@@ -6,6 +6,7 @@ using Unity.Transforms;
 using Unity.Collections;
 using Unity.Rendering;
 using Unity.Jobs;
+using Unity.Physics;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class GameManager : MonoBehaviour
     }
 
     [SerializeField]
-    private Material[] materials;
+    private UnityEngine.Material[] materials;
 
     private EntityManager entityManager;
 
@@ -115,7 +116,7 @@ public class GameManager : MonoBehaviour
 
             int matIndex = (int)generatedTiles[x, y];
 
-            Material material = materials[matIndex];
+            UnityEngine.Material material = materials[matIndex];
 
             entityManager.SetSharedComponentData(entity, new RenderMesh
             {

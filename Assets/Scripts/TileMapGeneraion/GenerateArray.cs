@@ -12,7 +12,7 @@ public class GenerateArray : MonoBehaviour
     private int[,] mapToBeGenerated;
 
     [SerializeField]
-    private Tilemap generatedTileMap;
+    private Tilemap generateTileMap;
 
     [SerializeField]
     private TileBase[] testTiles;
@@ -20,13 +20,13 @@ public class GenerateArray : MonoBehaviour
 
     private void Awake()
     {
-        generatedTileMap = gameObject.GetComponent<Tilemap>();
+        generateTileMap = gameObject.GetComponent<Tilemap>();
        // mapToBeGenerated = new int[mapWidth, mapHeight];
          mapToBeGenerated = GenerateArrayFunction(mapWidth, mapHeight, true);
         // mapToBeGenerated = RandomWalkTop(mapToBeGenerated, 0.485345f);
-        mapToBeGenerated = PerlinNoiseCave(mapToBeGenerated, 0.23f, false);
+        mapToBeGenerated = RandomWalkTopSmoothed(mapToBeGenerated, 0.23f, 1);
 
-        RenderMap(mapToBeGenerated, generatedTileMap, testTiles[1]);
+        RenderMap(mapToBeGenerated, generateTileMap, testTiles[1]);
 
     }
 
@@ -276,6 +276,107 @@ public class GenerateArray : MonoBehaviour
                 }
             }
         }
+        return map;
+    }
+
+    public static int[,] RandomWalkCave(int[,] map, float seed, int requiredFloorPercent)
+    {
+        //Seed our random
+        System.Random rand = new System.Random(seed.GetHashCode());
+
+        //Define our start x position
+        int floorX = rand.Next(1, map.GetUpperBound(0) - 1);
+        //Define our start y position
+        int floorY = rand.Next(1, map.GetUpperBound(1) - 1);
+        //Determine our required floorAmount
+        int reqFloorAmount = ((map.GetUpperBound(1) * map.GetUpperBound(0)) * requiredFloorPercent) / 100;
+        //Used for our while loop, when this reaches our reqFloorAmount we will stop tunneling
+        int floorCount = 0;
+
+        //Set our start position to not be a tile (0 = no tile, 1 = tile)
+        map[floorX, floorY] = 0;
+        //Increase our floor count
+        floorCount++;
+
+        while (floorCount < reqFloorAmount)
+        {
+            //Determine our next direction
+            int randDir = rand.Next(4);
+
+            switch (randDir)
+            {
+                //Up
+                case 0:
+                    //Ensure that the edges are still tiles
+                    if ((floorY + 1) < map.GetUpperBound(1) - 1)
+                    {
+                        //Move the y up one
+                        floorY++;
+
+                        //Check if that piece is currently still a tile
+                        if (map[floorX, floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 0;
+                            //Increase floor count
+                            floorCount++;
+                        }
+                    }
+                    break;
+                //Down
+                case 1:
+                    //Ensure that the edges are still tiles
+                    if ((floorY - 1) > 1)
+                    {
+                        //Move the y down one
+                        floorY--;
+                        //Check if that piece is currently still a tile
+                        if (map[floorX, floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 0;
+                            //Increase the floor count
+                            floorCount++;
+                        }
+                    }
+                    break;
+                //Right
+                case 2:
+                    //Ensure that the edges are still tiles
+                    if ((floorX + 1) < map.GetUpperBound(0) - 1)
+                    {
+                        //Move the x to the right
+                        floorX++;
+                        //Check if that piece is currently still a tile
+                        if (map[floorX, floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 0;
+                            //Increase the floor count
+                            floorCount++;
+                        }
+                    }
+                    break;
+                //Left
+                case 3:
+                    //Ensure that the edges are still tiles
+                    if ((floorX - 1) > 1)
+                    {
+                        //Move the x to the left
+                        floorX--;
+                        //Check if that piece is currently still a tile
+                        if (map[floorX, floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 0;
+                            //Increase the floor count
+                            floorCount++;
+                        }
+                    }
+                    break;
+            }
+        }
+        //Return the updated map
         return map;
     }
 
