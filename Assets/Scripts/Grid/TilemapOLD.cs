@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tilemap
+public class TilemapOLD
 {
     public event EventHandler OnLoaded;
 
