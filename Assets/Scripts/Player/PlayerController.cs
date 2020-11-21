@@ -103,7 +103,7 @@ public class PlayerController : MonoBehaviour
         }
 
         maxSpeed = Mathf.Abs(rb2d.velocity.x);
-        Debug.Log(maxSpeed);
+        //Debug.Log(maxSpeed);
         if (maxSpeed > 25f && rb2d.velocity.x > 0)
         {
             widthTimer += Time.deltaTime;

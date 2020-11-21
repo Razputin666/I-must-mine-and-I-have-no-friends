@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8978213078250018397
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3738170577226596389}
+  - component: {fileID: 8978213078250018398}
+  - component: {fileID: 1094416595}
+  m_Layer: 0
+  m_Name: LevelGeneration
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3738170577226596389
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8978213078250018397}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -242.26572, y: 1049.9954, z: -439.6709}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8978213078250018398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8978213078250018397}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e6fc9c468df533499c544f025dca35b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tilemap: {fileID: 0}
+  tiles:
+  - {fileID: 11400000, guid: c144d314e1654444e8da3de8d94b0b0a, type: 2}
+  - {fileID: 11400000, guid: d2a454cdcf61587439cbe5ede10d0c9c, type: 2}
+  - {fileID: 11400000, guid: b9a875a4b87044f4b82a7d9d2a922a39, type: 2}
+  width: 300
+  height: 100
+  mapSettings:
+  - {fileID: 11400000, guid: bf6fe75e3f5a3cf48ab5a5a9a6f42d12, type: 2}
+  - {fileID: 11400000, guid: 7e44f010d0d73e64fac75bfb3dc8ec92, type: 2}
+  - {fileID: 11400000, guid: fe676c85093aa8c4291e3a8aae6f42ed, type: 2}
+--- !u!114 &1094416595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8978213078250018397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ff514e712ab9894f99d98267a8d16d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tilemap: {fileID: 0}
+  tiles:
+  - {fileID: 11400000, guid: de19a2843a821bf408d85079724df125, type: 2}
+  - {fileID: 11400000, guid: d2a454cdcf61587439cbe5ede10d0c9c, type: 2}
+  - {fileID: 11400000, guid: b9a875a4b87044f4b82a7d9d2a922a39, type: 2}
+  width: 100
+  height: 100
+  mapSetting: {fileID: 11400000, guid: 7e44f010d0d73e64fac75bfb3dc8ec92, type: 2}

@@ -29,8 +29,8 @@ public class TilemapVisual : MonoBehaviour
     private bool colliderHasGenerated;
 
 
-    [SerializeField]
-    private TerrainGenerator terrainGenerator;
+    //[SerializeField]
+    //private TerrainGenerator terrainGenerator;
 
     //[SerializeField]
     //private ColliderManager colliderManager;
