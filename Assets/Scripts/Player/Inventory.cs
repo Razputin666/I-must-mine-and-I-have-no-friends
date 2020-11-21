@@ -7,7 +7,8 @@ public class Inventory : MonoBehaviour
     //Items in the players inventory
     public List<Item> characterItems = new List<Item>();
     //Reference to our items
-    public ItemDatabase itemDatabase;
+    [SerializeField]
+    private ItemDatabase itemDatabase;
 
     [SerializeField]
     private UIInventory inventoryUI;
@@ -25,7 +26,6 @@ public class Inventory : MonoBehaviour
         {
             AddItem(0);
         }
-            
     }
 
     public void AddItem(int id)
@@ -33,6 +33,7 @@ public class Inventory : MonoBehaviour
         if(characterItems.Count < numberOfSlots)
         {
             Item itemToAdd = itemDatabase.GetItem(id);
+            Debug.Log(itemToAdd);
             characterItems.Add(itemToAdd);
             inventoryUI.AddNewItem(itemToAdd);
             Debug.Log("Added item: " + itemToAdd.Title);

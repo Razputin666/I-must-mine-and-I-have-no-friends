@@ -15,7 +15,6 @@ public abstract class Item
         this.title = title;
         this.description = description;
         this.icon = Resources.Load<Sprite>("Sprites/Items/" + title);
-        Debug.Log(icon);
     }
 
     public Item(Item item)
@@ -29,7 +28,7 @@ public abstract class Item
     public int ID
     {
         get 
-        { 
+        {
             return this.id; 
         }
         set

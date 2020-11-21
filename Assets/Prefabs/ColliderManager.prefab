@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4301397025705174548}
   - component: {fileID: 4301397025705174547}
   - component: {fileID: 4301397025705174546}
-  - component: {fileID: 4301397025705174545}
   m_Layer: 0
   m_Name: ColliderManager
   m_TagString: Untagged
@@ -76,16 +75,3 @@ CompositeCollider2D:
     m_Paths: []
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
---- !u!114 &4301397025705174545
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4301397025705174544}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4844be21076f3a44489b50bb0fd8fd48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collider: {fileID: 0}

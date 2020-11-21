@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Entities;
-using Unity.Mathematics;
 
 
 public class GamemanagerJoffy : MonoBehaviour
@@ -21,10 +19,6 @@ public class GamemanagerJoffy : MonoBehaviour
 
     public Text mainText;
     public Text[] playerTexts;
-
-    Entity ballEntityPrefab;
-    EntityManager manager;
-
     // Start is called before the first frame update
     private void Awake()
     {

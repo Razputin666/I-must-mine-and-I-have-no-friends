@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8181247841218053084}
   - component: {fileID: 1398906487}
   - component: {fileID: 1398906492}
+  - component: {fileID: 355642844}
   m_Layer: 2
   m_Name: Buttface-guy
   m_TagString: Untagged
@@ -152,7 +153,6 @@ MonoBehaviour:
     m_Bits: 0
   unitMode: 0
   speed: 1.5
-  maxSpeed: 0
   jumpVelocity: 25
   maxFallSpeed: 0
   _camera: {fileID: 0}
@@ -168,6 +168,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19c112c55c641704f8c5ccc162f2b607, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &355642844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8181247841218053072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f84a9278a27b5324a81039c32f9b8ee5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemDatabase: {fileID: 5877550586013752606, guid: 47690889342226f4791e2e03479af492,
+    type: 3}
+  inventoryUI: {fileID: 1450370641672513141, guid: a8d9e96491ac63d4286fc2500f692e19,
+    type: 3}
 --- !u!1 &8181247841502162097
 GameObject:
   m_ObjectHideFlags: 0
