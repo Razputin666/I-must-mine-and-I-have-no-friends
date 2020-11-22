@@ -386,12 +386,12 @@ MonoBehaviour:
   whenToStop: 8
   whenToBack: 6
   whenToMove: 10
-  speed: 1
+  speed: 2
   enemyHP: 5
   player: {fileID: 0}
   maxFallSpeed: 0
   enemyStrength: 2
-  enemyKnockBack: {x: 2500, y: 1000}
+  enemyKnockBack: {x: 1250, y: 500}
 --- !u!1 &8181247841502162097
 GameObject:
   m_ObjectHideFlags: 0
