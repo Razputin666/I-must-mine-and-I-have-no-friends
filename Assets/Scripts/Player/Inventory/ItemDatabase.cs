@@ -37,6 +37,5 @@ public class ItemDatabase : MonoBehaviour
                 {"Mining", 15 }
             })
         };
-        Debug.Log(items.Count);
     }
 }

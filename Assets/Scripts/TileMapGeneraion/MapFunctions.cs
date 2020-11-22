@@ -5,31 +5,6 @@ using UnityEngine.Tilemaps;
 
 public class MapFunctions 
 {
-    //[SerializeField]
-    //private int mapWidth;
-    //[SerializeField]
-    //private int mapHeight;
-
-    //private int[,] mapToBeGenerated;
-
-    //public void GenerateTiles(int width, int height)
-    //{
-    //    mapWidth = width;
-    //    mapHeight = height;
-
-    //    // mapToBeGenerated = new int[mapWidth, mapHeight];
-    //    mapToBeGenerated = GenerateArrayFunction(mapWidth, mapHeight, false);
-
-    //    //mapToBeGenerated = GenerateCellularAutomata(mapToBeGenerated, 0.25f, 90, false);
-    //    //mapToBeGenerated = SmoothMooreCellularAutomata(mapToBeGenerated, false, 3);
-
-    //    mapToBeGenerated = PerlinNoiseSmooth(mapToBeGenerated, 0.25f, 15);
-
-    //    mapToBeGenerated = RandomWalkTopSmoothed(mapToBeGenerated, 0.485345f, 3);
-    //    //mapToBeGenerated = PerlinNoiseCave(mapToBeGenerated, 0.13f, true);
-    //    mapToBeGenerated = DirectionalTunnel(mapToBeGenerated, 3, 7, 5, 1, 3);
-    //}
-
     /// <summary>
     /// Generates an int array of the supplied width and height
     /// </summary>
@@ -103,6 +78,28 @@ public class MapFunctions
                 if (map[x, y] == 1)
                 {
                     tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Renders a map using an offset provided, Useful for having multiple maps on one tilemap
+    /// </summary>
+    /// <param name="map">The map to draw</param>
+    /// <param name="tilemap">The tilemap to draw on</param>
+    /// <param name="tile">The tile to draw with</param>
+    /// <param name="offset">The offset to apply</param>
+    public static IEnumerator RenderMapWithOffsetWithDelay(int[,] map, Tilemap tilemap, TileBase[] tiles, Vector2Int offset)
+    {
+        for (int x = 0; x < map.GetUpperBound(0); x++)
+        {
+            for (int y = 0; y < map.GetUpperBound(1); y++)
+            {
+                if (map[x, y] == 1)
+                {
+                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
+                    yield return null;
                 }
             }
         }

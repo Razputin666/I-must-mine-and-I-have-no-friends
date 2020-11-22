@@ -15,4 +15,16 @@ public class Weapon : Item
     {
         this.stats = weapon.stats;
     }
+
+    public Dictionary<string, int> Stats
+    {
+        get
+        {
+            return this.stats;
+        }
+        set
+        {
+            this.stats = value;
+        }
+    }
 }

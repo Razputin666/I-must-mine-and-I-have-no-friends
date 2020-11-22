@@ -25,4 +25,4 @@ MonoBehaviour:
   roughness: 0
   windyness: 0
   edgesAreWalls: 1
-  modifier: 0.0001
+  modifier: 0.95

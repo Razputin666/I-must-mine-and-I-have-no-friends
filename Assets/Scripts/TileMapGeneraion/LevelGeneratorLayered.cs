@@ -26,6 +26,8 @@ public class LevelGeneratorLayered : MonoBehaviour
 	[Tooltip("The settings of our map")]
 	[SerializeField]
 	public List<MapSettings> mapSettings = new List<MapSettings>();
+	[SerializeField]
+	private bool RenderDelay;
 
 	List<int[,]> mapList = new List<int[,]>();
 
@@ -135,7 +137,10 @@ public class LevelGeneratorLayered : MonoBehaviour
 		//Work through the list to generate all maps
 		foreach (int[,] map in mapList)
 		{
-			MapFunctions.RenderMapWithOffset(map, tilemap, tiles, offset);
+			if (RenderDelay)
+				StartCoroutine(MapFunctions.RenderMapWithOffsetWithDelay(map, tilemap, tiles, offset));
+			else
+				MapFunctions.RenderMapWithOffset(map, tilemap, tiles, offset);
 			offset.y += -height + 1;
 		}
 	}

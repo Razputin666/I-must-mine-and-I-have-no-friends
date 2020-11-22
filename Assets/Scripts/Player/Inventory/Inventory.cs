@@ -26,6 +26,10 @@ public class Inventory : MonoBehaviour
         {
             AddItem(0);
         }
+        else if(Input.GetKeyDown(KeyCode.I))
+        {
+            inventoryUI.gameObject.SetActive(!inventoryUI.gameObject.activeSelf);
+        }
     }
 
     public void AddItem(int id)
@@ -38,14 +42,15 @@ public class Inventory : MonoBehaviour
             inventoryUI.AddNewItem(itemToAdd);
             Debug.Log("Added item: " + itemToAdd.Title);
         }
-        
     }
+
     public void AddItem(string itemName)
     {
         Item itemToAdd = itemDatabase.GetItem(itemName);
         characterItems.Add(itemToAdd);
         Debug.Log("Added item: " + itemToAdd.Title);
     }
+
     public Item CheckforItem(int id)
     {
         return characterItems.Find(item => item.ID == id);
