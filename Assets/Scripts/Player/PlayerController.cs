@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     #region PlayerValues
     private Tilemap targetedBlock;
     
+    public int playerHP;
     public float speed;                //Floating point variable to store the player's movement speed.
     public float jumpVelocity;
     public float maxFallSpeed;
@@ -36,6 +37,8 @@ public class PlayerController : MonoBehaviour
     private ItemController itemController;
     private Inventory inventory;
     private Transform item;
+    private JumpController jumpController;
+   [SerializeField]private DeathScreen deathScreen;
 
 
     [SerializeField]
@@ -55,6 +58,8 @@ public class PlayerController : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         boxCollider2d = transform.GetComponent<BoxCollider2D>();
         capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
+        jumpController = GetComponent<JumpController>();
+        Debug.Log(deathScreen);
        // itemController.SetMiningMode(); // Vi har inte combat än så den e på mining default
         StartCoroutine(CoroutineCoordinator());
     }
@@ -124,12 +129,37 @@ public class PlayerController : MonoBehaviour
             widthTimer = 1f;
         }
 
+        if (Input.GetKey("space") && jumpController.IsGrounded())
+        {
+            jumpController.Jump();
+        }
+
+        if (playerHP <= 0)
+        {
+            Die();
+        }
+
     }
 
-    public bool IsGrounded()
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        RaycastHit2D raycastHit2D = Physics2D.CapsuleCast(capsuleCollider2d.bounds.center, capsuleCollider2d.bounds.size, CapsuleDirection2D.Vertical, 0f, Vector2.down, 0.5f);
-        return raycastHit2D.collider != null;
+        if(collision.collider.CompareTag("EnemyWeapon"))
+        {
+            EnemyController enemy = collision.collider.gameObject.GetComponentInParent<EnemyController>();
+            playerHP -= enemy.enemyStrength;
+
+            if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x > 0f)
+            {
+                rb2d.AddForceAtPosition(enemy.enemyKnockBack, transform.position);
+            }
+
+            else if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x < 0f)
+            {
+                rb2d.AddForceAtPosition(-enemy.enemyKnockBack, transform.position);
+            }
+        }
+
+
     }
 
 
@@ -137,6 +167,14 @@ public class PlayerController : MonoBehaviour
 
 
     #region GameLogic
+
+    void Die()
+    {
+        Debug.Log("playerded");
+        deathScreen.gameObject.SetActive(true);
+        gameObject.SetActive(false);
+    }
+
 
     IEnumerator CoroutineCoordinator()
     {

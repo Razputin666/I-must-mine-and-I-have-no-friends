@@ -6,6 +6,7 @@ public class Bullet : MonoBehaviour
 {
     private Vector3 directionOfShot;
     private Rigidbody2D rb2d;
+    public int projectileStrength;
     [SerializeField] float bulletSpeed;
 
     public float GetAngleFromVectorFloat(Vector3 direction)

@@ -446,7 +446,7 @@ GameObject:
   - component: {fileID: 658734927}
   m_Layer: 2
   m_Name: Buttface-guy
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -555,12 +555,14 @@ MonoBehaviour:
   blockLayerMask:
     serializedVersion: 2
     m_Bits: 0
+  playerHP: 10
   speed: 1
   jumpVelocity: 1200
   maxFallSpeed: 0
   rb2d: {fileID: 8181247841218053084}
   worldPosition: {x: 0, y: 0, z: 0}
   mousePos: {x: 0, y: 0, z: 0}
+  deathScreen: {fileID: 0}
   _camera: {fileID: 0}
 --- !u!70 &658734921
 CapsuleCollider2D:
@@ -592,7 +594,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 1
   coolDownDuration: 0.4
-  player: {fileID: 1398906487}
+  jumpVelocity: 1200
   coolDownSystem: {fileID: 658734927}
 --- !u!114 &658734927
 MonoBehaviour:

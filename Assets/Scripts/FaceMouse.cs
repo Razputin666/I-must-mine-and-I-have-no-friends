@@ -6,6 +6,11 @@ public class FaceMouse : MonoBehaviour
 {
     [SerializeField] private PlayerController player;
 
+    private void Start()
+    {
+        player = GetComponentInParent<PlayerController>();
+    }
+
     void Update()
     {
         Vector2 direction = new Vector2(
