@@ -1,10 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
-using UnityEngine.Tilemaps;
 
-public class PlayerController : MonoBehaviour
+public class PlayerMovementNoRigid : MonoBehaviour
 {
     [SerializeField]
     LayerMask blockLayerMask;
@@ -17,8 +15,8 @@ public class PlayerController : MonoBehaviour
     public PlayerStates playerStates { get; private set; }
 
     #region PlayerValues
-    private Tilemap targetedBlock;
-    
+   // private Tilemap targetedBlock;
+
     public int playerHP;
     public float speed;                //Floating point variable to store the player's movement speed.
     public float jumpVelocity;
@@ -45,7 +43,7 @@ public class PlayerController : MonoBehaviour
     private Inventory inventory;
     public Transform item;
     private JumpController jumpController;
-   [SerializeField]private DeathScreen deathScreen;
+    [SerializeField] private DeathScreen deathScreen;
 
 
     [SerializeField]
@@ -53,22 +51,14 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        inventory = GetComponentInChildren<Inventory>();
-        item = gameObject.GetComponentInChildren<FaceMouse>().gameObject.transform.Find("ItemHeldInHand");
-        item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Drill");
-        item.GetComponent<DefaultGun>().enabled = false;
-        item.GetComponent<MiningController>().enabled = true;
-        Debug.Log(item);
         //Get and store a reference to the Rigidbody2D component so that we can access it.
-        
+
         facingRight = true;
         rb2d = GetComponent<Rigidbody2D>();
         boxCollider2d = transform.GetComponent<BoxCollider2D>();
         capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
         jumpController = GetComponent<JumpController>();
-        playerStates = PlayerStates.Mining;
-       // itemController.SetMiningMode(); // Vi har inte combat än så den e på mining default
-        StartCoroutine(CoroutineCoordinator());
+        // itemController.SetMiningMode(); // Vi har inte combat än så den e på mining default
     }
 
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
@@ -79,34 +69,16 @@ public class PlayerController : MonoBehaviour
         worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
         _camera.transform.position = new Vector3(rb2d.transform.position.x, rb2d.transform.position.y, -1);
 
-        if(Input.GetKey(KeyCode.Alpha1))
-        {
-            // gameObject.GetComponentInChildren<ItemController>().gameObject.GetComponent<SpriteRenderer>().sprite = inventory.GetItem(0).Icon;
-            item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Drill");
-            item.GetComponent<DefaultGun>().enabled = false;
-            item.GetComponent<MiningController>().enabled = true;
-            playerStates = PlayerStates.Mining;
 
-        }
-
-        if(Input.GetKey(KeyCode.Alpha2))
+        if (Input.GetKey(KeyCode.D))
         {
-            // gameObject.GetComponentInChildren<ItemController>().gameObject.GetComponent<SpriteRenderer>().sprite = inventory.GetItem(0).Icon;
-            item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Gun");
-            item.GetComponent<MiningController>().enabled = false;
-            item.GetComponent<DefaultGun>().enabled = true;
-            playerStates = PlayerStates.Normal;
-        }
-
-        if(Input.GetKey(KeyCode.D))
-        {
-            rb2d.velocity += Vector2.right * speed;
+            rb2d.MovePosition(Vector2.right * Time.deltaTime);
             Flip(Vector2.right.x);
         }
 
         if (Input.GetKey(KeyCode.A))
         {
-            rb2d.velocity += Vector2.left * speed;
+            rb2d.MovePosition(Vector2.left  * Time.deltaTime);
             Flip(Vector2.left.x);
         }
         if (rb2d.velocity.y < -25f)
@@ -115,7 +87,7 @@ public class PlayerController : MonoBehaviour
             maxFallSpeed = Mathf.Clamp(heightTimer, 1f, 5f);
             rb2d.velocity -= Vector2.down * maxFallSpeed;
             if (rb2d.velocity.y > -35f)
-            heightTimer = 1f;
+                heightTimer = 1f;
         }
 
         maxSpeed = Mathf.Abs(rb2d.velocity.x);
@@ -126,7 +98,7 @@ public class PlayerController : MonoBehaviour
             float asedf = Mathf.Clamp(widthTimer, 1f, 3f);
             rb2d.velocity -= Vector2.right * asedf;
             if (maxSpeed > 30f)
-            widthTimer = 1f;
+                widthTimer = 1f;
         }
 
         if (maxSpeed > 25f && rb2d.velocity.x < 0)
@@ -135,7 +107,7 @@ public class PlayerController : MonoBehaviour
             float asedf = Mathf.Clamp(widthTimer, 1f, 3f);
             rb2d.velocity -= Vector2.left * asedf;
             if (maxSpeed > 30f)
-            widthTimer = 1f;
+                widthTimer = 1f;
         }
 
         if (Input.GetKey("space") && jumpController.IsGrounded())
@@ -152,7 +124,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.collider.CompareTag("EnemyWeapon"))
+        if (collision.collider.CompareTag("EnemyWeapon"))
         {
             EnemyController enemy = collision.collider.gameObject.GetComponentInParent<EnemyController>();
             playerHP -= enemy.enemyStrength;
@@ -180,62 +152,9 @@ public class PlayerController : MonoBehaviour
     void Die()
     {
         Debug.Log("playerded");
-        deathScreen.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
 
-
-    IEnumerator CoroutineCoordinator()
-    {
-        while (true)
-        {
-            while (coroutineQueue.Count > 0)
-            {
-                yield return StartCoroutine(coroutineQueue.Dequeue());
-            }
-            yield return null;
-        }
-    }
-
-    //IEnumerator MineBlock()
-    //{
-    //    int blockHP = 1;
-
-    //    while (Input.GetMouseButton(0) && TargetedBlock != null)
-    //    {
-    //        if(blockHP == 0)
-    //        {
-    //            blockTile = TargetedBlock.GetComponent<Tilemap>();
-
-
-
-    //            Vector3Int targetBlockIntPos = Vector3Int.FloorToInt(worldPosition);
-    //            targetBlockIntPos.z = 0;
-    //            Debug.Log(targetBlockIntPos);
-
-    //            blockTile.SetTile(targetBlockIntPos, null);
-
-
-    //        }
-    //        blockHP -= 1;
-    //        yield return new WaitForSeconds(0.1f);          
-    //    }
-
-    //}
-
-    //public Tilemap TargetedBlock
-    //{
-    //    get 
-    //    {
-    //        return targetedBlock; 
-
-    //    }
-
-    //    set 
-    //    {
-    //        targetedBlock = value;
-    //    }
-    //}
 
     public float DistanceFromPlayerX
     {
@@ -251,32 +170,6 @@ public class PlayerController : MonoBehaviour
         set { distanceFromPlayery = value; }
     }
 
-    //IEnumerator MineBlockOld()
-    //{
-    //    int blockHP = 1;
-    //    Collider2D thisTargetedBlock = TargetedBlock;
-    //    while (Input.GetMouseButton(0) && TargetedBlock == thisTargetedBlock && TargetedBlock != null)
-    //    {
-    //        if (blockHP == 0)
-    //        {
-    //            TilemapVisual tilemapVisual = targetedBlock.transform.parent.GetComponent<TilemapVisual>();
-    //            if (tilemapVisual != null)
-    //            {
-    //                TilemapOLD.TilemapObject tilemapObject = tilemapVisual.GetGridObjectAtXY(targetedBlock.transform.position);
-    //                if (tilemapObject != null)
-    //                {
-    //                    tilemapObject.SetTilemapSprite(TilemapOLD.TilemapObject.TilemapSprite.None);
-
-    //                    //Destroy(TargetedBlock.gameObject);
-    //                }
-    //            }
-
-    //        }
-    //        blockHP -= 1;
-    //        yield return new WaitForSeconds(0.05f);
-    //    }
-
-    //}
     #endregion
     private void Flip(float horizontal)
     {

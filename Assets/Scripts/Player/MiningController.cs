@@ -10,76 +10,27 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     [SerializeField] private float coolDownDuration;
     [SerializeField] private CoolDownSystem coolDownSystem;
     [SerializeField] private Transform[] points;
-    [SerializeField] private LineController line;
 
-    PlayerController player;
-    TileMapChecker tileMapChecker;
-
-
-    Vector3 worldPosition;
-    private Tilemap targetedBlock;
-
-    Vector3Int targetBlockIntPos;
-
-    float timer;
     public Transform endOfGun;
 
     // Start is called before the first frame update
     void Start()
     {
         endOfGun = transform.Find("EndOfGun");
-        line = GetComponent<LineController>();
-        player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
-        tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
-    }
-
-    void OnEnable()
-    {
-        
+      //  player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
+      //  tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
     }
 
 
-    // Update is called once per frame
-    void Update()
+    public void Mine(Vector3Int blockToMine, Tilemap currentTileMap)
     {
-        targetBlockIntPos = Vector3Int.FloorToInt(player.worldPosition);
-        targetBlockIntPos.z = 0;
-        Vector3Int playerIntPos = Vector3Int.FloorToInt(transform.position);
-        
-
-
-         TargetedBlock = tileMapChecker.currentTilemap;
-         Vector3Int distanceFromPlayer = targetBlockIntPos - playerIntPos;
-
-         if (coolDownSystem.IsOnCoolDown(id))
-         {
-             return;
-         }
-
-         if (Input.GetMouseButton(0) && distanceFromPlayer.x > -5 && distanceFromPlayer.x < 5 && distanceFromPlayer.y > -5 && distanceFromPlayer.y < 5)
-         {
-             TargetedBlock.SetTile(targetBlockIntPos, null);
-             line.enabled = true;
-             coolDownSystem.PutOnCoolDown(this);
-         }
-                
-          
-    }
-
-
-public Tilemap TargetedBlock
-    {
-        get
+        if(!coolDownSystem.IsOnCoolDown(id))
         {
-            return targetedBlock;
-
-        }
-
-        set
-        {
-            targetedBlock = value;
+            currentTileMap.SetTile(blockToMine, null);
+            coolDownSystem.PutOnCoolDown(this);
         }
     }
+
 
     public int Id => id;
 

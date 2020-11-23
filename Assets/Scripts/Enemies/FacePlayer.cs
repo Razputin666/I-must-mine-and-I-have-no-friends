@@ -14,10 +14,12 @@ public class FacePlayer : MonoBehaviour
     void Update()
     {
         Vector2 direction = new Vector2(
-        player.transform.position.x- transform.position.x,
+        (player.transform.position.x) - transform.position.x,
         player.transform.position.y - transform.position.y);
 
-       // Debug.Log(transform.up);
+        // Vector2 direction = new Vector2(Random.Range(player.transform.position.x - transform.position.x, transform.position.x), Random.Range(player.transform.position.y - transform.position.y, transform.position.y));
+
+        // Debug.Log(transform.up);
         transform.up = direction;
     }
 }

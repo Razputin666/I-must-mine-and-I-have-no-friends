@@ -444,6 +444,7 @@ GameObject:
   - component: {fileID: 658734921}
   - component: {fileID: 658734926}
   - component: {fileID: 658734927}
+  - component: {fileID: 1800691689235569727}
   m_Layer: 2
   m_Name: Buttface-guy
   m_TagString: Player
@@ -606,6 +607,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f635b584ce867a645a4bd7f5e3a716d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1800691689235569727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8181247841218053072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88a37433fec4c3944961e514c0ff0323, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &8181247841502162097
