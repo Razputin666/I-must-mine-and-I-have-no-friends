@@ -22,16 +22,16 @@ public class UIInventory : MonoBehaviour
         }
     }
 
-    public void UpdateSlot(int slot, Item item)
+    public void UpdateSlot(int slot, ItemOld item)
     {
         uIItem[slot].UpdateItem(item);
     }
 
-    public void AddNewItem(Item item)
+    public void AddNewItem(ItemOld item)
     {
         UpdateSlot(uIItem.FindIndex(i => i.Item == null), item);
     }
-    public void RemoveItem(Item item)
+    public void RemoveItem(ItemOld item)
     {
         UpdateSlot(uIItem.FindIndex(i => i.Item == null), null);
     }

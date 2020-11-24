@@ -14,7 +14,7 @@ public class Tooltip : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void GenerateTooltip(Item item)
+    public void GenerateTooltip(ItemOld item)
     {
         string statText = "";
         if(item.GetType() == typeof(Weapon))

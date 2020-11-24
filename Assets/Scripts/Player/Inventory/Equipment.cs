@@ -22,7 +22,7 @@ public class Equipment : MonoBehaviour
         }
     }
 
-    public void EquipItem(int slot, Item item)
+    public void EquipItem(int slot, ItemOld item)
     {
         
     }

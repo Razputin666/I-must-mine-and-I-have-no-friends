@@ -7,6 +7,6 @@ public class DefaultObject : ItemObject
 {
     public void Awake()
     {
-        itemType = ITEM_TYPE.Default;
+        itemType = ITEM_TYPE.ChestMod;
     }
 }

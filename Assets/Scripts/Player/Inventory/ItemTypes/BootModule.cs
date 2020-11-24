@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BootModule : Item
+public class BootModule : ItemOld
 {
     private float jumpMultiplier;
 

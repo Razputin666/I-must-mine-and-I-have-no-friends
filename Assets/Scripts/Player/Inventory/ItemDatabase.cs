@@ -4,26 +4,26 @@ using UnityEngine;
 
 public class ItemDatabase : MonoBehaviour
 {
-    private List<Item> items = new List<Item>();
+    private List<ItemOld> items = new List<ItemOld>();
 
     private void Awake()
     {
         BuildDatabase();
     }
 
-    public Item GetItem(int id)
+    public ItemOld GetItem(int id)
     {
         return items.Find(item => item.ID == id);
     }
 
-    public Item GetItem(string itemName)
+    public ItemOld GetItem(string itemName)
     {
         return items.Find(item => item.Title == itemName);
     }
 
     private void BuildDatabase()
     {
-        items = new List<Item>()
+        items = new List<ItemOld>()
         {
             new Weapon(0, "Diamond Sword", "A sword made of diamond",
             new Dictionary<string, int>

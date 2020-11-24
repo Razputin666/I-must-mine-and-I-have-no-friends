@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Item
+public abstract class ItemOld
 {
     protected int id;
     protected string title;
     protected string description;
     protected Sprite icon;
 
-    public Item(int id, string title, string description)
+    public ItemOld(int id, string title, string description)
     {
         this.id = id;
         this.title = title;
@@ -17,7 +17,7 @@ public abstract class Item
         this.icon = Resources.Load<Sprite>("Sprites/Items/" + title);
     }
 
-    public Item(Item item)
+    public ItemOld(ItemOld item)
     {
         this.id = item.id;
         this.title = item.title;

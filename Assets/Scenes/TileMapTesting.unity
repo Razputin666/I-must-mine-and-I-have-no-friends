@@ -282,6 +282,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8978213078250018398, guid: c6963e988a08d9642a0e8b79ae49ff62,
         type: 3}
+      propertyPath: width
+      value: 3000
+      objectReference: {fileID: 0}
+    - target: {fileID: 8978213078250018398, guid: c6963e988a08d9642a0e8b79ae49ff62,
+        type: 3}
       propertyPath: tilemap
       value: 
       objectReference: {fileID: 1408327563}
