@@ -204,6 +204,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: EvilBeavis(enemy) (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 8181247841218053072, guid: a30216263475d1b4692d6f122da9391a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8181247841218053085, guid: a30216263475d1b4692d6f122da9391a,
         type: 3}
       propertyPath: m_RootOrder

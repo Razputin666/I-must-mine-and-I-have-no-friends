@@ -20,7 +20,7 @@ public class MouseOver : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         HowerText.color = new Color(1, 1, 1, 1);
         audioData.Play(0);
-        Debug.Log("Mouse is over GameObject.");
+        
     }
     public void OnPointerExit(PointerEventData eventData)
     {
