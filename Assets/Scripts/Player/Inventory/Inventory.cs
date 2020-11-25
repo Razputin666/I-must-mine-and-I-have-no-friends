@@ -1,64 +1,28 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Inventory : MonoBehaviour
+[System.Serializable]
+public class Inventory
 {
-    //Items in the players inventory
-    public List<Item> characterItems = new List<Item>();
-    //Reference to our items
     [SerializeField]
-    private ItemDatabase itemDatabase;
+    private InventorySlot[] inventorySlots = new InventorySlot[36];
 
-    [SerializeField]
-    private UIInventory inventoryUI;
-
-    private int numberOfSlots;
-
-    private void Start()
+    public void Clear()
     {
-        numberOfSlots = inventoryUI.GetMaxSlots();
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.O))
+        for (int i = 0; i < inventorySlots.Length; i++)
         {
-            AddItem(0);
+            inventorySlots[i].RemoveItem();
         }
     }
 
-    public void AddItem(int id)
+    public InventorySlot[] InventorySlot
     {
-        if(characterItems.Count < numberOfSlots)
+        get
         {
-            Item itemToAdd = itemDatabase.GetItem(id);
-            Debug.Log(itemToAdd);
-            characterItems.Add(itemToAdd);
-            inventoryUI.AddNewItem(itemToAdd);
-            Debug.Log("Added item: " + itemToAdd.Title);
+            return this.inventorySlots;
         }
-        
-    }
-    public void AddItem(string itemName)
-    {
-        Item itemToAdd = itemDatabase.GetItem(itemName);
-        characterItems.Add(itemToAdd);
-        Debug.Log("Added item: " + itemToAdd.Title);
-    }
-    public Item CheckforItem(int id)
-    {
-        return characterItems.Find(item => item.ID == id);
-    }
-
-    public void RemoveItem(int id)
-    {
-        Item item = CheckforItem(id);
-        if(item != null)
+        set
         {
-            characterItems.Remove(item);
-            inventoryUI.RemoveItem(item);
-            Debug.Log("Item removed: " + item.Title);
+            this.inventorySlots = value;
         }
     }
 }

@@ -1,0 +1,198 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20a34459c138a5841b5a37f1ac38071f, type: 3}
+  m_Name: PlayerInventory
+  m_EditorClassIdentifier: 
+  savePath: /Inventory.Save
+  itemDatabase: {fileID: 11400000, guid: 0479499c299ce264c916f647df531e9a, type: 2}
+  container:
+    items:
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+      amount: 0
