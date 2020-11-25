@@ -14,21 +14,14 @@ public enum ITEM_TYPE
     WeaponMod
 }
 
-//public enum ATTRIBUTES
-//{
-//    Agi,
-//    Int,
-//    Sta,
-//    Str
-//}
 public abstract class ItemObject : ScriptableObject
 {
-    public int itemID;
     public Sprite uiDisplaySprite;
+    public bool stackable;
     public ITEM_TYPE itemType;
     [TextArea(15, 20)]
     public string description;
-    //public ItemBuff[] buffs;
+    public Item data = new Item();
 
     public Item CreateItem()
     {
@@ -41,7 +34,7 @@ public abstract class ItemObject : ScriptableObject
 public class Item
 {
     public string name;
-    public int id;
+    public int id = -1;
     //public ItemBuff[] buffs;
 
     public Item()
@@ -52,7 +45,7 @@ public class Item
     public Item(ItemObject item)
     {
         name = item.name;
-        id = item.itemID;
+        id = item.data.id;
 
         //buffs = new ItemBuff[item.buffs.Length];
         //for(int i = 0; i < buffs.Length; i++)

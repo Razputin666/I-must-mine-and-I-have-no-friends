@@ -10,7 +10,7 @@ public class StaticInterface : UserInterface
 
     public override void CreateSlots()
     {
-        itemsDisplayed = new Dictionary<GameObject, InventorySlot>();
+        slotsOnInterface = new Dictionary<GameObject, InventorySlot>();
         //Loop through all the items in our Equipment database
         for (int i = 0; i < inventory.container.Items.Length; i++)
         {
@@ -24,7 +24,7 @@ public class StaticInterface : UserInterface
             AddEvent(itemObject, EventTriggerType.Drag, delegate { OnDrag(itemObject); });
 
             //Link the database to the itemObject
-            itemsDisplayed.Add(itemObject, inventory.container.Items[i]);
+            slotsOnInterface.Add(itemObject, inventory.container.Items[i]);
         }
     }
 }

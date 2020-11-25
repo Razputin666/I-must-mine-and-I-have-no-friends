@@ -4,18 +4,21 @@ using UnityEngine;
 
 public class ItemHandler : MonoBehaviour
 {
-    public MouseItem mouseItem = new MouseItem();
     [SerializeField]
     private InventoryObject inventory;
-
+    [SerializeField]
+    private InventoryObject equipment;
     public void OnTriggerEnter2D(Collider2D other)
     {
-        GroundItem item = other.GetComponent<GroundItem>();
+        GroundItem groundItem = other.GetComponent<GroundItem>();
 
-        if(item)
+        if(groundItem)
         {
-            inventory.AddItem(new Item(item.Item), 1);
-            Destroy(other.gameObject);
+            Item newItem = new Item(groundItem.Item);
+            if(inventory.AddItem(newItem, 1))
+            {
+                Destroy(other.gameObject);
+            }           
         }
     }
 
@@ -24,15 +27,18 @@ public class ItemHandler : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.P))
         {
             inventory.Save();
+            equipment.Save();
         }
         if (Input.GetKeyDown(KeyCode.L))
         {
             inventory.Load();
+            equipment.Load();
         }
     }
 
     private void OnApplicationQuit()
     {
-        inventory.Container.Items = new InventorySlot[36] ;
+        inventory.Container.Clear();
+        equipment.Container.Clear();
     }
 }

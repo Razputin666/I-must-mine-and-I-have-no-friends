@@ -9,6 +9,6 @@ public class WeaponObject : ItemObject
     private float fireRate;
     public void Awake()
     {
-        itemType = ITEM_TYPE.WeaponMod;
+        //itemType = ITEM_TYPE.WeaponMod;
     }
 }
