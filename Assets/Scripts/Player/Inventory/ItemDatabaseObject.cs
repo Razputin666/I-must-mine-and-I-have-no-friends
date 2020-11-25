@@ -6,15 +6,15 @@ using UnityEngine;
 public class ItemDatabaseObject : ScriptableObject, ISerializationCallbackReceiver
 {
     [SerializeField] 
-    private ItemObject[] items;
+    private ItemObject[] itemObjects;
 
     [ContextMenu("Update ID's")]
     public void UpdateID()
     {
-        for (int i = 0; i < items.Length; i++)
+        for (int i = 0; i < itemObjects.Length; i++)
         {
-            if (items[i].Data.ID != i)
-                items[i].Data.ID = i;
+            if (itemObjects[i].Data.ID != i)
+                itemObjects[i].Data.ID = i;
         }
     }
     public void OnAfterDeserialize()
@@ -29,6 +29,6 @@ public class ItemDatabaseObject : ScriptableObject, ISerializationCallbackReceiv
 
     public ItemObject GetItemAt(int id)
     {
-       return this.items[id];
+       return this.itemObjects[id];
     }
 }

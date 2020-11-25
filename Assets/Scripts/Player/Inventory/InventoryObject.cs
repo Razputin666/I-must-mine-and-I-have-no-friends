@@ -1,10 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Runtime.Serialization;
-using UnityEngine.Events;
+
+public enum INTERFACE_TYPE
+{
+    Inventory,
+    Equipment,
+    Chest
+}
 
 [CreateAssetMenu(fileName = "New Inventory", menuName = "Inventory System/Inventory")]
 public class InventoryObject : ScriptableObject
@@ -15,14 +19,16 @@ public class InventoryObject : ScriptableObject
     private ItemDatabaseObject itemDatabase;
     [SerializeField]
     private Inventory container;
- 
+    [SerializeField]
+    private INTERFACE_TYPE interfaceType;
+
     public InventorySlot FindItemInInventory(Item item)
     {
-        for (int i = 0; i < container.Items.Length; i++)
+        for (int i = 0; i < GetSlots.Length; i++)
         {
-            if (container.Items[i].Item.ID <= -1)
+            if (GetSlots[i].Item.ID <= -1)
             {
-                return container.Items[i];
+                return GetSlots[i];
             }
         }
         return null;
@@ -30,13 +36,13 @@ public class InventoryObject : ScriptableObject
 
     public InventorySlot SetEmptySlot(Item item, int amount)
     {
-        for (int i = 0; i < container.Items.Length; i++)
+        for (int i = 0; i < GetSlots.Length; i++)
         {
             //Check if the slot is empty == -1
-            if (container.Items[i].Item.ID <= -1)
+            if (GetSlots[i].Item.ID <= -1)
             {
-                container.Items[i].UpdateSlot(item, amount);
-                return container.Items[i];
+                GetSlots[i].UpdateSlot(item, amount);
+                return GetSlots[i];
             }
         }
         //Setup functionallity when inventory full
@@ -76,11 +82,11 @@ public class InventoryObject : ScriptableObject
 
     public void RemoveItem(Item item)
     {
-        for (int i = 0; i < container.Items.Length; i++)
+        for (int i = 0; i < GetSlots.Length; i++)
         {
-            if(container.Items[i].Item == item)
+            if(GetSlots[i].Item == item)
             {
-                container.Items[i].UpdateSlot(null, 0);
+                GetSlots[i].UpdateSlot(null, 0);
             }
         }
     }
@@ -100,14 +106,29 @@ public class InventoryObject : ScriptableObject
             return this.itemDatabase;
         }
     }
+    public INTERFACE_TYPE InterfaceType
+    {
+        get
+        {
+            return this.interfaceType;
+        }
+    }
+    public InventorySlot[] GetSlots
+    {
+        get
+        {
+            return container.InventorySlot;
+        }
+    }
+
     public int EmptySlotCount
     {
         get
         {
             int counter = 0;
-            for (int i = 0; i < container.Items.Length; i++)
+            for (int i = 0; i < GetSlots.Length; i++)
             {
-                if (container.Items[i].Item.ID <= -1)
+                if (GetSlots[i].Item.ID <= -1)
                     counter++;
             }
             return counter;
@@ -143,10 +164,9 @@ public class InventoryObject : ScriptableObject
             Stream stream = new FileStream(string.Concat(Application.persistentDataPath, savePath), FileMode.Open, FileAccess.Read);
             Inventory newContainer = (Inventory)formatter.Deserialize(stream);
             
-            for (int i = 0; i < container.Items.Length; i++)
+            for (int i = 0; i < GetSlots.Length; i++)
             {
-                Debug.Log(newContainer.Items[i].Item);
-                container.Items[i].UpdateSlot(newContainer.Items[i].Item, newContainer.Items[i].Amount);
+                GetSlots[i].UpdateSlot(newContainer.InventorySlot[i].Item, newContainer.InventorySlot[i].Amount);
             }
             stream.Close();
         }
@@ -157,123 +177,4 @@ public class InventoryObject : ScriptableObject
         container.Clear();
     }
     #endregion
-}
-
-[System.Serializable]
-public class Inventory
-{
-    [SerializeField]
-    private InventorySlot[] items = new InventorySlot[36];
-    
-    public void Clear()
-    {
-        for (int i = 0; i < items.Length; i++)
-        {
-            items[i].RemoveItem();
-        }
-    }
-    
-    public InventorySlot[] Items
-    {
-        get
-        {
-            return this.items;
-        }
-        set
-        {
-            this.items = value;
-        }
-    }
-}
-
-[System.Serializable]
-public class InventorySlot
-{
-    public ITEM_TYPE[] itemTypeAllowed = new ITEM_TYPE[0];
-    [System.NonSerialized]
-    public UserInterface parent;
-
-    [SerializeField]
-    private Item item;
-    [SerializeField]
-    private int amount;
-    public ItemObject ItemObject
-    {
-        get
-        {
-            if(item.ID >= 0)
-                return parent.Inventory.ItemDatabase.GetItemAt(item.ID);
-
-            return null;
-        }
-    }
-    #region Constructors
-    public InventorySlot()
-    {
-        this.item = new Item();
-        this.amount = 0;
-    }
-
-    public InventorySlot(Item item, int amount)
-    {
-        this.item = item;
-        this.amount = amount;
-    }
-    #endregion 
-
-    public void UpdateSlot(Item item, int amount)
-    {
-        this.item = item;
-        this.amount = amount;
-    }
-
-    public void RemoveItem()
-    {
-        this.item = new Item();
-        this.amount = 0;
-    }
-
-    public void AddAmount(int value)
-    {
-        this.amount += value;
-    }
-    //Check if we can place the itemobject in this slot
-    public bool CanPlaceInSlot(ItemObject itemObject)
-    {
-        //Check if every item is allowed or the item we are trying to place is couldnt be found or if the slot is empty
-        if (itemTypeAllowed.Length <= 0 || itemObject == null || itemObject.Data.ID < 0)
-            return true;
-            
-
-        for (int i = 0; i < itemTypeAllowed.Length; i++)
-        {
-            //Check if the item type is allowed in the slot
-            if (itemObject.ItemType == itemTypeAllowed[i])
-            {
-                return true;
-            }
-                
-        }
-        return false;
-    }
-
-    public Item Item
-    {
-        get
-        {
-            return this.item;
-        }
-        set
-        {
-            this.item = value;
-        }
-    }
-
-    public int Amount
-    {
-        get
-        {
-            return this.amount;
-        }
-    }
 }

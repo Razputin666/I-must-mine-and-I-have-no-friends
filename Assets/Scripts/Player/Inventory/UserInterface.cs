@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using System;
 
 public abstract class UserInterface : MonoBehaviour
 {
@@ -16,19 +14,30 @@ public abstract class UserInterface : MonoBehaviour
     //Start is called before the first frame update
     void Start()
     {
-        for (int i = 0; i < inventory.Container.Items.Length; i++)
+        for (int i = 0; i < inventory.GetSlots.Length; i++)
         {
-            inventory.Container.Items[i].parent = this;
+            inventory.GetSlots[i].parent = this;
+            inventory.GetSlots[i].OnAfterUpdate += OnSlotUpdate;
         }
         CreateSlots();
         AddEvent(gameObject, EventTriggerType.PointerEnter, delegate { OnEnterInterface(gameObject); });
         AddEvent(gameObject, EventTriggerType.PointerExit, delegate { OnExitInterface(gameObject); });
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnSlotUpdate(InventorySlot slot)
     {
-        slotsOnInterface.UpdateSlotDisplay();
+        if (slot.Item.ID >= 0)
+        {
+            slot.slotObject.transform.GetChild(0).GetComponentInChildren<Image>().sprite = slot.ItemObject.UIDisplaySprite;
+            slot.slotObject.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(1, 1, 1, 1);
+            slot.slotObject.GetComponentInChildren<TextMeshProUGUI>().text = slot.Amount == 1 ? "" : slot.Amount.ToString("n0");
+        }
+        else //empty slot
+        {
+            slot.slotObject.transform.GetChild(0).GetComponentInChildren<Image>().sprite = null;
+            slot.slotObject.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(1, 1, 1, 0);
+            slot.slotObject.GetComponentInChildren<TextMeshProUGUI>().text = "";
+        }
     }
 
     public abstract void CreateSlots();
@@ -92,6 +101,7 @@ public abstract class UserInterface : MonoBehaviour
 
         if(MouseData.interfaceMouseIsOver == null)
         {
+            SpawnManager.SpawnItemAt(Camera.main.ScreenToWorldPoint(Input.mousePosition), slotsOnInterface[obj].ItemObject);
             slotsOnInterface[obj].RemoveItem();
             return;
         }
@@ -113,35 +123,6 @@ public abstract class UserInterface : MonoBehaviour
         get
         {
             return this.inventory;
-        }
-    }
-}
-
-public static class MouseData
-{
-    public static UserInterface interfaceMouseIsOver;
-    public static GameObject tempItemBeingDragged;
-    public static GameObject slotHoveredOver;
-}
-
-public static class ExtensionMethods
-{
-    public static void UpdateSlotDisplay(this Dictionary<GameObject, InventorySlot> slotsOnInterface)
-    {
-        foreach (KeyValuePair<GameObject, InventorySlot> slot in slotsOnInterface)
-        {
-            if (slot.Value.Item.ID >= 0)
-            {
-                slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().sprite = slot.Value.ItemObject.UIDisplaySprite;
-                slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(1, 1, 1, 1);
-                slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = slot.Value.Amount == 1 ? "" : slot.Value.Amount.ToString("n0");
-            }
-            else //empty slot
-            {
-                slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().sprite = null;
-                slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(1, 1, 1, 0);
-                slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = "";
-            }
         }
     }
 }

@@ -19,4 +19,4 @@ MonoBehaviour:
   data:
     name: 
     id: 0
-  jumpMultiplier: 0
+  jumpMultiplier: 1.5

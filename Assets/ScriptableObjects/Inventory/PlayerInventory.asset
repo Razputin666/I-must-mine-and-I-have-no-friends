@@ -17,182 +17,182 @@ MonoBehaviour:
   container:
     items:
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
     - itemTypeAllowed: 
-      Item:
+      item:
         name: 
         id: -1
-      Amount: 0
+      amount: 0
