@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
 
     public Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
     private ItemController itemController;
-    private Inventory inventory;
+    //private Inventory inventory;
     public Transform item;
     private JumpController jumpController;
    [SerializeField]private DeathScreen deathScreen;
@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        inventory = GetComponentInChildren<Inventory>();
+        //inventory = GetComponentInChildren<Inventory>();
         item = gameObject.GetComponentInChildren<FaceMouse>().gameObject.transform.Find("ItemHeldInHand");
         item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Drill");
         item.GetComponent<DefaultGun>().enabled = false;

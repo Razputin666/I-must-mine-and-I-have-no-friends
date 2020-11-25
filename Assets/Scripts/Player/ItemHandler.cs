@@ -61,11 +61,10 @@ public class ItemHandler : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D other)
     {
         GroundItem groundItem = other.GetComponent<GroundItem>();
-
         if(groundItem)
         {
             Item newItem = new Item(groundItem.Item);
-            if(inventory.AddItem(newItem, 1))
+            if (inventory.AddItem(newItem, 1))
             {
                 Destroy(other.gameObject);
             }           

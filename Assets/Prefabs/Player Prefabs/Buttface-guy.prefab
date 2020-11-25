@@ -97,6 +97,7 @@ GameObject:
   - component: {fileID: 1590221734}
   - component: {fileID: 1505938777}
   - component: {fileID: 1505938776}
+  - component: {fileID: 261607337}
   m_Layer: 2
   m_Name: ItemHeldInHand
   m_TagString: Untagged
@@ -215,10 +216,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 2
-  coolDownDuration: 0.2
+  coolDownDuration: 0.5
   coolDownSystem: {fileID: 658734927}
   points: []
-  line: {fileID: 0}
   endOfGun: {fileID: 0}
 --- !u!120 &1505938777
 LineRenderer:
@@ -330,6 +330,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 735eb0431543be841a0bc67937627708, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &261607337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1590221729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c4edf53b628fc145ba0ed132ad2fd3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1635492100
 GameObject:
   m_ObjectHideFlags: 0
@@ -340,7 +352,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1635492101}
   - component: {fileID: 1635492103}
-  - component: {fileID: 1635492102}
   m_Layer: 2
   m_Name: BackPack
   m_TagString: Untagged
@@ -413,22 +424,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1635492102
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1635492100}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f84a9278a27b5324a81039c32f9b8ee5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemDatabase: {fileID: 5877550586013752606, guid: 47690889342226f4791e2e03479af492,
-    type: 3}
-  inventoryUI: {fileID: 1450370641672513141, guid: a8d9e96491ac63d4286fc2500f692e19,
-    type: 3}
 --- !u!1 &8181247841218053072
 GameObject:
   m_ObjectHideFlags: 0
@@ -445,6 +440,7 @@ GameObject:
   - component: {fileID: 658734926}
   - component: {fileID: 658734927}
   - component: {fileID: 1800691689235569727}
+  - component: {fileID: 1547874993}
   m_Layer: 2
   m_Name: Buttface-guy
   m_TagString: Player
@@ -563,6 +559,7 @@ MonoBehaviour:
   rb2d: {fileID: 8181247841218053084}
   worldPosition: {x: 0, y: 0, z: 0}
   mousePos: {x: 0, y: 0, z: 0}
+  item: {fileID: 0}
   deathScreen: {fileID: 0}
   _camera: {fileID: 0}
 --- !u!70 &658734921
@@ -621,6 +618,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a37433fec4c3944961e514c0ff0323, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1547874993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8181247841218053072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e65608fcc3036348aa8aa4cc9bac9a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventory: {fileID: 11400000, guid: 74f6aef5271999548b36c1d127af90f2, type: 2}
+  equipment: {fileID: 11400000, guid: 38df84b87fcb50d4bb42ec3aba0baf9e, type: 2}
 --- !u!1 &8181247841502162097
 GameObject:
   m_ObjectHideFlags: 0
