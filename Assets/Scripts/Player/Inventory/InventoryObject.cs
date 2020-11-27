@@ -80,22 +80,26 @@ public class InventoryObject : ScriptableObject
     {
         if (item1 == item2)
             return;
+        
         //Check if the items can swap used for the equipment slots.
         if (item2.CanPlaceInSlot(item1.ItemObject) && item1.CanPlaceInSlot(item2.ItemObject))
         {
-            //check if the items are of the same type then stack them and is stackable
-            if(item1.ID == item2.ID && item1.ItemObject.Stackable)
+            //check so that both slots arent empty
+            if(item1.ID >= 0 || item2.ID >= 0)
             {
-                item2.UpdateSlot(item2.Item, item2.Amount + item1.Amount);
-                item1.RemoveItem();
+                //check if the items are of the same type then stack them and is stackable
+                if (item1.ID == item2.ID && ItemDatabase.GetItemAt(item1.ID).Stackable)
+                {
+                    item2.UpdateSlot(item2.Item, item2.Amount + item1.Amount);
+                    item1.RemoveItem();
+                }
+                else
+                {
+                    InventorySlot temp = new InventorySlot(item2.Item, item2.Amount);
+                    item2.UpdateSlot(item1.Item, item1.Amount);
+                    item1.UpdateSlot(temp.Item, temp.Amount);
+                }
             }
-            else
-            {
-                InventorySlot temp = new InventorySlot(item2.Item, item2.Amount);
-                item2.UpdateSlot(item1.Item, item1.Amount);
-                item1.UpdateSlot(temp.Item, temp.Amount);
-            }
-            
         }
     }
 
@@ -105,7 +109,7 @@ public class InventoryObject : ScriptableObject
         if (item == null || item.ID < 0)
             return;
         //check if the item is stackable
-        if (!ItemDatabase.GetItemAt(item.ID).Stackable && item.Amount > 1)
+        if (!ItemDatabase.GetItemAt(item.ID).Stackable || item.Amount <= 1)
             return;
 
         int newAmount = item.Amount / 2;
