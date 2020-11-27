@@ -105,7 +105,7 @@ public class InventoryObject : ScriptableObject
         if (item == null || item.ID < 0)
             return;
         //check if the item is stackable
-        if (!ItemDatabase.GetItemAt(item.ID).Stackable && item.Amount > 1)
+        if (!ItemDatabase.GetItemAt(item.ID).Stackable || item.Amount <= 1)
             return;
 
         int newAmount = item.Amount / 2;
