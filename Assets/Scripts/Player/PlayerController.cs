@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour
         item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Drill");
         item.GetComponent<DefaultGun>().enabled = false;
         item.GetComponent<MiningController>().enabled = true;
-        Debug.Log(item);
+
         //Get and store a reference to the Rigidbody2D component so that we can access it.
         
         facingRight = true;
