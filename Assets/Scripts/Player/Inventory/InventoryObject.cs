@@ -95,7 +95,6 @@ public class InventoryObject : ScriptableObject
                 item2.UpdateSlot(item1.Item, item1.Amount);
                 item1.UpdateSlot(temp.Item, temp.Amount);
             }
-            
         }
     }
 
