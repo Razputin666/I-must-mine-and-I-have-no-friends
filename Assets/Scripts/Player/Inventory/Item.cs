@@ -7,18 +7,22 @@ public class Item
     private string name;
     [SerializeField]
     private int id = -1;
+    [SerializeField]
+    private int amount;
     //public ItemBuff[] buffs;
-
+    private ItemObject itemObject;
     public Item()
     {
         name = "";
         id = -1;
+        amount = 0;
     }
     public Item(ItemObject item)
     {
+        itemObject = item;
         name = item.name;
         id = item.Data.id;
-
+        amount = item.Data.amount;
         //buffs = new ItemBuff[item.buffs.Length];
         //for(int i = 0; i < buffs.Length; i++)
         //{
@@ -43,6 +47,25 @@ public class Item
         set
         {
             this.id = value;
+        }
+    }
+
+    public int Amount
+    {
+        get
+        {
+            return this.amount;
+        }
+        set
+        {
+            this.amount = value;
+        }
+    }
+    public ItemObject ItemObject
+    {
+        get
+        {
+            return this.itemObject;
         }
     }
 }

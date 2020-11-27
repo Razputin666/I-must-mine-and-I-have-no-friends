@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class PlayerStatesController : MonoBehaviour
 {
+    private ItemHandler itemHandler;
     private PlayerController player;
     private LineController line;
     private MiningController miningMode;
@@ -20,7 +21,7 @@ public class PlayerStatesController : MonoBehaviour
         tileMapChecker = GetComponentInChildren<TileMapChecker>();
         line = GetComponentInChildren<FaceMouse>().GetComponentInChildren<LineController>();
         miningMode = GetComponentInChildren<FaceMouse>().GetComponentInChildren<MiningController>();
-
+        itemHandler = GetComponent<ItemHandler>();
     }
 
     // Update is called once per frame
@@ -38,10 +39,22 @@ public class PlayerStatesController : MonoBehaviour
 
                 if (Input.GetMouseButton(0) && distanceFromPlayer.x > -5 && distanceFromPlayer.x < 5 && distanceFromPlayer.y > -5 && distanceFromPlayer.y < 5)
                 {
+                    Sprite sprite = TargetedBlock.GetSprite(targetBlockIntPos);
                     line.enabled = true;
-                    miningMode.Mine(targetBlockIntPos,TargetedBlock);
+                    if(miningMode.Mine(targetBlockIntPos,TargetedBlock))
+                    {
+                        ItemObject itemObj = itemHandler.ItemDatabase.GetItemAt(8);
+                        if(itemObj != null)
+                        {
+                            ItemObject newItemObj = Instantiate(itemObj);
+                            SpawnManager.SpawnItemAt(targetBlockIntPos, newItemObj);
+                        }
+                        else
+                        {
+                            Debug.Log("null itemObj");
+                        }
+                    }
                 }
-
                 break;
             case PlayerController.PlayerStates.Normal:
                 break;

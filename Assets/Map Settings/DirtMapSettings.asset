@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e04dc494a6945ed47b4d6e93c6be4759, type: 3}
   m_Name: DirtMapSettings
   m_EditorClassIdentifier: 
-  algorithm: 6
+  algorithm: 7
   randomSeed: 1
   seed: 0
   fillAmount: 0

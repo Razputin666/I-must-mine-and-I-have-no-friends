@@ -11,7 +11,8 @@ public enum ITEM_TYPE
     LaserMod,
     FlightMod,
     LightMod,
-    WeaponMod
+    WeaponMod,
+    TileBlock
 }
 
 public abstract class ItemObject : ScriptableObject

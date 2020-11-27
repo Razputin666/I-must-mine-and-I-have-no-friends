@@ -19,14 +19,13 @@ public class InventorySlot
 
     [SerializeField]
     private Item item;
-    [SerializeField]
-    private int amount;
     public ItemObject ItemObject
     {
         get
         {
             if (item.ID >= 0)
-                return parent.Inventory.ItemDatabase.GetItemAt(item.ID);
+                return item.ItemObject;
+                //return parent.Inventory.ItemDatabase.GetItemAt(item.ID);
 
             return null;
         }
@@ -49,7 +48,7 @@ public class InventorySlot
             OnBeforeUpdate.Invoke(this);
 
         this.item = item;
-        this.amount = amount;
+        this.item.Amount = amount;
 
         if (OnAfterUpdate != null)
             OnAfterUpdate.Invoke(this);
@@ -63,7 +62,7 @@ public class InventorySlot
 
     public void AddAmount(int value)
     {
-        this.amount += value;
+        UpdateSlot(item, this.item.Amount + value);
     }
     //Check if we can place the itemobject in this slot
     public bool CanPlaceInSlot(ItemObject itemObject)
@@ -80,7 +79,6 @@ public class InventorySlot
             {
                 return true;
             }
-
         }
         return false;
     }
@@ -101,7 +99,15 @@ public class InventorySlot
     {
         get
         {
-            return this.amount;
+            return this.item.Amount;
+        }
+    }
+
+    public int ID
+    {
+        get
+        {
+            return this.item.ID;
         }
     }
 }

@@ -22,7 +22,7 @@ public class InventoryObject : ScriptableObject
     [SerializeField]
     private INTERFACE_TYPE interfaceType;
 
-    public InventorySlot FindItemInInventory(Item item)
+    public InventorySlot GetEmptySlot()
     {
         for (int i = 0; i < GetSlots.Length; i++)
         {
@@ -34,19 +34,28 @@ public class InventoryObject : ScriptableObject
         return null;
     }
 
-    public InventorySlot SetEmptySlot(Item item, int amount)
+    public InventorySlot FindItemInInventory(Item item)
     {
         for (int i = 0; i < GetSlots.Length; i++)
         {
-            //Check if the slot is empty == -1
-            if (GetSlots[i].Item.ID <= -1)
+            if (GetSlots[i].Item.ID == item.ID)
             {
-                GetSlots[i].UpdateSlot(item, amount);
                 return GetSlots[i];
             }
         }
-        //Setup functionallity when inventory full
         return null;
+    }
+
+    public bool IsItemInInventory(Item item)
+    {
+        for (int i = 0; i < GetSlots.Length; i++)
+        {
+            if (GetSlots[i].Item.ID == item.ID)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public bool AddItem(Item item, int amount)
@@ -56,11 +65,10 @@ public class InventoryObject : ScriptableObject
             return false;
 
         InventorySlot slot = FindItemInInventory(item);
-
         //If the item is not stackable or we couldnt find the same item type in the inventory add a new slot
         if (!ItemDatabase.GetItemAt(item.ID).Stackable || slot == null)
         {
-            SetEmptySlot(item, amount);
+            GetEmptySlot().UpdateSlot(item, amount);
             return true;
         }
         //add the amount to an exisiting item of the same type.
@@ -70,14 +78,50 @@ public class InventoryObject : ScriptableObject
 
     public void SwapItems(InventorySlot item1, InventorySlot item2)
     {
+        if (item1 == item2)
+            return;
         //Check if the items can swap used for the equipment slots.
         if (item2.CanPlaceInSlot(item1.ItemObject) && item1.CanPlaceInSlot(item2.ItemObject))
         {
-            InventorySlot temp = new InventorySlot(item2.Item, item2.Amount);
-            item2.UpdateSlot(item1.Item, item1.Amount);
-            item1.UpdateSlot(temp.Item, temp.Amount);
+            //check if the items are of the same type then stack them and is stackable
+            if(item1.ID == item2.ID && item1.ItemObject.Stackable)
+            {
+                item2.UpdateSlot(item2.Item, item2.Amount + item1.Amount);
+                item1.RemoveItem();
+            }
+            else
+            {
+                InventorySlot temp = new InventorySlot(item2.Item, item2.Amount);
+                item2.UpdateSlot(item1.Item, item1.Amount);
+                item1.UpdateSlot(temp.Item, temp.Amount);
+            }
+            
         }
+    }
 
+    public void SplitItem(InventorySlot item)
+    {
+        //Check if the slot is empty
+        if (item == null || item.ID < 0)
+            return;
+        //check if the item is stackable
+        if (!ItemDatabase.GetItemAt(item.ID).Stackable && item.Amount > 1)
+            return;
+
+        int newAmount = item.Amount / 2;
+
+        InventorySlot newSlot = GetEmptySlot();
+
+        //check if there was an empty slot
+        if (newSlot == null)
+            return;
+
+        //Create a new item from the same itemObject type.
+        Item newItem = new Item(Instantiate(ItemDatabase.GetItemAt(item.ID)));
+        //Update the amount of the original item.
+        item.UpdateSlot(item.Item, item.Amount - newAmount);
+        //put the new item in the inventory with an updated amount.
+        newSlot.UpdateSlot(newItem, newAmount);
     }
 
     public void RemoveItem(Item item)

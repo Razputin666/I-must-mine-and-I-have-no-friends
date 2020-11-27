@@ -29,7 +29,7 @@ public class ItemHandler : MonoBehaviour
                 break;
             case INTERFACE_TYPE.Equipment:
                 print(string.Concat("Removed ", slot.ItemObject, " on ", slot.parent.Inventory.InterfaceType, ", Allowed Items: ", string.Join(", ", slot.itemTypeAllowed)));
-
+                //Ta bort variablar från spelaren när man unequippar object
 
                 break;
             case INTERFACE_TYPE.Chest:
@@ -50,6 +50,7 @@ public class ItemHandler : MonoBehaviour
                 break;
             case INTERFACE_TYPE.Equipment:
                 print(string.Concat("Placed ", slot.ItemObject, " on ", slot.parent.Inventory.InterfaceType, ", Allowed Items: ", string.Join(", ", slot.itemTypeAllowed)));
+                //Lägg till variablar till spelaren när man equippar object
                 break;
             case INTERFACE_TYPE.Chest:
                 break;
@@ -60,13 +61,13 @@ public class ItemHandler : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        GroundItem groundItem = other.GetComponent<GroundItem>();
-        if(groundItem)
+        GroundItem groundItem = other.GetComponentInParent<GroundItem>();
+        if(groundItem && groundItem.PickupTime <= 0f)
         {
             Item newItem = new Item(groundItem.Item);
-            if (inventory.AddItem(newItem, 1))
+            if (inventory.AddItem(newItem, newItem.Amount))
             {
-                Destroy(other.gameObject);
+                Destroy(other.transform.parent.gameObject);
             }           
         }
     }
@@ -89,5 +90,13 @@ public class ItemHandler : MonoBehaviour
     {
         inventory.Clear();
         equipment.Clear();
+    }
+
+    public ItemDatabaseObject ItemDatabase
+    {
+        get
+        {
+            return this.inventory.ItemDatabase;
+        }
     }
 }

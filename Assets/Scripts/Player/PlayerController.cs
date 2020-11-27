@@ -179,7 +179,6 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-        Debug.Log("playerded");
         deathScreen.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }

@@ -101,11 +101,14 @@ public abstract class UserInterface : MonoBehaviour
 
         if(MouseData.interfaceMouseIsOver == null)
         {
-            SpawnManager.SpawnItemAt(Camera.main.ScreenToWorldPoint(Input.mousePosition), slotsOnInterface[obj].ItemObject);
+            ItemObject newItem = slotsOnInterface[obj].ItemObject;
+            newItem.Data.Amount = slotsOnInterface[obj].Item.Amount;
+            Debug.Log(newItem.Data.Amount);
+            SpawnManager.SpawnItemAt(Camera.main.ScreenToWorldPoint(Input.mousePosition), newItem);
             slotsOnInterface[obj].RemoveItem();
             return;
         }
-        if(MouseData.slotHoveredOver)
+        if(MouseData.slotHoveredOver != null)
         {
             InventorySlot mouseHoverSlotData = MouseData.interfaceMouseIsOver.slotsOnInterface[MouseData.slotHoveredOver];
             inventory.SwapItems(slotsOnInterface[obj], mouseHoverSlotData);

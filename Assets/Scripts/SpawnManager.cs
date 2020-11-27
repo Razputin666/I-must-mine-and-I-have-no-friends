@@ -14,4 +14,9 @@ public class SpawnManager : MonoBehaviour
         GroundItem gItem = groundObject.GetComponent<GroundItem>();
         gItem.Item = item;
     }
+
+    public static void SpawnItem(Vector3 spawnPos, Sprite sprite)
+    {
+
+    }
 }

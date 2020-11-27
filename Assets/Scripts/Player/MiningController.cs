@@ -22,13 +22,20 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     }
 
 
-    public void Mine(Vector3Int blockToMine, Tilemap currentTileMap)
+    public bool Mine(Vector3Int blockToMine, Tilemap currentTileMap)
     {
         if(!coolDownSystem.IsOnCoolDown(id))
         {
-            currentTileMap.SetTile(blockToMine, null);
+            if(currentTileMap.GetTile(blockToMine) != null)
+            {
+                currentTileMap.SetTile(blockToMine, null);
+                coolDownSystem.PutOnCoolDown(this);
+                return true;
+            }
             coolDownSystem.PutOnCoolDown(this);
+            return false;
         }
+        return false;
     }
 
 

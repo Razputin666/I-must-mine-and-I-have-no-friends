@@ -5,7 +5,17 @@ public class GroundItem : MonoBehaviour, ISerializationCallbackReceiver
 {
     [SerializeField]
     private ItemObject item;
+    private float pickupCooldown = 2f;
 
+    void Start()
+    {
+    }
+
+    private void Update()
+    {
+        if (pickupCooldown >= 0f)
+            pickupCooldown -= Time.deltaTime;
+    }
     public ItemObject Item
     {
         get 
@@ -17,9 +27,17 @@ public class GroundItem : MonoBehaviour, ISerializationCallbackReceiver
             this.item = value;
             if(item != null)
             {
+                pickupCooldown = 2f;
                 GetComponentInChildren<SpriteRenderer>().sprite = item.UIDisplaySprite;
-                Debug.Log(GetComponentInChildren<SpriteRenderer>().sprite);
             }
+        }
+    }
+
+    public float PickupTime
+    {
+        get
+        {
+            return this.pickupCooldown;
         }
     }
 

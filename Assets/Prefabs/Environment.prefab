@@ -274,7 +274,7 @@ GameObject:
   - component: {fileID: 1664937651011830821}
   - component: {fileID: 8643538394234633596}
   - component: {fileID: 3525345394350859356}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Terrain
   m_TagString: TileMap
   m_Icon: {fileID: 0}

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -30,6 +31,7 @@ public class DynamicInterface : UserInterface
 
             slotsOnInterface.Add(itemObject, inventory.GetSlots[i]);
             //Add events
+            AddEvent(itemObject, EventTriggerType.PointerDown, delegate { OnPointerDown(itemObject); });
             AddEvent(itemObject, EventTriggerType.PointerEnter, delegate { OnEnter(itemObject); });
             AddEvent(itemObject, EventTriggerType.PointerExit, delegate { OnExit(itemObject); });
             AddEvent(itemObject, EventTriggerType.BeginDrag, delegate { OnDragStart(itemObject); });
@@ -37,6 +39,16 @@ public class DynamicInterface : UserInterface
             AddEvent(itemObject, EventTriggerType.Drag, delegate { OnDrag(itemObject); });
         }
     }
+
+    private void OnPointerDown(GameObject itemObject)
+    {
+        //If we hover over a slot and press the right mousebutton
+        if(MouseData.slotHoveredOver != null && Input.GetMouseButton(1))
+        {
+            inventory.SplitItem(slotsOnInterface[MouseData.slotHoveredOver]);
+        }
+    }
+
 
     private Vector3 GetPosition(int index)
     {

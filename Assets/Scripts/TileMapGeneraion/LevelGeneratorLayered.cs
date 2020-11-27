@@ -77,7 +77,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 					//First generate our array
 					map = MapFunctions.GenerateArray(width, height, true);
 					//Next generate the perlin noise onto the array
-					map = MapFunctions.PerlinNoiseSmooth(map, seed, mapSettings[i].interval);
+					map = MapFunctions.PerlinNoiseSmooth(map, seed, mapSettings[0].interval);
 					break;
 				case Algorithm.PerlinCave:
 					//First generate our array
