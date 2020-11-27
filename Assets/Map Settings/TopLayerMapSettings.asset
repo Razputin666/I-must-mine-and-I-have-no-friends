@@ -18,7 +18,7 @@ MonoBehaviour:
   fillAmount: 0
   smoothAmount: 0
   clearAmount: 0
-  interval: 2
+  interval: 4
   minPathWidth: 0
   maxPathWidth: 0
   maxPathChange: 0
@@ -26,3 +26,4 @@ MonoBehaviour:
   windyness: 0
   edgesAreWalls: 0
   modifier: 0
+  randomHeightStart: 7

@@ -77,9 +77,9 @@ public class PlayerController : MonoBehaviour
 
         mousePos = Input.mousePosition;
         worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
-        _camera.transform.position = new Vector3(rb2d.transform.position.x, rb2d.transform.position.y, -1);
+        _camera.transform.position = new Vector3(rb2d.transform.position.x, rb2d.transform.position.y, -1); 
 
-        if(Input.GetKey(KeyCode.Alpha1))
+        if (Input.GetKey(KeyCode.Alpha1))
         {
             // gameObject.GetComponentInChildren<ItemController>().gameObject.GetComponent<SpriteRenderer>().sprite = inventory.GetItem(0).Icon;
             item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Drill");

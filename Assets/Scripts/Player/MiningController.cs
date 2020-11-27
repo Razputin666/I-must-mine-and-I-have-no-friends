@@ -35,4 +35,7 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     public int Id => id;
 
     public float CoolDownDuration => coolDownDuration;
+
+
+
 }

@@ -31,6 +31,7 @@ public class MapSettings : ScriptableObject
     public int minPathWidth, maxPathWidth, maxPathChange, roughness, windyness;
     public bool edgesAreWalls;
     public float modifier;
+    public int randomHeightStart;
 }
 
 //Custom UI for our class
@@ -70,6 +71,7 @@ public class MapSettings_Editor : Editor
                 break;
             case Algorithm.RandomWalkTopSmoothed:
                 mapLayer.interval = EditorGUILayout.IntSlider("Minimum Section Length", mapLayer.interval, 1, 10);
+                mapLayer.randomHeightStart = EditorGUILayout.IntSlider("Minimum Random Start", mapLayer.randomHeightStart, 1, 10);
                 break;
             case Algorithm.RandomWalkCave:
                 mapLayer.clearAmount = EditorGUILayout.IntSlider("Amount To Clear", mapLayer.clearAmount, 0, 100);

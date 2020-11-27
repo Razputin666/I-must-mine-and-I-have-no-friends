@@ -10,19 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e04dc494a6945ed47b4d6e93c6be4759, type: 3}
-  m_Name: BottomMapSettings
+  m_Name: MooreMapSettings
   m_EditorClassIdentifier: 
-  algorithm: 6
+  algorithm: 8
   randomSeed: 1
   seed: 0
-  fillAmount: 50
-  smoothAmount: 10
-  clearAmount: 32
-  interval: 1
+  fillAmount: 85
+  smoothAmount: 3
+  clearAmount: 10
+  interval: 2
   minPathWidth: 0
   maxPathWidth: 0
   maxPathChange: 0
   roughness: 0
   windyness: 0
-  edgesAreWalls: 1
-  modifier: 0.011
+  edgesAreWalls: 0
+  modifier: 0.032
+  randomHeightStart: 6

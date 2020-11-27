@@ -36,6 +36,7 @@ public class MapFunctions
     /// <param name="width">How wide you want the array</param>
     /// <param name="height">How high you want the array</param>
     /// <returns>The map array initialised</returns>
+    /// 
     public static int[,] GenerateArray(int width, int height, bool empty)
     {
         int[,] map = new int[width, height];
@@ -94,15 +95,19 @@ public class MapFunctions
     /// <param name="tilemap">The tilemap to draw on</param>
     /// <param name="tile">The tile to draw with</param>
     /// <param name="offset">The offset to apply</param>
-    public static void RenderMapWithOffset(int[,] map, Tilemap tilemap, TileBase[] tiles, Vector2Int offset)
+    public static void RenderMapWithOffset(int[,] map, Tilemap tilemap, TileBase tiles, Vector2Int offset, bool addTiles)
     {
         for (int x = 0; x < map.GetUpperBound(0); x++)
         {
             for (int y = 0; y < map.GetUpperBound(1); y++)
             {
-                if (map[x, y] == 1)
+                if (map[x, y] == 1 && addTiles)
                 {
-                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
+                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles);
+                }
+                else if (map[x, y] == 0)
+                {
+                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
                 }
             }
         }
@@ -114,17 +119,22 @@ public class MapFunctions
     /// <param name="map">The map to draw</param>
     /// <param name="tilemap">The tilemap to draw on</param>
     /// <param name="tile">The tile to draw with</param>
-    public static IEnumerator RenderMapWithDelay(int[,] map, Tilemap tilemap, TileBase tile)
+    public static IEnumerator RenderMapWithDelay(int[,] map, Tilemap tilemap, TileBase tiles, Vector2Int offset, bool addTiles)
     {
         for (int x = 0; x < map.GetUpperBound(0); x++)
         {
             for (int y = 0; y < map.GetUpperBound(1); y++)
             {
-                if (map[x, y] == 1)
+                if (map[x, y] == 1 && addTiles)
                 {
-                    tilemap.SetTile(new Vector3Int(x, y, 0), tile);
-                    yield return null;
+                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles);
                 }
+                else if (map[x, y] == 0)
+                {
+                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                }
+
+                yield return null;
             }
         }
     }
@@ -324,13 +334,13 @@ public class MapFunctions
     /// <param name="seed">The seed for the random</param>
     /// <param name="minSectionWidth">The minimum width of the current height to have before changing the height</param>
     /// <returns>The modified map with a smoothed random walk</returns>
-    public static int[,] RandomWalkTopSmoothed(int[,] map, float seed, int minSectionWidth)
+    public static int[,] RandomWalkTopSmoothed(int[,] map, float seed, int minSectionWidth, int randomizedRange)
     {
         //Seed our random
         System.Random rand = new System.Random(seed.GetHashCode());
 
         //Determine the start position
-        int lastHeight = Random.Range(0, map.GetUpperBound(1));
+        int lastHeight = Random.Range(map.GetUpperBound(1) - randomizedRange, map.GetUpperBound(1));
 
         //Used to determine which direction to go
         int nextMove = 0;
@@ -388,14 +398,17 @@ public class MapFunctions
         int reqFloorAmount = ((map.GetUpperBound(1) * map.GetUpperBound(0)) * requiredFloorPercent) / 100;
         //Used for our while loop, when this reaches our reqFloorAmount we will stop tunneling
         int floorCount = 0;
+        // Number of loops allowed
+        int maxLoops = 1000;
 
         //Set our start position to not be a tile (0 = no tile, 1 = tile)
         map[floorX, floorY] = 0;
         //Increase our floor count
         floorCount++;
 
-        while (floorCount < reqFloorAmount)
+        while (floorCount < reqFloorAmount && maxLoops > 0)
         {
+            Debug.Log(floorCount + " floor count " + reqFloorAmount + " required floor amount");
             //Determine our next direction
             int randDir = rand.Next(4);
 
@@ -407,6 +420,7 @@ public class MapFunctions
                     {
                         //Move the y up one
                         floorY++;
+                        
 
                         //Check if that piece is currently still a tile
                         if (map[floorX, floorY] == 1)
@@ -415,6 +429,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
@@ -431,6 +446,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
@@ -447,6 +463,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
@@ -463,10 +480,12 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
             }
+            maxLoops--;
         }
         //Return the updated map
         return map;
@@ -498,9 +517,11 @@ public class MapFunctions
         map[floorX, floorY] = 0;
         //Increase our floor count
         floorCount++;
+        int maxLoops = 1000;
 
-        while (floorCount < reqFloorAmount)
+        while (floorCount < reqFloorAmount && maxLoops > 0)
         {
+            Debug.Log(floorCount + " floor count " + reqFloorAmount + " required floor amount");
             //Determine our next direction
             int randDir = rand.Next(8);
 
@@ -522,6 +543,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
@@ -539,6 +561,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
@@ -558,6 +581,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
@@ -575,6 +599,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
@@ -594,6 +619,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
@@ -611,6 +637,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
@@ -630,6 +657,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
@@ -647,10 +675,12 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
+                            maxLoops = 1000;
                         }
                     }
                     break;
             }
+            maxLoops--;
         }
 
         return map;
@@ -799,10 +829,11 @@ public class MapFunctions
                         map[x, y] = 1; //Keep our edges as walls
                     }
                     //von Neuemann Neighbourhood requires only 3 or more surrounding tiles to be changed to a tile
-                    else if (surroundingTiles > 2)
-                    {
-                        map[x, y] = 1;
-                    }
+                    // ADD THIS TO SPAWN TILES AGAIN
+                    //else if (surroundingTiles > 2) 
+                    //{
+                    //    map[x, y] = 1;
+                    //}
                     //If we have less than 2 neighbours, set the tile to be inactive
                     else if (surroundingTiles < 2)
                     {
@@ -939,10 +970,11 @@ public class MapFunctions
                         map[x, y] = 1;
                     }
                     //If we have more than 4 neighbours, change to an active cell
-                    else if (surroundingTiles > 4)
-                    {
-                        map[x, y] = 1;
-                    }
+                    // ADD THIS TO SPAWN TILES
+                    //else if (surroundingTiles > 4)
+                    //{
+                    //    map[x, y] = 1;
+                    //}
                     //If we have less than 4 neighbours, change to be an inactive cell
                     else if (surroundingTiles < 4)
                     {
