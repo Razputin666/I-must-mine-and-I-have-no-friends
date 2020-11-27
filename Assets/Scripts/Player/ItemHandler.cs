@@ -8,7 +8,8 @@ public class ItemHandler : MonoBehaviour
     private InventoryObject inventory;
     [SerializeField]
     private InventoryObject equipment;
-
+    
+    
     private void Start()
     {
         for (int i = 0; i < equipment.GetSlots.Length; i++)
