@@ -51,7 +51,7 @@ public class CraftingInterface : UserInterface
         if(Input.GetKeyDown(KeyCode.T))
         {
             craftChecker.CheckAvailableRecipes(playerInventory);
-            List<CraftingRecipeObject> recipes = craftChecker.AvailableRecipes;
+            List<CraftingRecipeObject> recipes = craftChecker.CraftableItems;
             if(recipes.Count > 0)
                 craftChecker.CraftItem(playerInventory, recipes[0]);
         }
