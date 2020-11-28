@@ -41,19 +41,7 @@ public class PlayerStatesController : MonoBehaviour
                 {
                     Sprite sprite = TargetedBlock.GetSprite(targetBlockIntPos);
                     line.enabled = true;
-                    if(miningMode.Mine(targetBlockIntPos,TargetedBlock))
-                    {
-                        ItemObject itemObj = itemHandler.ItemDatabase.GetItemAt(8);
-                        if(itemObj != null)
-                        {
-                            ItemObject newItemObj = Instantiate(itemObj);
-                            SpawnManager.SpawnItemAt(targetBlockIntPos, newItemObj);
-                        }
-                        else
-                        {
-                            Debug.Log("null itemObj");
-                        }
-                    }
+                    miningMode.Mine(targetBlockIntPos, TargetedBlock);
                 }
                 break;
             case PlayerController.PlayerStates.Normal:

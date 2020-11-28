@@ -19,4 +19,5 @@ MonoBehaviour:
   data:
     name: 
     id: 0
+    amount: 1
   jumpMultiplier: 1.5

@@ -103,7 +103,6 @@ public abstract class UserInterface : MonoBehaviour
         {
             ItemObject newItem = slotsOnInterface[obj].ItemObject;
             newItem.Data.Amount = slotsOnInterface[obj].Item.Amount;
-            Debug.Log(newItem.Data.Amount);
             SpawnManager.SpawnItemAt(Camera.main.ScreenToWorldPoint(Input.mousePosition), newItem);
             slotsOnInterface[obj].RemoveItem();
             return;

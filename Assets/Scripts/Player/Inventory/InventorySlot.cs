@@ -52,7 +52,6 @@ public class InventorySlot
 
         if (OnAfterUpdate != null)
             OnAfterUpdate.Invoke(this);
-
     }
 
     public void RemoveItem()
@@ -70,7 +69,6 @@ public class InventorySlot
         //Check if every item is allowed or the item we are trying to place is couldnt be found or if the slot is empty
         if (itemTypeAllowed.Length <= 0 || itemObject == null || itemObject.Data.ID < 0)
             return true;
-
 
         for (int i = 0; i < itemTypeAllowed.Length; i++)
         {

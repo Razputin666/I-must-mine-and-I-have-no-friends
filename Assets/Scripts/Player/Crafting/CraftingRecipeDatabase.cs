@@ -31,4 +31,9 @@ public class CraftingRecipeDatabase : ScriptableObject, ISerializationCallbackRe
     {
         return this.recipeObject[id];
     }
+
+    public CraftingRecipeObject[] GetRecipes()
+    {
+        return this.recipeObject;
+    }
 }
