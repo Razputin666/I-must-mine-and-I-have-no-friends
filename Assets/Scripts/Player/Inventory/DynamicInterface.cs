@@ -5,7 +5,8 @@ using UnityEngine.EventSystems;
 
 public class DynamicInterface : UserInterface
 {
-    public GameObject inventoryPrefab;
+    [SerializeField]
+    private GameObject inventoryPrefab;
 
     [SerializeField]
     private int X_START;

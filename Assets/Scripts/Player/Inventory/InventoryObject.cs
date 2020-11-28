@@ -134,7 +134,20 @@ public class InventoryObject : ScriptableObject
         {
             if(GetSlots[i].Item == item)
             {
-                GetSlots[i].UpdateSlot(null, 0);
+                GetSlots[i].RemoveItem();
+            }
+        }
+    }
+    public void RemoveItem(Item item, int amount)
+    {
+        for (int i = 0; i < GetSlots.Length; i++)
+        {
+            if (GetSlots[i].Item == item)
+            {
+                if (item.Amount > amount)
+                    GetSlots[i].UpdateSlot(item, item.Amount - amount);
+                else
+                    GetSlots[i].RemoveItem();
             }
         }
     }

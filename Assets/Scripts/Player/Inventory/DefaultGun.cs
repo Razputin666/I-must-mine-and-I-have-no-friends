@@ -30,24 +30,15 @@ public class DefaultGun : MonoBehaviour, HasCoolDownInterFace
             return;
         }
 
-            if (coolDownSystem.IsOnCoolDown(id))
-            {
-                return;
-            }
+        if (coolDownSystem.IsOnCoolDown(id))
+        {
+            return;
+        }
 
-            Transform bulletTransform = Instantiate(bullet,endOfGun.position , Quaternion.identity);
-            Vector3 directionOfShot = (player.worldPosition - endOfGun.position).normalized;
+        Transform bulletTransform = Instantiate(bullet,endOfGun.position , Quaternion.identity);
+        Vector3 directionOfShot = (player.worldPosition - endOfGun.position).normalized;
 
-            bulletTransform.GetComponent<Bullet>().Setup(directionOfShot);
-
-
-        
-            Debug.Log("gunshooted");
-        
-
+        bulletTransform.GetComponent<Bullet>().Setup(directionOfShot);
         coolDownSystem.PutOnCoolDown(this);
-        
     }
-
-
 }

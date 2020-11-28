@@ -16,6 +16,7 @@ public class Item
         name = "";
         id = -1;
         amount = 0;
+        itemObject = null;
     }
     public Item(ItemObject item)
     {

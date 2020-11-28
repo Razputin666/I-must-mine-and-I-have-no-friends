@@ -9,14 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82cf89fcbaeae4947a7ed794a8dc6aca, type: 3}
-  m_Name: LightMod_1
+  m_Script: {fileID: 11500000, guid: d3982edd1a9495047a52f8f20fe5abe2, type: 3}
+  m_Name: CraftingDatabase
   m_EditorClassIdentifier: 
-  uiDisplaySprite: {fileID: 21300000, guid: 2213965ec1862be4aaf0224183cef9f3, type: 3}
-  stackable: 0
-  itemType: 6
-  description: 
-  data:
-    name: 
-    id: 6
-    amount: 1
+  recipeObject:
+  - {fileID: 11400000, guid: fa44882aabaeee44da3adf15331f3a9a, type: 2}

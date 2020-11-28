@@ -19,3 +19,4 @@ MonoBehaviour:
   data:
     name: 
     id: 5
+    amount: 1
