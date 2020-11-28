@@ -17,14 +17,15 @@ public abstract class UserInterface : MonoBehaviour
         for (int i = 0; i < inventory.GetSlots.Length; i++)
         {
             inventory.GetSlots[i].parent = this;
-            inventory.GetSlots[i].OnAfterUpdate += OnSlotUpdate;
+            //inventory.GetSlots[i].OnAfterUpdate += OnSlotUpdate;
         }
+
         CreateSlots();
         AddEvent(gameObject, EventTriggerType.PointerEnter, delegate { OnEnterInterface(gameObject); });
         AddEvent(gameObject, EventTriggerType.PointerExit, delegate { OnExitInterface(gameObject); });
     }
 
-    private void OnSlotUpdate(InventorySlot slot)
+    protected void OnSlotUpdate(InventorySlot slot)
     {
         if (slot.Item.ID >= 0)
         {
@@ -35,7 +36,7 @@ public abstract class UserInterface : MonoBehaviour
         else //empty slot
         {
             slot.slotObject.transform.GetChild(0).GetComponentInChildren<Image>().sprite = null;
-            slot.slotObject.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(1, 1, 1, 0);
+            slot.slotObject.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(0f, 70f / 255f,  168f / 255f, 190f / 255f);
             slot.slotObject.GetComponentInChildren<TextMeshProUGUI>().text = "";
         }
     }

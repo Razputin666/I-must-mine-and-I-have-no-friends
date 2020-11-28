@@ -4,7 +4,7 @@
 public class Inventory
 {
     [SerializeField]
-    private InventorySlot[] inventorySlots = new InventorySlot[36];
+    private InventorySlot[] inventorySlots = new InventorySlot[32];
 
     public void Clear()
     {
