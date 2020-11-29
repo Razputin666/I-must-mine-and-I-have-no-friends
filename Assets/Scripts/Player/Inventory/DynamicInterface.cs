@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class DynamicInterface : UserInterface
 {
@@ -25,11 +26,13 @@ public class DynamicInterface : UserInterface
 
         for (int i = 0; i < inventory.GetSlots.Length; i++)
         {
+            inventory.GetSlots[i].OnAfterUpdate += OnSlotUpdate;
+
             GameObject itemObject = Instantiate(inventoryPrefab, Vector3.zero, Quaternion.identity, transform);
             itemObject.GetComponent<RectTransform>().localPosition = GetPosition(i);
 
             inventory.GetSlots[i].slotObject = itemObject;
-
+            
             slotsOnInterface.Add(itemObject, inventory.GetSlots[i]);
             //Add events
             AddEvent(itemObject, EventTriggerType.PointerDown, delegate { OnPointerDown(itemObject); });
@@ -38,6 +41,8 @@ public class DynamicInterface : UserInterface
             AddEvent(itemObject, EventTriggerType.BeginDrag, delegate { OnDragStart(itemObject); });
             AddEvent(itemObject, EventTriggerType.EndDrag, delegate { OnDragEnd(itemObject); });
             AddEvent(itemObject, EventTriggerType.Drag, delegate { OnDrag(itemObject); });
+
+            inventory.GetSlots[i].slotObject.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(0f, 70f / 255f, 168f / 255f, 190f / 255f);
         }
     }
 

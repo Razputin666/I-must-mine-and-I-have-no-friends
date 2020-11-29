@@ -18,7 +18,7 @@ public class CraftingChecker : MonoBehaviour
             for (int n = 0; n < craftingRecipes[i].Materials.Count; n++) // Loop through the required materials.
             {
                 int amount = 0;
-                ItemAmount currentMaterial = craftingRecipes[i].Materials[i];
+                ItemAmount currentMaterial = craftingRecipes[i].Materials[n];
                 for (int j = 0; j < currentInventory.GetSlots.Length; j++) //loop through our inventory.
                 {
                     //Check if the material exists in the inventory
@@ -40,7 +40,6 @@ public class CraftingChecker : MonoBehaviour
                 //Add the recipe to our list of craftable items
                 craftableItems.Add(craftingRecipes[i]);
             }
-                
         }
     }
 
@@ -49,6 +48,14 @@ public class CraftingChecker : MonoBehaviour
         get
         {
             return this.craftableItems;
+        }
+    }
+
+    public CraftingRecipeDatabase CraftingDatabase
+    {
+        get
+        {
+            return this.craftingRecipeDatabase;
         }
     }
 
