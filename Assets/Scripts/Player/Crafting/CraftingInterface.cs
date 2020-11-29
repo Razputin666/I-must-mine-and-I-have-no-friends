@@ -27,6 +27,8 @@ public class CraftingInterface : UserInterface
     [SerializeField]
     private int Y_SPACE_BETWEEN_ITEM;
 
+    private float craftButtonCooldown = 1f;
+
     Dictionary<GameObject, CraftingRecipeObject> crafting = new Dictionary<GameObject, CraftingRecipeObject>();
 
     public override void CreateSlots()
@@ -35,28 +37,6 @@ public class CraftingInterface : UserInterface
         
         craftChecker = GetComponent<CraftingChecker>();
         slotsOnInterface = new Dictionary<GameObject, InventorySlot>();
-
-        //for (int i = 0; i < inventory.GetSlots.Length; i++)
-        //{
-            //GameObject itemObject = Instantiate(inventoryPrefab, Vector3.zero, Quaternion.identity, transform);
-            //itemObject.GetComponent<RectTransform>().localPosition = GetPosition(i);
-
-            //inventory.GetSlots[i].slotObject = itemObject;
-            //inventory.GetSlots[i].OnBeforeUpdate += OnCraftSlotUpdate;
-            //inventory.GetSlots[i].OnAfterUpdate += OnCraftSlotUpdate;
-
-            //slotsOnInterface.Add(itemObject, inventory.GetSlots[i]);
-
-            //Add events
-            //AddEvent(itemObject, EventTriggerType.PointerEnter, delegate { OnEnter(itemObject); });
-            //AddEvent(itemObject, EventTriggerType.PointerExit, delegate { OnExit(itemObject); });
-            //AddEvent(itemObject, EventTriggerType.PointerDown, delegate { OnPointerDown(itemObject); });
-            //AddEvent(itemObject, EventTriggerType.BeginDrag, delegate { OnDragStart(itemObject); });
-            //AddEvent(itemObject, EventTriggerType.EndDrag, delegate { OnDragEnd(itemObject); });
-            //AddEvent(itemObject, EventTriggerType.Drag, delegate { OnDrag(itemObject); });
-
-            //inventory.GetSlots[i].slotObject.transform.GetChild(0).GetComponentInChildren<UnityEngine.UI.Image>().color = new Color(0f, 70f / 255f, 168f / 255f, 190f / 255f);
-        //}
 
         int yPos = -16;
         CraftingRecipeObject[] craftingRecipes = craftChecker.CraftingDatabase.GetRecipes();
@@ -99,23 +79,20 @@ public class CraftingInterface : UserInterface
 
         UnityEngine.UI.Button button = GetComponentInChildren<UnityEngine.UI.Button>();
         //button.on.AddListener(OnCraftClick);
-        button.gameObject.AddComponent<EventTrigger>();
         AddEvent(button.gameObject, EventTriggerType.PointerDown, delegate { OnCraftClick(); });
     }
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.T))
-        {
-            craftChecker.CheckAvailableRecipes(playerInventory);
-            
-        }
+        if(this.craftButtonCooldown > 0f)
+            this.craftButtonCooldown -= Time.deltaTime;
     }
 
     private void OnCraftClick()
     {
-        //if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && this.craftButtonCooldown <= 0f)
         {
+            this.craftButtonCooldown = 0.5f;
             List<CraftingRecipeObject> recipes = craftChecker.CraftableItems;
             for (int i = 0; i < recipes.Count; i++)
             {
