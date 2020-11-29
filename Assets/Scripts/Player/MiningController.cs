@@ -41,10 +41,6 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
                     ItemObject newItemObj = Instantiate(itemObj);
                     SpawnManager.SpawnItemAt(blockToMine, newItemObj);
                 }
-                else
-                {
-                    Debug.Log("null itemObj");
-                }
                 currentTileMap.SetTile(blockToMine, null);
                 coolDownSystem.PutOnCoolDown(this);
                 return true;
