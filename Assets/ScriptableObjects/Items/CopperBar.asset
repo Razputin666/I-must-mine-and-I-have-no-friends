@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c24a72b71acf7341adb69095f866761, type: 3}
+  m_Name: CopperBar
+  m_EditorClassIdentifier: 
+  uiDisplaySprite: {fileID: 21300000, guid: 219184d1697080d4b8f806df4677e82b, type: 3}
+  stackable: 1
+  itemType: 8
+  description: 
+  data:
+    name: Copper Bar
+    id: -1
+    amount: 1

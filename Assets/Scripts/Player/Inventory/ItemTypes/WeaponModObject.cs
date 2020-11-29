@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Weapon Mod Object", menuName = "Inventory System/Items/Weapon")]
+[CreateAssetMenu(fileName = "New Weapon Mod Object", menuName = "Inventory System/Items/Weapon Mod")]
 public class WeaponModObject : ItemObject
 {
     [SerializeField]
