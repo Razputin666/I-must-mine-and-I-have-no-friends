@@ -9,7 +9,7 @@ public class SpawnManager : MonoBehaviour
         spawnPos.z = 0;
         GameObject parentObject = GameObject.Find("ItemSpawner");
         GameObject groundItemPrefab = Resources.Load<GameObject>("Prefabs/GroundItemObject") as GameObject;
-        GameObject groundObject = Instantiate(groundItemPrefab, spawnPos, Quaternion.identity, parentObject.transform);
+        GameObject groundObject = Instantiate(groundItemPrefab, spawnPos + Vector3.up, Quaternion.identity, parentObject.transform);
 
         GroundItem gItem = groundObject.GetComponent<GroundItem>();
         gItem.Item = item;
