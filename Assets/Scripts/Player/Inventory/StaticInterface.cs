@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class StaticInterface : UserInterface
 {
@@ -14,8 +15,10 @@ public class StaticInterface : UserInterface
         //Loop through all the items in our Equipment database
         for (int i = 0; i < inventory.GetSlots.Length; i++)
         {
-            GameObject itemObject = slots[i];
+            inventory.GetSlots[i].OnAfterUpdate += OnSlotUpdate;
 
+            GameObject itemObject = slots[i];
+            
             //Add events to our object inside our gameobjects array that is in the same order as our equipment database
             AddEvent(itemObject, EventTriggerType.PointerEnter, delegate { OnEnter(itemObject); });
             AddEvent(itemObject, EventTriggerType.PointerExit, delegate { OnExit(itemObject); });
@@ -27,6 +30,8 @@ public class StaticInterface : UserInterface
 
             //Link the database to the itemObject
             slotsOnInterface.Add(itemObject, inventory.GetSlots[i]);
+
+            inventory.GetSlots[i].slotObject.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(0f, 70f / 255f, 168f / 255f, 190f / 255f);
         }
     }
 }
