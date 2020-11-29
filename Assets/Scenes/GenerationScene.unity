@@ -149,6 +149,24 @@ Tilemap:
     type: 3}
   m_PrefabInstance: {fileID: 1836959839}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &352069847 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1221155642, guid: 67987fa2af623f547a95031ed4997d12,
+    type: 3}
+  m_PrefabInstance: {fileID: 1836959839}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &352069848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352069847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3443ab5cb643daa40afd8e38a7dc2e0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &523815214
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -160,6 +178,10 @@ PrefabInstance:
       propertyPath: _camera
       value: 
       objectReference: {fileID: 1110016036}
+    - target: {fileID: 1398906487, guid: 8892c9d624d2feb46b4740620f1e0891, type: 3}
+      propertyPath: deathScreen
+      value: 
+      objectReference: {fileID: 352069848}
     - target: {fileID: 1734677229, guid: 8892c9d624d2feb46b4740620f1e0891, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -526,6 +548,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1221155642, guid: 67987fa2af623f547a95031ed4997d12, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5918767642926632651, guid: 67987fa2af623f547a95031ed4997d12,
         type: 3}
       propertyPath: m_Name
