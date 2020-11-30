@@ -981,26 +981,6 @@ Tilemap:
     type: 3}
   m_PrefabInstance: {fileID: 3288425833139594144}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1547874984 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8181247841218053072, guid: 8892c9d624d2feb46b4740620f1e0891,
-    type: 3}
-  m_PrefabInstance: {fileID: 313085193}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1547874993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1547874984}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e65608fcc3036348aa8aa4cc9bac9a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inventory: {fileID: 11400000, guid: 74f6aef5271999548b36c1d127af90f2, type: 2}
-  equipment: {fileID: 11400000, guid: 38df84b87fcb50d4bb42ec3aba0baf9e, type: 2}
 --- !u!1001 &1576024531
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1383,6 +1363,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 874494294, guid: 67987fa2af623f547a95031ed4997d12, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 874494294, guid: 67987fa2af623f547a95031ed4997d12, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1171517088, guid: 67987fa2af623f547a95031ed4997d12, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -1398,6 +1386,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1221155642, guid: 67987fa2af623f547a95031ed4997d12, type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1308911576, guid: 67987fa2af623f547a95031ed4997d12, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1308911576, guid: 67987fa2af623f547a95031ed4997d12, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1577575787, guid: 67987fa2af623f547a95031ed4997d12, type: 3}
+      propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2077563514, guid: 67987fa2af623f547a95031ed4997d12, type: 3}
