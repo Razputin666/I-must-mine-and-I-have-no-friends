@@ -92,7 +92,6 @@ public class CraftingInterface : UserInterface
                 materialSlots[i].SetActive(false);
             }
         }
-        Debug.Log(craft.ResultObject.ItemObject.Data.ID);
         slotsOnInterface[resultSlot].UpdateSlot(new Item(Instantiate(craft.ResultObject.ItemObject)), craft.ResultObject.Amount);
         
         //resultSlot.GetComponentInChildren<UnityEngine.UI.Image>().sprite = craft.ResultObject.ItemObject.UIDisplaySprite;
