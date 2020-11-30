@@ -11,6 +11,10 @@ public abstract class UserInterface : MonoBehaviour
     protected InventoryObject inventory;
 
     protected Dictionary<GameObject, InventorySlot> slotsOnInterface = new Dictionary<GameObject, InventorySlot>();
+
+    [SerializeField]
+    private GameObject tooltipObject;
+
     //Start is called before the first frame update
     void Start()
     {
@@ -76,10 +80,27 @@ public abstract class UserInterface : MonoBehaviour
     {
         // Whenever we enter an inventory slot set the mouseitem hoverObj to that object so we now which slot the mouse is over
         MouseData.slotHoveredOver = obj;
+
+        if (slotsOnInterface[obj].ItemObject != null)
+        {
+            if(!tooltipObject.activeSelf)
+            {
+                //tooltipObject.transform.position = Vector3.zero;
+                //tooltipObject.transform.position = Input.mousePosition;
+                tooltipObject.SetActive(true);
+                string tooltip = string.Format("{0}\n\n{1}", slotsOnInterface[obj].ItemObject.Data.Name, slotsOnInterface[obj].ItemObject.Description);
+                tooltipObject.GetComponentInChildren<TextMeshProUGUI>().text = tooltip;
+            }
+        }
     }
     public void OnExit(GameObject obj)
     {
         MouseData.slotHoveredOver = null;
+        if(tooltipObject.activeSelf)
+        {
+            tooltipObject.SetActive(false);
+            tooltipObject.GetComponentInChildren<TextMeshProUGUI>().text = "";
+        }
     }
     
     private void OnEnterInterface(GameObject obj)
@@ -94,7 +115,8 @@ public abstract class UserInterface : MonoBehaviour
 
     public void OnDragStart(GameObject obj)
     {
-        MouseData.tempItemBeingDragged = CreateTempObject(obj);
+        if(MouseData.interfaceMouseIsOver.inventory.InterfaceType != INTERFACE_TYPE.Crafting)
+            MouseData.tempItemBeingDragged = CreateTempObject(obj);
     }
     public void OnDragEnd(GameObject obj)
     {
@@ -108,7 +130,7 @@ public abstract class UserInterface : MonoBehaviour
             slotsOnInterface[obj].RemoveItem();
             return;
         }
-        if(MouseData.slotHoveredOver != null)
+        if(MouseData.slotHoveredOver != null && MouseData.interfaceMouseIsOver.inventory.InterfaceType != INTERFACE_TYPE.Crafting)
         {
             InventorySlot mouseHoverSlotData = MouseData.interfaceMouseIsOver.slotsOnInterface[MouseData.slotHoveredOver];
             inventory.SwapItems(slotsOnInterface[obj], mouseHoverSlotData);

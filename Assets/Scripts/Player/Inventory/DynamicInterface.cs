@@ -22,6 +22,7 @@ public class DynamicInterface : UserInterface
 
     public override void CreateSlots()
     {
+
         slotsOnInterface = new Dictionary<GameObject, InventorySlot>();
 
         for (int i = 0; i < inventory.GetSlots.Length; i++)
@@ -42,7 +43,7 @@ public class DynamicInterface : UserInterface
             AddEvent(itemObject, EventTriggerType.EndDrag, delegate { OnDragEnd(itemObject); });
             AddEvent(itemObject, EventTriggerType.Drag, delegate { OnDrag(itemObject); });
 
-            inventory.GetSlots[i].slotObject.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(0f, 70f / 255f, 168f / 255f, 190f / 255f);
+            itemObject.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(0f, 70f / 255f, 168f / 255f, 190f / 255f);
         }
     }
 

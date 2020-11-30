@@ -13,9 +13,7 @@ MonoBehaviour:
   m_Name: CraftingDatabase
   m_EditorClassIdentifier: 
   recipeObject:
-  - {fileID: 11400000, guid: 53c6585bf686dd64eb6ddfff9a955f64, type: 2}
-  - {fileID: 11400000, guid: 5741b4fbb253d054ea7c2f05de38e9e7, type: 2}
-  - {fileID: 11400000, guid: aff6b4dcc0dca924d86dcd44f0b504f6, type: 2}
-  - {fileID: 11400000, guid: 15e58dee7af9cd34ea1870c44c92a5f5, type: 2}
-  - {fileID: 11400000, guid: b33afa61f65b82c428a5873cd721dd49, type: 2}
   - {fileID: 11400000, guid: 4c77e8cc29c1fa946883b2528a564204, type: 2}
+  - {fileID: 11400000, guid: 15e58dee7af9cd34ea1870c44c92a5f5, type: 2}
+  - {fileID: 11400000, guid: aff6b4dcc0dca924d86dcd44f0b504f6, type: 2}
+  - {fileID: 11400000, guid: 53c6585bf686dd64eb6ddfff9a955f64, type: 2}
