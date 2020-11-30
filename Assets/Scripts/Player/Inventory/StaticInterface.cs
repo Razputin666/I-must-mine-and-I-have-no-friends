@@ -31,7 +31,7 @@ public class StaticInterface : UserInterface
             //Link the database to the itemObject
             slotsOnInterface.Add(itemObject, inventory.GetSlots[i]);
 
-            inventory.GetSlots[i].slotObject.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(0f, 70f / 255f, 168f / 255f, 190f / 255f);
+            itemObject.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(0f, 70f / 255f, 168f / 255f, 190f / 255f);
         }
     }
 }
