@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
 
     public enum PlayerStates
     {
-        Mining, Normal
+        Mining, Normal, Building
     }
 
     public PlayerStates playerStates { get; private set; }
@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
 
     public Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
     private ItemController itemController;
-    //private Inventory inventory;
+    private ItemHandler itemHandler;
     public Transform item;
     private JumpController jumpController;
    [SerializeField]private DeathScreen deathScreen;
@@ -66,39 +66,60 @@ public class PlayerController : MonoBehaviour
         boxCollider2d = transform.GetComponent<BoxCollider2D>();
         capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
         jumpController = GetComponent<JumpController>();
+        itemHandler = GetComponent<ItemHandler>();
         playerStates = PlayerStates.Mining;
        // itemController.SetMiningMode(); // Vi har inte combat än så den e på mining default
         StartCoroutine(CoroutineCoordinator());
     }
 
+    private void Update()
+    {
+        CheckQuickslotInput();
+    }
+
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     void FixedUpdate()
     {
-
         mousePos = Input.mousePosition;
         worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
         _camera.transform.position = new Vector3(rb2d.transform.position.x, rb2d.transform.position.y, -1);
 
-        if(Input.GetKey(KeyCode.Alpha1))
-        {
-            // gameObject.GetComponentInChildren<ItemController>().gameObject.GetComponent<SpriteRenderer>().sprite = inventory.GetItem(0).Icon;
-            item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Drill");
-            item.GetComponent<DefaultGun>().enabled = false;
-            item.GetComponent<MiningController>().enabled = true;
-            playerStates = PlayerStates.Mining;
+        //if(Input.GetKey(KeyCode.Alpha1))
+        //{
+        //    // gameObject.GetComponentInChildren<ItemController>().gameObject.GetComponent<SpriteRenderer>().sprite = inventory.GetItem(0).Icon;
+        //    item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Drill");
+        //    item.GetComponent<DefaultGun>().enabled = false;
+        //    item.GetComponent<MiningController>().enabled = true;
+        //    playerStates = PlayerStates.Mining;
 
+        //}
+
+        //if(Input.GetKey(KeyCode.Alpha2))
+        //{
+        //    // gameObject.GetComponentInChildren<ItemController>().gameObject.GetComponent<SpriteRenderer>().sprite = inventory.GetItem(0).Icon;
+        //    item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Gun");
+        //    item.GetComponent<MiningController>().enabled = false;
+        //    item.GetComponent<DefaultGun>().enabled = true;
+        //    playerStates = PlayerStates.Normal;
+        //}
+
+        CalculateMovement();
+
+        if (Input.GetKey("space") && jumpController.IsGrounded())
+        {
+            jumpController.Jump();
         }
 
-        if(Input.GetKey(KeyCode.Alpha2))
+        if (playerHP <= 0)
         {
-            // gameObject.GetComponentInChildren<ItemController>().gameObject.GetComponent<SpriteRenderer>().sprite = inventory.GetItem(0).Icon;
-            item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Gun");
-            item.GetComponent<MiningController>().enabled = false;
-            item.GetComponent<DefaultGun>().enabled = true;
-            playerStates = PlayerStates.Normal;
+            Die();
         }
 
-        if(Input.GetKey(KeyCode.D))
+    }
+
+    private void CalculateMovement()
+    {
+        if (Input.GetKey(KeyCode.D))
         {
             rb2d.velocity += Vector2.right * speed;
             Flip(Vector2.right.x);
@@ -115,7 +136,7 @@ public class PlayerController : MonoBehaviour
             maxFallSpeed = Mathf.Clamp(heightTimer, 1f, 5f);
             rb2d.velocity -= Vector2.down * maxFallSpeed;
             if (rb2d.velocity.y > -35f)
-            heightTimer = 1f;
+                heightTimer = 1f;
         }
 
         maxSpeed = Mathf.Abs(rb2d.velocity.x);
@@ -126,7 +147,7 @@ public class PlayerController : MonoBehaviour
             float asedf = Mathf.Clamp(widthTimer, 1f, 3f);
             rb2d.velocity -= Vector2.right * asedf;
             if (maxSpeed > 30f)
-            widthTimer = 1f;
+                widthTimer = 1f;
         }
 
         if (maxSpeed > 25f && rb2d.velocity.x < 0)
@@ -135,19 +156,152 @@ public class PlayerController : MonoBehaviour
             float asedf = Mathf.Clamp(widthTimer, 1f, 3f);
             rb2d.velocity -= Vector2.left * asedf;
             if (maxSpeed > 30f)
-            widthTimer = 1f;
+                widthTimer = 1f;
         }
+    }
 
-        if (Input.GetKey("space") && jumpController.IsGrounded())
+    private void CheckQuickslotInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            jumpController.Jump();
-        }
+            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[0].ItemObject;
+            if (itemObj != null)
+            {
+                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
 
-        if (playerHP <= 0)
+                SetPlayerState(itemObj.ItemType);
+            }
+            else
+            {
+                playerStates = PlayerStates.Normal;
+                item.GetComponent<MiningController>().enabled = false;
+                item.GetComponent<DefaultGun>().enabled = true;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            Die();
-        }
+            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[1].ItemObject;
+            if (itemObj != null)
+            {
+                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
 
+                SetPlayerState(itemObj.ItemType);
+            }
+            else
+            {
+                playerStates = PlayerStates.Normal;
+                item.GetComponent<MiningController>().enabled = false;
+                item.GetComponent<DefaultGun>().enabled = true;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[2].ItemObject;
+            if (itemObj != null)
+            {
+                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
+
+                SetPlayerState(itemObj.ItemType);
+            }
+            else
+            {
+                playerStates = PlayerStates.Normal;
+                item.GetComponent<MiningController>().enabled = false;
+                item.GetComponent<DefaultGun>().enabled = true;
+            }
+
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[3].ItemObject;
+            if (itemObj != null)
+            {
+                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
+
+                SetPlayerState(itemObj.ItemType);
+            }
+            else
+            {
+                playerStates = PlayerStates.Normal;
+                item.GetComponent<MiningController>().enabled = false;
+                item.GetComponent<DefaultGun>().enabled = true;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[4].ItemObject;
+            if (itemObj != null)
+            {
+                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
+
+                SetPlayerState(itemObj.ItemType);
+            }
+            else
+            {
+                playerStates = PlayerStates.Normal;
+                item.GetComponent<MiningController>().enabled = false;
+                item.GetComponent<DefaultGun>().enabled = true;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[5].ItemObject;
+            if (itemObj != null)
+            {
+                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
+
+                SetPlayerState(itemObj.ItemType);
+            }
+            else
+            {
+                playerStates = PlayerStates.Normal;
+                item.GetComponent<MiningController>().enabled = false;
+                item.GetComponent<DefaultGun>().enabled = true;
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[6].ItemObject;
+            if (itemObj != null)
+            {
+                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
+
+                SetPlayerState(itemObj.ItemType);
+            }
+            else
+            {
+                playerStates = PlayerStates.Normal;
+                item.GetComponent<MiningController>().enabled = false;
+                item.GetComponent<DefaultGun>().enabled = true;
+            }
+        }
+    }
+
+    private void SetPlayerState(ITEM_TYPE itemType)
+    {
+        switch (itemType)
+        {
+            case ITEM_TYPE.TileBlock:
+                playerStates = PlayerStates.Building;
+                item.GetComponent<MiningController>().enabled = false;
+                item.GetComponent<DefaultGun>().enabled = false;
+                break;
+            case ITEM_TYPE.Weapon:
+                playerStates = PlayerStates.Normal;
+                item.GetComponent<MiningController>().enabled = false;
+                item.GetComponent<DefaultGun>().enabled = true;
+                break;
+            case ITEM_TYPE.MiningLaser:
+                playerStates = PlayerStates.Mining;
+                item.GetComponent<MiningController>().enabled = true;
+                item.GetComponent<DefaultGun>().enabled = false;
+                break;
+            default:
+                playerStates = PlayerStates.Normal;
+                item.GetComponent<MiningController>().enabled = false;
+                item.GetComponent<DefaultGun>().enabled = true;
+                break;
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

@@ -8,7 +8,8 @@ public enum INTERFACE_TYPE
     Inventory,
     Equipment,
     Chest,
-    Crafting
+    Crafting,
+    Quickslots
 }
 
 [CreateAssetMenu(fileName = "New Inventory", menuName = "Inventory System/Inventory")]
@@ -151,6 +152,11 @@ public class InventoryObject : ScriptableObject
                     GetSlots[i].RemoveItem();
             }
         }
+    }
+
+    public void ToggleVisibility()
+    {
+        GetSlots[0].parent.gameObject.SetActive(!GetSlots[0].parent.gameObject.activeSelf);
     }
     #region Getters
     public Inventory Container

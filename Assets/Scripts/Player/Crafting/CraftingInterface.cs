@@ -58,6 +58,8 @@ public class CraftingInterface : UserInterface
             //Add events to our object inside our gameobjects array that is in the same order as our equipment database
             AddEvent(itemObject, EventTriggerType.PointerEnter, delegate { OnEnter(itemObject); });
             AddEvent(itemObject, EventTriggerType.PointerExit, delegate { OnExit(itemObject); });
+
+            materialSlots[i].SetActive(false);
         }
         inventory.GetSlots[6].slotObject = resultSlot;
         inventory.GetSlots[6].OnAfterUpdate += OnSlotUpdate;
@@ -71,6 +73,18 @@ public class CraftingInterface : UserInterface
         UnityEngine.UI.Button button = GetComponentInChildren<UnityEngine.UI.Button>();
 
         AddEvent(button.gameObject, EventTriggerType.PointerDown, delegate { OnCraftClick(); });
+
+        CraftingRecipeObject startCraft = craftChecker.CraftingDatabase.GetRecipeAt(0);
+
+        for (int i = 0; i < startCraft.Materials.Count; i++)
+        {
+            slotsOnInterface[materialSlots[i]].UpdateSlot(new Item(Instantiate(startCraft.Materials[i].ItemObject)), startCraft.Materials[i].Amount);
+
+            materialSlots[i].SetActive(true);
+        }
+
+        slotsOnInterface[resultSlot].UpdateSlot(new Item(Instantiate(startCraft.ResultObject.ItemObject)), startCraft.ResultObject.Amount);
+        gameObject.transform.GetChild(7).GetComponentInChildren<TextMeshProUGUI>().text = startCraft.name;
     }
 
     private void OnRecipeSelectionChanged(GameObject obj)
@@ -92,7 +106,6 @@ public class CraftingInterface : UserInterface
                 materialSlots[i].SetActive(false);
             }
         }
-        Debug.Log(craft.ResultObject.ItemObject.Data.ID);
         slotsOnInterface[resultSlot].UpdateSlot(new Item(Instantiate(craft.ResultObject.ItemObject)), craft.ResultObject.Amount);
         
         //resultSlot.GetComponentInChildren<UnityEngine.UI.Image>().sprite = craft.ResultObject.ItemObject.UIDisplaySprite;

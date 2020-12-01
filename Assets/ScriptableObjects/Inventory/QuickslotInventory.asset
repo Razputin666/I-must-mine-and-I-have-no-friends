@@ -10,50 +10,45 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 20a34459c138a5841b5a37f1ac38071f, type: 3}
-  m_Name: PlayerEquipment
+  m_Name: QuickslotInventory
   m_EditorClassIdentifier: 
-  savePath: /Equipment.Save
+  savePath: /Quickslot.save
   itemDatabase: {fileID: 11400000, guid: 0479499c299ce264c916f647df531e9a, type: 2}
   container:
     inventorySlots:
-    - itemTypeAllowed: 00000000
+    - itemTypeAllowed: 
       item:
         name: 
         id: -1
         amount: 0
-    - itemTypeAllowed: 01000000
+    - itemTypeAllowed: 
       item:
         name: 
         id: -1
         amount: 0
-    - itemTypeAllowed: 02000000
+    - itemTypeAllowed: 
       item:
         name: 
         id: -1
         amount: 0
-    - itemTypeAllowed: 03000000
+    - itemTypeAllowed: 
       item:
         name: 
         id: -1
         amount: 0
-    - itemTypeAllowed: 04000000
+    - itemTypeAllowed: 
       item:
         name: 
         id: -1
         amount: 0
-    - itemTypeAllowed: 05000000
+    - itemTypeAllowed: 
       item:
         name: 
         id: -1
         amount: 0
-    - itemTypeAllowed: 06000000
+    - itemTypeAllowed: 
       item:
         name: 
         id: -1
         amount: 0
-    - itemTypeAllowed: 07000000
-      item:
-        name: 
-        id: -1
-        amount: 0
-  interfaceType: 1
+  interfaceType: 0
