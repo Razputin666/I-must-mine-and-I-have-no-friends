@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c24a72b71acf7341adb69095f866761, type: 3}
   m_Name: Fabric
   m_EditorClassIdentifier: 
-  uiDisplaySprite: {fileID: 0}
-  stackable: 0
-  itemType: 0
+  uiDisplaySprite: {fileID: 21300000, guid: c3124b5a926485b458a3f68c8a2c8318, type: 3}
+  stackable: 1
+  itemType: 11
   description: 
   data:
-    name: 
+    name: Fabric
     id: -1
-    amount: 0
+    amount: 1

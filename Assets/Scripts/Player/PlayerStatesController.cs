@@ -46,6 +46,9 @@ public class PlayerStatesController : MonoBehaviour
                 break;
             case PlayerController.PlayerStates.Normal:
                 break;
+            case PlayerController.PlayerStates.Building:
+
+                break;
             default:
                 break;
         }

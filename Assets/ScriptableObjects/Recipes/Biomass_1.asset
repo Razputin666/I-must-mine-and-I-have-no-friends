@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Biomass_1
   m_EditorClassIdentifier: 
   resultObject:
-    itemObject: {fileID: 11400000, guid: e32d637539e086a44a4e1eb33400f738, type: 2}
+    itemObject: {fileID: 11400000, guid: a644acc934489354d9f10894a774056c, type: 2}
     amount: 1
   materials:
   - itemObject: {fileID: 11400000, guid: d604cbe3adfb12341bb39e78a5161026, type: 2}
     amount: 6
-  iD: 0
+  iD: 1
