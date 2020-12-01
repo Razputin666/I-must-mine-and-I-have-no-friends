@@ -8,7 +8,9 @@ public class ItemHandler : MonoBehaviour
     private InventoryObject inventory;
     [SerializeField]
     private InventoryObject equipment;
-    
+    [SerializeField]
+    private InventoryObject quickSlots;
+
     private void Start()
     {
         for (int i = 0; i < equipment.GetSlots.Length; i++)
@@ -79,10 +81,18 @@ public class ItemHandler : MonoBehaviour
             inventory.Save();
             equipment.Save();
         }
-        if (Input.GetKeyDown(KeyCode.L))
+        else if (Input.GetKeyDown(KeyCode.L))
         {
             inventory.Load();
             equipment.Load();
+        }
+        else if (Input.GetKeyDown(KeyCode.I))
+        {
+            inventory.ToggleVisibility();
+        }
+        else if (Input.GetKeyDown(KeyCode.O))
+        {
+            equipment.ToggleVisibility();
         }
     }
 
@@ -90,6 +100,7 @@ public class ItemHandler : MonoBehaviour
     {
         inventory.Clear();
         equipment.Clear();
+        quickSlots.Clear();
     }
 
     public ItemDatabaseObject ItemDatabase
@@ -97,6 +108,30 @@ public class ItemHandler : MonoBehaviour
         get
         {
             return this.inventory.ItemDatabase;
+        }
+    }
+
+    public InventoryObject Inventory
+    {
+        get
+        {
+            return this.inventory;
+        }
+    }
+
+    public InventoryObject Equipment
+    {
+        get
+        {
+            return this.equipment;
+        }
+    }
+
+    public InventoryObject QuickSlots
+    {
+        get
+        {
+            return this.quickSlots;
         }
     }
 }

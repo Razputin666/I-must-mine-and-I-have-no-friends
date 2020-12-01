@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d65b42a5bf76d540bf7dd38f50e9469, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c24a72b71acf7341adb69095f866761, type: 3}
   m_Name: BasicElectronicComponent
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::NewComponentObject
   uiDisplaySprite: {fileID: 21300000, guid: 165571d0075e7bd4b8c2f42fd9f5d117, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 11
   description: 
   data:
-    name: Basic Electronic Component
-    id: -1
-    amount: 99
+    name: Basic Electronic Componenet
+    id: 0
+    amount: 1

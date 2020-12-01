@@ -11,12 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c24a72b71acf7341adb69095f866761, type: 3}
   m_Name: Biomass
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::NewComponentObject
   uiDisplaySprite: {fileID: 21300000, guid: 5d45e732722f9b34db513f641db48744, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 11
   description: 
   data:
     name: Biomass
-    id: -1
+    id: 1
     amount: 1

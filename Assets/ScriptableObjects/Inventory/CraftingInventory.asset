@@ -18,37 +18,37 @@ MonoBehaviour:
     inventorySlots:
     - itemTypeAllowed: 
       item:
-        name: IronOre
-        id: 13
-        amount: 2
+        name: CopperBar(Clone)
+        id: 3
+        amount: 1
     - itemTypeAllowed: 
       item:
-        name: 
-        id: -1
-        amount: 0
-    - itemTypeAllowed: 
-      item:
-        name: 
-        id: -1
-        amount: 0
-    - itemTypeAllowed: 
-      item:
-        name: 
-        id: -1
-        amount: 0
-    - itemTypeAllowed: 
-      item:
-        name: 
-        id: -1
-        amount: 0
-    - itemTypeAllowed: 
-      item:
-        name: 
-        id: -1
-        amount: 0
-    - itemTypeAllowed: 
-      item:
-        name: IronBar
+        name: StoneBlock(Clone)
         id: 11
+        amount: 1
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+        amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+        amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+        amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+        amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: BasicElectronicComponent(Clone)
+        id: 0
         amount: 1
   interfaceType: 3

@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:Assets/ScriptableObjects/Recipes/Biomass_1.asset.meta
 guid: b33afa61f65b82c428a5873cd721dd49
+=======
+guid: 07e3d744d60fd684688c193b36e98143
+>>>>>>> CrantBranch:Assets/ScriptableObjects/Items/BasicDrill.asset.meta
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 0

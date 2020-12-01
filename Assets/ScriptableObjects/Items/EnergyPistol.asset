@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300000, guid: e041eda25cf669d4ea71fc82dc14f341, type: 3}
   stackable: 0
-  itemType: 7
+  itemType: 9
   description: Basic energy weapon.
   data:
     name: Energy Pistol
-    id: -1
+    id: 6
     amount: 1
