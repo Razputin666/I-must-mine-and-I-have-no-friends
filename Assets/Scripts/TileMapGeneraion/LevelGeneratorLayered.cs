@@ -150,7 +150,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 		tilemap.ClearAllTiles();
 	}
 }
-
+#if UNITY_EDITOR
 [CustomEditor(typeof(LevelGeneratorLayered))]
 public class LevelGeneratorLayeredEditor : Editor
 {
@@ -193,3 +193,4 @@ public class LevelGeneratorLayeredEditor : Editor
 		}
 	}
 }
+#endif

@@ -442,6 +442,7 @@ GameObject:
   - component: {fileID: 658734927}
   - component: {fileID: 1800691689235569727}
   - component: {fileID: 175909222}
+  - component: {fileID: 1284842940383734445}
   m_Layer: 2
   m_Name: Buttface-guy
   m_TagString: Player
@@ -633,6 +634,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventory: {fileID: 11400000, guid: 74f6aef5271999548b36c1d127af90f2, type: 2}
   equipment: {fileID: 11400000, guid: 38df84b87fcb50d4bb42ec3aba0baf9e, type: 2}
+  quickSlots: {fileID: 11400000, guid: c4298cff35f68a7429860ecf2be26d16, type: 2}
+--- !u!114 &1284842940383734445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8181247841218053072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &8181247841502162097
 GameObject:
   m_ObjectHideFlags: 0
