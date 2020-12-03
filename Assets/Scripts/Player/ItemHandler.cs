@@ -64,7 +64,7 @@ public class ItemHandler : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D other)
     {
         GroundItem groundItem = other.GetComponentInParent<GroundItem>();
-        if(groundItem != null && groundItem.PickupTime <= 0f)
+        if(groundItem != null && groundItem.PickupTime <= 1f)
         {
             Item newItem = new Item(groundItem.Item);
             if (inventory.AddItem(newItem, newItem.Amount))

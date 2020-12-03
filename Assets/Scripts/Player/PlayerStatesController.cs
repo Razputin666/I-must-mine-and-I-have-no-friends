@@ -18,7 +18,7 @@ public class PlayerStatesController : MonoBehaviour
     void Start()
     {
         player = GetComponent<PlayerController>();
-        tileMapChecker = GetComponentInChildren<TileMapChecker>();
+        //tileMapChecker = GetComponentInChildren<TileMapChecker>();
         line = GetComponentInChildren<FaceMouse>().GetComponentInChildren<LineController>();
         miningMode = GetComponentInChildren<FaceMouse>().GetComponentInChildren<MiningController>();
         itemHandler = GetComponent<ItemHandler>();
@@ -34,20 +34,21 @@ public class PlayerStatesController : MonoBehaviour
                 targetBlockIntPos.z = 0;
                 Vector3Int playerIntPos = Vector3Int.FloorToInt(transform.position);
                 Vector3Int distanceFromPlayer = targetBlockIntPos - playerIntPos;
-                TargetedBlock = tileMapChecker.currentTilemap;
+                //TargetedBlock = tileMapChecker.currentTilemap;
                 //Debug.Log(targetBlockIntPos + " player mousepos");
 
                 if (Input.GetMouseButton(0) && distanceFromPlayer.x > -5 && distanceFromPlayer.x < 5 && distanceFromPlayer.y > -5 && distanceFromPlayer.y < 5)
                 {
-                    Sprite sprite = TargetedBlock.GetSprite(targetBlockIntPos);
                     line.enabled = true;
-                    miningMode.Mine(targetBlockIntPos, TargetedBlock);
+                    //miningMode.Mine(targetBlockIntPos, TargetedBlock);
                 }
                 break;
             case PlayerController.PlayerStates.Normal:
                 break;
             case PlayerController.PlayerStates.Building:
 
+                break;
+            case PlayerController.PlayerStates.Idle:
                 break;
             default:
                 break;

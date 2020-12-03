@@ -16,18 +16,20 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     // Start is called before the first frame update
     void Start()
     {
-        
-        endOfGun = transform.Find("EndOfGun");
+        if(endOfGun == null)
+            endOfGun = transform.Find("EndOfGun");
       //  player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
       //  tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
     }
 
     private void OnEnable()
     {
-        if(itemDatabase == null)
+        if(endOfGun == null)
+            endOfGun = transform.Find("EndOfGun");
+
+        if (itemDatabase == null)
             itemDatabase = GetComponent<ItemDatabaseObject>();
     }
-
 
     public bool Mine(Vector3Int blockToMine, Tilemap currentTileMap)
     {
