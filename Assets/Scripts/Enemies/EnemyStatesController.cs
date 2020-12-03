@@ -83,10 +83,9 @@ public class EnemyStatesController : MonoBehaviour
 
                 }
 
-              //  Debug.Log(enemy.item.GetComponent<BlockCollisionDetect>().PointOfContact + " Pickaxe pos " + enemy.player.worldPosition);
                 if (distanceFromEnemy.x > -5 && distanceFromEnemy.x < 5 && distanceFromEnemy.y > -5 && distanceFromEnemy.y < 5)
                 {
-                    miningMode.Mine(targetBlockIntPos, TargetedBlock);
+                    miningMode.Mine(targetBlockIntPos, enemy.miningStrength);
                     //for (int i = 1; i <= 5; i++)
                     //{
                     //    Vector3Int[] lookingForPlayer = GetNextBlocks(temp, i);

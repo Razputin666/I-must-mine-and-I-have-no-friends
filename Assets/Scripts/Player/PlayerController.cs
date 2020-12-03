@@ -22,10 +22,10 @@ public class PlayerController : MonoBehaviour
     public int playerHP;
     public float speed;                //Floating point variable to store the player's movement speed.
     public float jumpVelocity;
+    public float miningStrength;
+
     public float maxFallSpeed;
     private float maxSpeed;
-    Vector2 horizontalSpeed;
-    Vector2 verticalSpeed;
     float heightTimer;
     float widthTimer;
     float jumpTimer;
@@ -46,10 +46,13 @@ public class PlayerController : MonoBehaviour
     public Transform item;
     private JumpController jumpController;
    [SerializeField]private DeathScreen deathScreen;
+    [SerializeField] private LevelGeneratorLayered mapSize;
 
 
     [SerializeField]
     Camera _camera;
+    [SerializeField]
+    Camera _secondCamera;
 
     void Start()
     {
@@ -67,6 +70,8 @@ public class PlayerController : MonoBehaviour
         capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
         jumpController = GetComponent<JumpController>();
         playerStates = PlayerStates.Mining;
+        mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
+        _camera = GameObject.Find("Main Camera").GetComponent<Camera>();
        // itemController.SetMiningMode(); // Vi har inte combat än så den e på mining default
         StartCoroutine(CoroutineCoordinator());
     }
@@ -77,7 +82,7 @@ public class PlayerController : MonoBehaviour
 
         mousePos = Input.mousePosition;
         worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
-        _camera.transform.position = new Vector3(rb2d.transform.position.x, rb2d.transform.position.y, -1); 
+        _camera.transform.position = new Vector3(Mathf.Clamp(rb2d.transform.position.x, (0) + 26.7f, (mapSize.startPosition.x) - 26.7f), rb2d.transform.position.y, -1);
 
         if (Input.GetKey(KeyCode.Alpha1))
         {

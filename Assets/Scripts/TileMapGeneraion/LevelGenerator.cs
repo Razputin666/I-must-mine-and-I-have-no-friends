@@ -100,7 +100,7 @@ public class LevelGenerator : MonoBehaviour
 				//First generate our array
 				map = MapFunctions.GenerateArray(width, height, false);
 				//Next generate the custom random walk cave
-				map = MapFunctions.RandomWalkCaveCustom(map, seed, mapSetting.clearAmount);
+				map = MapFunctions.RandomWalkCaveCustom(map, seed, mapSetting.clearAmount, 100);
 				break;
 			case Algorithm.CellularAutomataVonNeuman:
 				//First generate the cellular automata array

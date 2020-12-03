@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e04dc494a6945ed47b4d6e93c6be4759, type: 3}
   m_Name: RandomWalkSettings
   m_EditorClassIdentifier: 
-  algorithm: 5
+  algorithm: 4
   randomSeed: 1
   seed: 0
   fillAmount: 45
   smoothAmount: 7
   clearAmount: 40
   interval: 2
-  minPathWidth: 0
-  maxPathWidth: 0
-  maxPathChange: 0
-  roughness: 0
-  windyness: 0
+  minPathWidth: 6
+  maxPathWidth: 15
+  maxPathChange: 19
+  roughness: 51
+  windyness: 47
   edgesAreWalls: 0
   modifier: 0.032
   randomHeightStart: 6

@@ -73,7 +73,7 @@ public class MapFunctions
             {
                 if (map[x, y] == 1) // 1 = tile, 0 = no tile
                 {
-                    Debug.Log(x + "," + y);
+                  //  Debug.Log(x + "," + y);
                     //if we are at ground level set the tile to Grass else set it to Dirt
                     if (isGround)
                     {
@@ -82,12 +82,14 @@ public class MapFunctions
                     }
                     else
                     {
-                        tilemap.SetTile(new Vector3Int(x, y, 0), tiles[1]);
+                        tilemap.SetTile(new Vector3Int(x, y, 0), tiles[0]);
                     }
                 }
             }
         }
     }
+
+ 
     /// <summary>
     /// Renders a map using an offset provided, Useful for having multiple maps on one tilemap
     /// </summary>
@@ -108,6 +110,96 @@ public class MapFunctions
                 else if (map[x, y] == 0)
                 {
                     tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                }
+
+                if (x + 1 < map.GetUpperBound(0) && x - 1 >= 0 && y + 1 < map.GetUpperBound(1) && y - 1 >= 0)
+                {
+                    if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
+                    {
+                        tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void RenderFeaturesWithOffset(int[,] map, Tilemap tilemap, TileBase[] tiles, Vector2Int offset, bool addTiles)
+    {
+
+        for (int x = 0; x < map.GetUpperBound(0); x++)
+        {
+            for (int y = 0; y < map.GetUpperBound(1); y++)
+            {
+                if (map[x, y] == 1 && addTiles)
+                {
+                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                }
+                else if (map[x, y] == 0)
+                {
+                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[0]);
+                }
+
+                if (x + 1 < map.GetUpperBound(0) && x - 1 >= 0 && y + 1 < map.GetUpperBound(1) && y - 1 >= 0)
+                {
+                    if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
+                    {
+                        tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Draws the map to the screen
+    /// </summary>
+    /// <param name="map">Map that we want to draw</param>
+    /// <param name="tilemap">Tilemap we will draw onto</param>
+    /// <param name="tile">Tile we will draw with</param>
+    public static void RenderMapFeatures(int[,] map, Tilemap tilemap, TileBase[] tiles, bool addTiles)
+    {
+        //tilemap.ClearAllTiles(); //Clear the map (ensures we dont overlap)
+        for (int x = 0; x < map.GetUpperBound(0); x++) //Loop through the width of the map
+        {
+            bool isGround = true;
+            for (int y = map.GetUpperBound(1); y >= 0; y--) //Loop through the height of the map
+            {
+                if (map[x, y] == 1 && addTiles) // 1 = tile, 0 = no tile
+                {
+                    //  Debug.Log(x + "," + y);
+                    //if we are at ground level set the tile to Grass else set it to Dirt
+                    if (isGround)
+                    {
+                        isGround = false;
+                        tilemap.SetTile(new Vector3Int(x, y, 0), tiles[0]);
+                    }
+                    else
+                    {
+                        tilemap.SetTile(new Vector3Int(x, y, 0), tiles[1]);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void RenderFeaturesWithOffsetNoNull(int[,] map, Tilemap tilemap, TileBase[] tiles, Vector2Int offset, bool addTiles)
+    {
+        for (int x = 0; x < map.GetUpperBound(0); x++)
+        {
+            for (int y = 0; y < map.GetUpperBound(1); y++)
+            {
+
+                if (map[x, y] == 0)
+                {
+                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[0]);
+                }
+
+                if (x + 1 < map.GetUpperBound(0) && x - 1 >= 0 && y + 1 < map.GetUpperBound(1) && y - 1 >= 0)
+                {
+                    if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
+                    {
+                        tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
+                    }
                 }
             }
         }
@@ -336,6 +428,7 @@ public class MapFunctions
     /// <returns>The modified map with a smoothed random walk</returns>
     public static int[,] RandomWalkTopSmoothed(int[,] map, float seed, int minSectionWidth, int randomizedRange)
     {
+        
         //Seed our random
         System.Random rand = new System.Random(seed.GetHashCode());
 
@@ -350,6 +443,7 @@ public class MapFunctions
         //Work through the array width
         for (int x = 0; x <= map.GetUpperBound(0); x++)
         {
+            
             //Determine the next move
             nextMove = rand.Next(2);
 
@@ -408,7 +502,6 @@ public class MapFunctions
 
         while (floorCount < reqFloorAmount && maxLoops > 0)
         {
-            Debug.Log(floorCount + " floor count " + reqFloorAmount + " required floor amount");
             //Determine our next direction
             int randDir = rand.Next(4);
 
@@ -499,15 +592,15 @@ public class MapFunctions
 	/// <param name="seed">The seed for the random</param>
 	/// <param name="requiredFloorPercent">Required amouount of floor to remove</param>
 	/// <returns>The modified map array</returns>
-	public static int[,] RandomWalkCaveCustom(int[,] map, float seed, int requiredFloorPercent)
+	public static int[,] RandomWalkCaveCustom(int[,] map, float seed, int requiredFloorPercent, int numberOfLoops)
     {
         //Seed our random
         System.Random rand = new System.Random(seed.GetHashCode());
 
         //Define our start x position
-        int floorX = Random.Range(1, map.GetUpperBound(0) - 1);
+        int floorX = Random.Range(0, map.GetUpperBound(0) - 1);
         //Define our start y position
-        int floorY = Random.Range(1, map.GetUpperBound(1) - 1);
+        int floorY = Random.Range(0, map.GetUpperBound(1) - 1);
         //Determine our required floorAmount
         int reqFloorAmount = ((map.GetUpperBound(1) * map.GetUpperBound(0)) * requiredFloorPercent) / 100;
         //Used for our while loop, when this reaches our reqFloorAmount we will stop tunneling
@@ -517,11 +610,10 @@ public class MapFunctions
         map[floorX, floorY] = 0;
         //Increase our floor count
         floorCount++;
-        int maxLoops = 1000;
+        int maxLoops = numberOfLoops;
 
         while (floorCount < reqFloorAmount && maxLoops > 0)
         {
-            Debug.Log(floorCount + " floor count " + reqFloorAmount + " required floor amount");
             //Determine our next direction
             int randDir = rand.Next(8);
 
@@ -543,7 +635,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase floor count
                             floorCount++;
-                            maxLoops = 1000;
+                            maxLoops = numberOfLoops;
                         }
                     }
                     break;
@@ -561,7 +653,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
-                            maxLoops = 1000;
+                            maxLoops = numberOfLoops;
                         }
                     }
                     break;
@@ -581,7 +673,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
-                            maxLoops = 1000;
+                            maxLoops = numberOfLoops;
                         }
                     }
                     break;
@@ -599,7 +691,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
-                            maxLoops = 1000;
+                            maxLoops = numberOfLoops;
                         }
                     }
                     break;
@@ -619,7 +711,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
-                            maxLoops = 1000;
+                            maxLoops = numberOfLoops;
                         }
                     }
                     break;
@@ -637,7 +729,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
-                            maxLoops = 1000;
+                            maxLoops = numberOfLoops;
                         }
                     }
                     break;
@@ -657,7 +749,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
-                            maxLoops = 1000;
+                            maxLoops = numberOfLoops;
                         }
                     }
                     break;
@@ -675,7 +767,7 @@ public class MapFunctions
                             map[floorX, floorY] = 0;
                             //Increase the floor count
                             floorCount++;
-                            maxLoops = 1000;
+                            maxLoops = numberOfLoops;
                         }
                     }
                     break;
@@ -685,6 +777,193 @@ public class MapFunctions
 
         return map;
     }
+
+    public static int[,] BlockWalkGeneration(int[,] map, float seed, int requiredFloorPercent, int numberOfLoops)
+    {
+        //Seed our random
+        System.Random rand = new System.Random(seed.GetHashCode());
+
+        //Define our start x position
+        int floorX = Random.Range(1, map.GetUpperBound(0) - 1);
+        //Define our start y position
+        int floorY = Random.Range(1, map.GetUpperBound(1) - 1);
+        //Determine our required floorAmount
+        int reqFloorAmount = ((map.GetUpperBound(1) * map.GetUpperBound(0)) * requiredFloorPercent) / 100;
+        //Used for our while loop, when this reaches our reqFloorAmount we will stop tunneling
+        int floorCount = 0;
+
+        //Set our start position to not be a tile (0 = no tile, 1 = tile)
+        map[floorX, floorY] = 0;
+        //Increase our floor count
+        floorCount++;
+        int maxLoops = numberOfLoops;
+
+        while (floorCount < reqFloorAmount && maxLoops > 0)
+        {
+            //Determine our next direction
+            int randDir = rand.Next(8);
+
+            switch (randDir)
+            {
+                case 0: //North-West
+                    //Ensure we don't go off the map
+                    if ((floorY + 1) < map.GetUpperBound(1) && (floorX - 1) > 0)
+                    {
+                        //Move the y up 
+                        floorY++;
+                        //Move the x left
+                        floorX--;
+
+                        //Check if the position is a tile
+                        if (map[floorX, floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 1;
+                            //Increase floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 1: //North
+                    //Ensure we don't go off the map
+                    if ((floorY + 1) < map.GetUpperBound(1))
+                    {
+                        //Move the y up
+                        floorY++;
+
+                        //Check if the position is a tile
+                        if (map[floorX, floorY] == 0)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 1;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 2: //North-East
+                    //Ensure we don't go off the map
+                    if ((floorY + 1) < map.GetUpperBound(1) && (floorX + 1) < map.GetUpperBound(0))
+                    {
+                        //Move the y up
+                        floorY++;
+                        //Move the x right
+                        floorX++;
+
+                        //Check if the position is a tile
+                        if (map[floorX, floorY] == 0)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 1;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 3: //East
+                    //Ensure we don't go off the map
+                    if ((floorX + 1) < map.GetUpperBound(0))
+                    {
+                        //Move the x right
+                        floorX++;
+
+                        //Check if the position is a tile
+                        if (map[floorX, floorY] == 0)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 1;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 4: //South-East
+                    //Ensure we don't go off the map
+                    if ((floorY - 1) > 0 && (floorX + 1) < map.GetUpperBound(0))
+                    {
+                        //Move the y down
+                        floorY--;
+                        //Move the x right
+                        floorX++;
+
+                        //Check if the position is a tile
+                        if (map[floorX, floorY] == 0)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 1;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 5: //South
+                    //Ensure we don't go off the map
+                    if ((floorY - 1) > 0)
+                    {
+                        //Move the y down
+                        floorY--;
+
+                        //Check if the position is a tile
+                        if (map[floorX, floorY] == 0)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 1;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 6: //South-West
+                    //Ensure we don't go off the map
+                    if ((floorY - 1) > 0 && (floorX - 1) > 0)
+                    {
+                        //Move the y down
+                        floorY--;
+                        //move the x left
+                        floorX--;
+
+                        //Check if the position is a tile
+                        if (map[floorX, floorY] == 0)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 1;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 7: //West
+                    //Ensure we don't go off the map
+                    if ((floorX - 1) > 0)
+                    {
+                        //Move the x left
+                        floorX--;
+
+                        //Check if the position is a tile
+                        if (map[floorX, floorY] == 0)
+                        {
+                            //Change it to not a tile
+                            map[floorX, floorY] = 1;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+            }
+            maxLoops--;
+        }
+
+        return map;
+    }
+
 
     /// <summary>
     /// Creates a tunnel of length height. Takes into account roughness and windyness

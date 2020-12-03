@@ -18,6 +18,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] public int enemyHP;
     [SerializeField] private float enterDigModeTimer;
+    
 
 
     
@@ -39,6 +40,7 @@ public class EnemyController : MonoBehaviour
 
     public int enemyStrength;
     public Vector2 enemyKnockBack;
+    public float miningStrength;
 
 
 
@@ -61,7 +63,7 @@ public class EnemyController : MonoBehaviour
     {
         distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
         enterDigModeTimer += Time.deltaTime;
-        Debug.DrawRay(gameObject.transform.position, player.gameObject.transform.position - transform.position, Color.red);
+        //Debug.DrawRay(gameObject.transform.position, player.gameObject.transform.position - transform.position, Color.red);
 
        
 

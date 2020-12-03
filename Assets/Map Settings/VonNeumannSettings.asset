@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e04dc494a6945ed47b4d6e93c6be4759, type: 3}
   m_Name: VonNeumannSettings
   m_EditorClassIdentifier: 
-  algorithm: 7
+  algorithm: 8
   randomSeed: 1
   seed: 0
-  fillAmount: 85
-  smoothAmount: 3
-  clearAmount: 10
+  fillAmount: 40
+  smoothAmount: 7
+  clearAmount: 50
   interval: 2
-  minPathWidth: 0
-  maxPathWidth: 0
-  maxPathChange: 0
-  roughness: 0
-  windyness: 0
+  minPathWidth: 3
+  maxPathWidth: 5
+  maxPathChange: 10
+  roughness: 22
+  windyness: 20
   edgesAreWalls: 0
-  modifier: 0.032
+  modifier: 0.093
   randomHeightStart: 6

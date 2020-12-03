@@ -39,7 +39,7 @@ public class PlayerStatesController : MonoBehaviour
                 if (Input.GetMouseButton(0) && distanceFromPlayer.x > -5 && distanceFromPlayer.x < 5 && distanceFromPlayer.y > -5 && distanceFromPlayer.y < 5)
                 {
                     line.enabled = true;
-                    miningMode.Mine(targetBlockIntPos,TargetedBlock);
+                    miningMode.Mine(targetBlockIntPos, player.miningStrength);
                 }
 
                 break;

@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e04dc494a6945ed47b4d6e93c6be4759, type: 3}
   m_Name: RandomWalkCustomSettings
   m_EditorClassIdentifier: 
-  algorithm: 6
+  algorithm: 7
   randomSeed: 1
   seed: 0
   fillAmount: 45
   smoothAmount: 7
-  clearAmount: 33
+  clearAmount: 5
   interval: 2
   minPathWidth: 0
   maxPathWidth: 0
