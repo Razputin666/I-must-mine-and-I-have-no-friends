@@ -15,6 +15,10 @@ public class Blink : MonoBehaviour
         //Call coroutine BlinkText on Start
         StartCoroutine(BlinkText());
     }
+    void OnEnable()
+    {
+        StartCoroutine(BlinkText());
+    }
 
     //function to blink the text 
     public IEnumerator BlinkText()

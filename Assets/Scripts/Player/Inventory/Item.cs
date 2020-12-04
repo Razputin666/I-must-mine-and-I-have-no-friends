@@ -1,72 +1,92 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public abstract class Item
+[System.Serializable]
+public class Item
 {
-    protected int id;
-    protected string title;
-    protected string description;
-    protected Sprite icon;
-
-    public Item(int id, string title, string description)
+    [SerializeField]
+    private string name;
+    [SerializeField]
+    private int id = -1;
+    [SerializeField]
+    private int amount;
+    //public ItemBuff[] buffs;
+    private ItemObject itemObject;
+    public Item()
     {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.icon = Resources.Load<Sprite>("Sprites/Items/" + title);
+        name = "";
+        id = -1;
+        amount = 0;
+        itemObject = null;
+    }
+    public Item(ItemObject item)
+    {
+        itemObject = item;
+        name = item.name;
+        id = item.Data.id;
+        amount = item.Data.amount;
+        //buffs = new ItemBuff[item.buffs.Length];
+        //for(int i = 0; i < buffs.Length; i++)
+        //{
+        //    buffs[i] = new ItemBuff(item.buffs[i].min, item.buffs[i].max);
+        //}
     }
 
-    public Item(Item item)
+    public string Name
     {
-        this.id = item.id;
-        this.title = item.title;
-        this.description = item.description;
-        this.icon = item.icon;
+        get
+        {
+            return this.name;
+        }
     }
 
     public int ID
     {
-        get 
+        get
         {
-            return this.id; 
+            return this.id;
         }
         set
         {
             this.id = value;
         }
     }
-    public string Title
+
+    public int Amount
     {
         get
         {
-            return this.title;
+            return this.amount;
         }
         set
         {
-            this.title = value;
+            this.amount = value;
         }
     }
-    public string Description
+    public ItemObject ItemObject
     {
         get
         {
-            return this.description;
-        }
-        set
-        {
-            this.description = value;
-        }
-    }
-    public Sprite Icon
-    {
-        get
-        {
-            return this.icon;
-        }
-        set
-        {
-            this.icon = value;
+            return this.itemObject;
         }
     }
 }
+//[System.Serializable]
+//public class ItemBuff
+//{
+//    public ATTRIBUTES attributes;
+//    public int value;
+//    public int min;
+//    public int max;
+
+//    public ItemBuff(int min, int max)
+//    {
+//        this.min = min;
+//        this.max = max;
+//        GenerateValue();
+//    }
+
+//    public void GenerateValue()
+//    {
+//        value = UnityEngine.Random.Range(min, max);
+//    }
+//}

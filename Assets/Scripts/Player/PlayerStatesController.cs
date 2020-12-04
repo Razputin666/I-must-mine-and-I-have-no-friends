@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class PlayerStatesController : MonoBehaviour
 {
+    private ItemHandler itemHandler;
     private PlayerController player;
     private LineController line;
     private MiningController miningMode;
@@ -20,7 +21,7 @@ public class PlayerStatesController : MonoBehaviour
         tileMapChecker = GetComponentInChildren<TileMapChecker>();
         line = GetComponentInChildren<FaceMouse>().GetComponentInChildren<LineController>();
         miningMode = GetComponentInChildren<FaceMouse>().GetComponentInChildren<MiningController>();
-
+        itemHandler = GetComponent<ItemHandler>();
     }
 
     // Update is called once per frame
@@ -33,17 +34,20 @@ public class PlayerStatesController : MonoBehaviour
                 targetBlockIntPos.z = 0;
                 Vector3Int playerIntPos = Vector3Int.FloorToInt(transform.position);
                 Vector3Int distanceFromPlayer = targetBlockIntPos - playerIntPos;
-                TargetedBlock = tileMapChecker.currentTilemap;
+               // TargetedBlock = tileMapChecker.currentTilemap;
                 //Debug.Log(targetBlockIntPos + " player mousepos");
 
                 if (Input.GetMouseButton(0) && distanceFromPlayer.x > -5 && distanceFromPlayer.x < 5 && distanceFromPlayer.y > -5 && distanceFromPlayer.y < 5)
                 {
                     line.enabled = true;
                     miningMode.Mine(targetBlockIntPos, player.miningStrength);
-                }
 
+                }
                 break;
             case PlayerController.PlayerStates.Normal:
+                break;
+            case PlayerController.PlayerStates.Building:
+
                 break;
             default:
                 break;

@@ -28,7 +28,6 @@ public class ChunkSettings : MonoBehaviour
         
 
         StartCoroutine(GrassGrowth());
-        
 
     }
 

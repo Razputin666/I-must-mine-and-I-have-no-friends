@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 0
+    path: Assets/Scenes/Blackened Stars.unity
+    guid: 06a3270c657f1ca4bbeb6b6ddb66e014
+  - enabled: 1
+    path: Assets/Scenes/Main Menu.unity
+    guid: fc72e74441a02a744a4099eb2a8bd57f
+  - enabled: 1
+    path: Assets/Scenes/TileMapTesting.unity
+    guid: 93750caeb203312419054b83a297f867
   m_configObjects: {}

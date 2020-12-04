@@ -14,7 +14,6 @@ public class TileMapChecker : MonoBehaviour
         if (collision.gameObject.tag == "TileMap")
         {
             currentTilemap = collision.gameObject.GetComponent<Tilemap>();
-            Debug.Log("NewTileMap");
         }
     }
 

@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 
 public class MiningController : MonoBehaviour, HasCoolDownInterFace
 {
-
+    [SerializeField] private ItemDatabaseObject itemDatabase;
     [SerializeField] private int id = 2;
     [SerializeField] private float coolDownDuration;
     [SerializeField] private CoolDownSystem coolDownSystem;
@@ -27,6 +27,12 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
       //  tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
     }
 
+    private void OnEnable()
+    {
+        if(itemDatabase == null)
+            itemDatabase = GetComponent<ItemDatabaseObject>();
+    }
+
 
     public void Mine(Vector3Int blockToMine, float miningStr)
     {
@@ -40,7 +46,7 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
             Vector3Int blockInLocal = chunk.WorldToCell(blockToMine);
             float blockStr = 0;
             string blockType = tileMapManager.BlockTypeGet(new Vector3Int(blockInLocal.x, blockInLocal.y, 0), chunk);
-
+            
 
 
             if (!blockChecker.TryGetValue(blockInLocal, out blockStr))
@@ -59,8 +65,8 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
                 blockStr -= miningStr * Time.deltaTime;
                 blockChecker[blockInLocal] = blockStr;
             }
-
-            if(blockStr <= 0)
+            Debug.Log(blockType);
+            if (blockStr <= 0)
             {
                 
                 CheckBlockRules(blockInLocal, blockType, chunk);
@@ -76,6 +82,16 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     {
         switch (blockType)
         {
+            case "Dirt":
+                //Debug.Log("DIRT!");
+                ItemObject itemObj = itemDatabase.GetItemAt(3);
+                Debug.Log(itemObj);
+                if (itemObj != null)
+                {
+                    ItemObject newItemObj = Instantiate(itemObj);
+                    SpawnManager.SpawnItemAt(chunkThis.CellToWorld(blockPosition), newItemObj);
+                }
+                break;
             case "Grass":
                 
                 if (chunkThis.HasTile(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0)))
@@ -100,6 +116,8 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
                 }
                 upperBlocks.Clear();
                 break;
+
+
         }
     }
 

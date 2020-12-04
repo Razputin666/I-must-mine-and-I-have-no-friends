@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6611024963374839542}
   - component: {fileID: -7461722848896506654}
   - component: {fileID: 7663779823202159461}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: TileChunk
   m_TagString: TileMap
   m_Icon: {fileID: 0}
