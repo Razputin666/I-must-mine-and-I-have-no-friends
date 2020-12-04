@@ -203,28 +203,6 @@ public class MapFunctions
     }
 
     /// <summary>
-    /// Renders a map using an offset provided, Useful for having multiple maps on one tilemap
-    /// </summary>
-    /// <param name="map">The map to draw</param>
-    /// <param name="tilemap">The tilemap to draw on</param>
-    /// <param name="tile">The tile to draw with</param>
-    /// <param name="offset">The offset to apply</param>
-    public static IEnumerator RenderMapWithOffsetWithDelay(int[,] map, Tilemap tilemap, TileBase[] tiles, Vector2Int offset)
-    {
-        for (int x = 0; x < map.GetUpperBound(0); x++)
-        {
-            for (int y = 0; y < map.GetUpperBound(1); y++)
-            {
-                if (map[x, y] == 1)
-                {
-                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
-                    yield return null;
-                }
-            }
-        }
-    }
-
-    /// <summary>
     /// Renders the map but with a delay, this allows us to see it being generated before our eyes
     /// </summary>
     /// <param name="map">The map to draw</param>
