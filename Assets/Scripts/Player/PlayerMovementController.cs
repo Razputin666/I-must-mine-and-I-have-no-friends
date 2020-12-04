@@ -10,12 +10,9 @@ public class PlayerMovementController : NetworkBehaviour
 
     private Vector2 previousInput;
 
-
     public float jumpVelocity;
     public float maxFallSpeed;
     private float maxSpeed;
-    Vector2 horizontalSpeed;
-    Vector2 verticalSpeed;
     float heightTimer;
     float widthTimer;
     float jumpTimer;

@@ -17,23 +17,12 @@ public class PlayerController : NetworkBehaviour
 
     public PlayerStates playerStates { get; private set; }
 
-    #region PlayerValues
-    private Tilemap targetedBlock;
-    
+    #region PlayerValues    
     public int playerHP;
-    public float speed;                //Floating point variable to store the player's movement speed.
-    public float jumpVelocity;
-    public float maxFallSpeed;
-    private float maxSpeed;
-    Vector2 horizontalSpeed;
-    Vector2 verticalSpeed;
-    float heightTimer;
-    float widthTimer;
-    float jumpTimer;
     public Rigidbody2D rb2d;        //Store a reference to the Rigidbody2D component required to use 2D Physics.
-    private BoxCollider2D boxCollider2d;
-    private CapsuleCollider2D capsuleCollider2d;
-    private bool facingRight;
+    //private BoxCollider2D boxCollider2d;
+    //private CapsuleCollider2D capsuleCollider2d;
+    //private bool facingRight;
     public Vector3 worldPosition;
     public Vector3 mousePos;
     private float distanceFromPlayerx;
@@ -109,10 +98,10 @@ public class PlayerController : NetworkBehaviour
 
         //Get and store a reference to the Rigidbody2D component so that we can access it.
 
-        facingRight = true;
+        //facingRight = true;
         rb2d = GetComponent<Rigidbody2D>();
-        boxCollider2d = transform.GetComponent<BoxCollider2D>();
-        capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
+        //boxCollider2d = transform.GetComponent<BoxCollider2D>();
+        //capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
         jumpController = GetComponent<JumpController>();
         itemHandler = GetComponent<ItemHandler>();
         playerStates = PlayerStates.Idle;
@@ -212,51 +201,6 @@ public class PlayerController : NetworkBehaviour
 
     }
     #endregion
-
-    //private void CalculateMovement()
-    //{
-    //    if (Input.GetKey(KeyCode.D))
-    //    {
-    //        rb2d.velocity += Vector2.right * speed;
-    //        Flip(Vector2.right.x);
-    //    }
-
-    //    if (Input.GetKey(KeyCode.A))
-    //    {
-    //        rb2d.velocity += Vector2.left * speed;
-    //        Flip(Vector2.left.x);
-    //    }
-    //    if (rb2d.velocity.y < -25f)
-    //    {
-    //        heightTimer += Time.deltaTime;
-    //        maxFallSpeed = Mathf.Clamp(heightTimer, 1f, 5f);
-    //        rb2d.velocity -= Vector2.down * maxFallSpeed;
-    //        if (rb2d.velocity.y > -35f)
-    //            heightTimer = 1f;
-    //    }
-
-    //    maxSpeed = Mathf.Abs(rb2d.velocity.x);
-
-    //    if (maxSpeed > 25f && rb2d.velocity.x > 0)
-    //    {
-    //        widthTimer += Time.deltaTime;
-    //        float asedf = Mathf.Clamp(widthTimer, 1f, 3f);
-    //        rb2d.velocity -= Vector2.right * asedf;
-    //        if (maxSpeed > 30f)
-    //            widthTimer = 1f;
-    //    }
-
-    //    if (maxSpeed > 25f && rb2d.velocity.x < 0)
-    //    {
-    //        widthTimer += Time.deltaTime;
-    //        float asedf = Mathf.Clamp(widthTimer, 1f, 3f);
-    //        rb2d.velocity -= Vector2.left * asedf;
-    //        if (maxSpeed > 30f)
-    //            widthTimer = 1f;
-    //    }
-    //}
-
-
     private void UpdateState(ItemObject itemObj)
     {
         if (itemObj != null)
@@ -383,96 +327,6 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    //IEnumerator MineBlock()
-    //{
-    //    int blockHP = 1;
-
-    //    while (Input.GetMouseButton(0) && TargetedBlock != null)
-    //    {
-    //        if(blockHP == 0)
-    //        {
-    //            blockTile = TargetedBlock.GetComponent<Tilemap>();
-
-
-
-    //            Vector3Int targetBlockIntPos = Vector3Int.FloorToInt(worldPosition);
-    //            targetBlockIntPos.z = 0;
-    //            Debug.Log(targetBlockIntPos);
-
-    //            blockTile.SetTile(targetBlockIntPos, null);
-
-
-    //        }
-    //        blockHP -= 1;
-    //        yield return new WaitForSeconds(0.1f);          
-    //    }
-
-    //}
-
-    //public Tilemap TargetedBlock
-    //{
-    //    get 
-    //    {
-    //        return targetedBlock; 
-
-    //    }
-
-    //    set 
-    //    {
-    //        targetedBlock = value;
-    //    }
-    //}
-
-    public float DistanceFromPlayerX
-    {
-        get { return distanceFromPlayerx; }
-
-        set { distanceFromPlayerx = value; }
-    }
-
-    public float DistanceFromPlayerY
-    {
-        get { return distanceFromPlayery; }
-
-        set { distanceFromPlayery = value; }
-    }
-
-    //IEnumerator MineBlockOld()
-    //{
-    //    int blockHP = 1;
-    //    Collider2D thisTargetedBlock = TargetedBlock;
-    //    while (Input.GetMouseButton(0) && TargetedBlock == thisTargetedBlock && TargetedBlock != null)
-    //    {
-    //        if (blockHP == 0)
-    //        {
-    //            TilemapVisual tilemapVisual = targetedBlock.transform.parent.GetComponent<TilemapVisual>();
-    //            if (tilemapVisual != null)
-    //            {
-    //                TilemapOLD.TilemapObject tilemapObject = tilemapVisual.GetGridObjectAtXY(targetedBlock.transform.position);
-    //                if (tilemapObject != null)
-    //                {
-    //                    tilemapObject.SetTilemapSprite(TilemapOLD.TilemapObject.TilemapSprite.None);
-
-    //                    //Destroy(TargetedBlock.gameObject);
-    //                }
-    //            }
-
-    //        }
-    //        blockHP -= 1;
-    //        yield return new WaitForSeconds(0.05f);
-    //    }
-
-    //}
+    
     #endregion
-    //private void Flip(float horizontal)
-    //{
-    //    if (horizontal > 0 && !facingRight || horizontal < 0 && facingRight)
-    //    {
-    //        facingRight = !facingRight;
-
-    //        Vector3 theScale = transform.localScale;
-    //        theScale.x *= -1;
-    //        transform.localScale = theScale;
-    //    }
-    //}
 }
