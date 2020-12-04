@@ -31,9 +31,10 @@ public class EnemyStatesController : MonoBehaviour
         {
             case EnemyController.EnemyStates.FrogMining:
 
+                
+
                 Vector3 temp = enemy.player.transform.position - transform.position;
 
-                Vector3 normalizedTemp = temp.normalized;
                 if (temp.x > 0)
                 {
                     temp.x = 1;
@@ -82,10 +83,26 @@ public class EnemyStatesController : MonoBehaviour
 
                 }
 
-              //  Debug.Log(enemy.item.GetComponent<BlockCollisionDetect>().PointOfContact + " Pickaxe pos " + enemy.player.worldPosition);
                 if (distanceFromEnemy.x > -5 && distanceFromEnemy.x < 5 && distanceFromEnemy.y > -5 && distanceFromEnemy.y < 5)
                 {
-                    miningMode.Mine(targetBlockIntPos, TargetedBlock);
+                    miningMode.Mine(targetBlockIntPos, enemy.miningStrength);
+                    //for (int i = 1; i <= 5; i++)
+                    //{
+                    //    Vector3Int[] lookingForPlayer = GetNextBlocks(temp, i);
+                    //    for (int j = 0; j < lookingForPlayer.Length; j++)
+                    //    {
+                    //        if (targetedBlock.HasTile(lookingForPlayer[j]))
+                    //        {
+                    //            break;
+                    //        }
+
+                    //        else if (!targetedBlock.HasTile(lookingForPlayer[j]) && Vector3Int.FloorToInt(enemy.player.transform.position) == lookingForPlayer[j])
+                    //        {
+                    //            Debug.Log("sees player");
+                    //            enemy.SetAggressiveMode();
+                    //        }
+                    //    }
+                    //}
                 }
 
                 break;

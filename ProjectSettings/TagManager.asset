@@ -9,6 +9,9 @@ TagManager:
   - Enemy
   - Bullet
   - EnemyWeapon
+  - Test
+  - Camera
+  - GameManager
   layers:
   - Default
   - TransparentFX
@@ -21,6 +24,8 @@ TagManager:
   - Blocks
   - Player
   - Enemy
+  - Camera
+  - WorldTeleporter
   - Items
   - 
   - 
