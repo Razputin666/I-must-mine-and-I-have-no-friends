@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3738170577226596389}
   - component: {fileID: 8978213078250018398}
   - component: {fileID: 1497535763}
-  - component: {fileID: 1726475134}
+  - component: {fileID: 1792650185}
   m_Layer: 0
   m_Name: LevelGeneration
   m_TagString: GameManager
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e6fc9c468df533499c544f025dca35b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileChunk: {fileID: 4802906064719502046, guid: 85a827aba6a28de47952ea18c67b2957,
+  tileChunk: {fileID: 4802906064719502046, guid: f1fc65f761491f74abdd69e1daf070b8,
     type: 3}
   tiles:
   - {fileID: 11400000, guid: d2a454cdcf61587439cbe5ede10d0c9c, type: 2}
@@ -76,7 +76,7 @@ MonoBehaviour:
   mainMap: {fileID: 11400000, guid: 142c074dbc6f1554eb927690b627468c, type: 2}
   customCaveLoops: 50
   numberOfChunks: 3
-  worldWrappingTeleport: {fileID: 8390871902958351613, guid: 7397b87881d4b16488eddb8fcede1fe7,
+  worldWrappingTeleport: {fileID: 8390871902958351613, guid: dcafde4813b34eb41bcd40306c9533f7,
     type: 3}
   grassOverWorldChunk: {fileID: 1497535763}
   playerCharacter: {fileID: 8181247841218053072, guid: 8892c9d624d2feb46b4740620f1e0891,
@@ -102,7 +102,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9f16b9b68fd89124e9d85a234be1c3d7, type: 2}
   - {fileID: 11400000, guid: bf21960a34ad7744cb2e9212bd19afd9, type: 2}
   - {fileID: 11400000, guid: fe676c85093aa8c4291e3a8aae6f42ed, type: 2}
---- !u!114 &1726475134
+--- !u!114 &1792650185
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -111,16 +111,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 8978213078250018397}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b5c23bab80a6b641b043631f80efd6a, type: 3}
+  m_Script: {fileID: 11500000, guid: 80649f7813e3e3049bb9f2c56b7d0885, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   chunks: []
   tileDatas:
+  - {fileID: 11400000, guid: 1ea78bb27036e8645b0eaf68259b61e0, type: 2}
   - {fileID: 11400000, guid: 743de9394c2689d4898f56ace2f5c190, type: 2}
   - {fileID: 11400000, guid: 84490c554332e7144851208582a24b98, type: 2}
-  - {fileID: 11400000, guid: e24c3d4e35069a4469c130b33fa6562c, type: 2}
-  - {fileID: 11400000, guid: 8bbc7ce4a7dad5f43bad1dde5999ad57, type: 2}
-  - {fileID: 11400000, guid: 45cfb562a4c7b1849abb43aca8dbc877, type: 2}
-  - {fileID: 11400000, guid: 1ea78bb27036e8645b0eaf68259b61e0, type: 2}
   - {fileID: 11400000, guid: 981c8eafcaab8764485419ea26853f20, type: 2}
+  - {fileID: 11400000, guid: 8bbc7ce4a7dad5f43bad1dde5999ad57, type: 2}
+  - {fileID: 11400000, guid: e24c3d4e35069a4469c130b33fa6562c, type: 2}
+  - {fileID: 11400000, guid: 45cfb562a4c7b1849abb43aca8dbc877, type: 2}
   mapgGen: {fileID: 8978213078250018398}
