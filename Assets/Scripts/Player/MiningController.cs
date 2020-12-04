@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -12,10 +13,10 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     [SerializeField] private Transform[] points;
     [SerializeField] private TileMapManager tileMapManager;
 
-    [SerializeField] private Tilemap tilemap;
+    [SerializeField] private Tilemap chunk;
 
     public Transform endOfGun;
-    private Dictionary<Vector3Int, float> something = new Dictionary<Vector3Int, float>();
+    private Dictionary<Vector3Int, float> blockChecker = new Dictionary<Vector3Int, float>();
 
     // Start is called before the first frame update
     void Start()
@@ -31,49 +32,76 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     {
         if(!coolDownSystem.IsOnCoolDown(id))
         {
-            RaycastHit2D tileMapCheck = Physics2D.Linecast(transform.position, new Vector2(blockToMine.x, blockToMine.y));
-            if(tileMapCheck.collider != null && tileMapCheck.collider.gameObject.CompareTag("TileMap"))
+            RaycastHit2D chunkCheck = Physics2D.Linecast(transform.position, new Vector2(blockToMine.x, blockToMine.y));
+            if(chunkCheck.collider != null && chunkCheck.collider.gameObject.CompareTag("TileMap"))
             {
-                tilemap = tileMapCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
+                chunk = chunkCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
             }
-            Vector3Int blockInLocal = tilemap.WorldToCell(blockToMine);
+            Vector3Int blockInLocal = chunk.WorldToCell(blockToMine);
             float blockStr = 0;
-            //string checkForPlant = tileMapManager.BlockTypeGet(new Vector3Int(blockInLocal.x, blockInLocal.y + 1, 0), tilemap);
+            string blockType = tileMapManager.BlockTypeGet(new Vector3Int(blockInLocal.x, blockInLocal.y, 0), chunk);
 
 
 
-            if (!something.TryGetValue(blockInLocal, out blockStr))
+            if (!blockChecker.TryGetValue(blockInLocal, out blockStr))
             {
                 
-                blockStr = tileMapManager.BlockStrengthGet(blockInLocal, tilemap);
+                blockStr = tileMapManager.BlockStrengthGet(blockInLocal, chunk);
                 if(blockStr >= 0)
                 {
                     blockStr -= miningStr * Time.deltaTime;
-                    something.Add(blockInLocal, blockStr);
+                    blockChecker.Add(blockInLocal, blockStr);
                 }
             }
             else
             {
-                blockStr = something[blockInLocal];
+                blockStr = blockChecker[blockInLocal];
                 blockStr -= miningStr * Time.deltaTime;
-                something[blockInLocal] = blockStr;
+                blockChecker[blockInLocal] = blockStr;
             }
 
             if(blockStr <= 0)
             {
-                tilemap.SetTile(blockInLocal, null);
-                //if (checkForPlant == "Plant")
-                //{
-                //    Debug.Log(checkForPlant);
-                //    tilemap.SetTile(new Vector3Int(blockInLocal.x, blockInLocal.y + 1, 0), null);
-                //}
-                something.Remove(blockInLocal);
+                
+                CheckBlockRules(blockInLocal, blockType, chunk);
+                chunk.SetTile(blockInLocal, null);
+                blockChecker.Remove(blockInLocal);
                 coolDownSystem.PutOnCoolDown(this);
             }
 
         }
     }
 
+    private void CheckBlockRules(Vector3Int blockPosition, string blockType, Tilemap chunkThis)
+    {
+        switch (blockType)
+        {
+            case "Grass":
+                
+                if (chunkThis.HasTile(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0)))
+                {
+                    string upperBlockType = tileMapManager.BlockTypeGet(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), chunkThis);
+                    if(upperBlockType == "Plant")
+                    chunkThis.SetTile(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), null);
+                    //Drop block here
+                }
+                break;
+
+            case "Tree":
+                List<String> upperBlocks = new List<string>();
+                
+                for (int y = 0; y < 15; y++)
+                {
+                    upperBlocks.Add(tileMapManager.BlockTypeGet(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), chunkThis));
+                    if (upperBlocks[y] == "Tree")
+                    {
+                        chunkThis.SetTile(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), null);
+                    }
+                }
+                upperBlocks.Clear();
+                break;
+        }
+    }
 
 
     public int Id => id;

@@ -1053,15 +1053,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1726475134, guid: c6963e988a08d9642a0e8b79ae49ff62, type: 3}
-      propertyPath: tileDatas.Array.size
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1726475134, guid: c6963e988a08d9642a0e8b79ae49ff62, type: 3}
-      propertyPath: tileDatas.Array.data[4]
-      value: 
-      objectReference: {fileID: 11400000, guid: 45cfb562a4c7b1849abb43aca8dbc877,
-        type: 2}
     - target: {fileID: 3738170577226596389, guid: c6963e988a08d9642a0e8b79ae49ff62,
         type: 3}
       propertyPath: m_RootOrder
@@ -1121,16 +1112,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: LevelGeneration
-      objectReference: {fileID: 0}
-    - target: {fileID: 8978213078250018397, guid: c6963e988a08d9642a0e8b79ae49ff62,
-        type: 3}
-      propertyPath: m_TagString
-      value: GameManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 8978213078250018398, guid: c6963e988a08d9642a0e8b79ae49ff62,
-        type: 3}
-      propertyPath: numberOfChunks
-      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c6963e988a08d9642a0e8b79ae49ff62, type: 3}

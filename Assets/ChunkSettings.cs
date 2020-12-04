@@ -6,6 +6,7 @@ using Unity.Mathematics;
 using UnityEngine.Tilemaps;
 using Unity.Collections;
 using Unity.Burst;
+using System;
 
 public class ChunkSettings : MonoBehaviour
 {
@@ -24,8 +25,10 @@ public class ChunkSettings : MonoBehaviour
         height = mapGen.height;
         tileChunk = GetComponent<Tilemap>();
         TreeGrowth();
+        
 
         StartCoroutine(GrassGrowth());
+        
 
     }
 
@@ -98,7 +101,7 @@ public class ChunkSettings : MonoBehaviour
        
         grassGrowthTimer += Time.deltaTime;
         
-        if(grassGrowthTimer > 10)
+        if(grassGrowthTimer > 30)
         {
            StartCoroutine(GrassGrowth());
             grassGrowthTimer = 0f;

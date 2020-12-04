@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 1
@@ -12,7 +13,7 @@ MonoBehaviour:
   m_Name: Forest_terrain_gray_ice_128px_4
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 21300008, guid: 8529cced46fbd1e429d3bd64cb6d7e7c, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.631586, g: 0.766084, b: 0.7830189, a: 1}
   m_Transform:
     e00: 1
     e01: 0

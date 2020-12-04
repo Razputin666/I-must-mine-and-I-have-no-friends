@@ -113,4 +113,28 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
         }
     }
 
+    void CreateOres(Tilemap tilemap)
+    {
+        int startPositionX = 0;
+        int startPositionY = 0;
+        int spawnWidth = width;
+        int spawnHeight = height / 10;
+
+        int numberOfLoops = 5;
+        int amountToFill = chunkSettings[0].fillAmount;
+
+        mapGen.GenerateMapFeatures(chunkSettings[0], new Vector2Int(startPositionX, startPositionY), spawnWidth, spawnHeight, false, amountToFill, 0, tilemap);
+
+        for (int i = 0; i < numberOfLoops - 1; i++)
+        {
+            amountToFill += 3;
+            mapGen.GenerateMapFeatures(chunkSettings[0], new Vector2Int(startPositionX, startPositionY += spawnHeight - 2), spawnWidth, spawnHeight, false, amountToFill, 0, tilemap);
+            mapGen.GenerateMapFeatures(chunkSettings[2], new Vector2Int(startPositionX, startPositionY), spawnWidth, spawnHeight, false, amountToFill, 0, tilemap);
+
+        }
+        amountToFill = chunkSettings[0].fillAmount + chunkSettings[0].fillAmount / 2;
+        mapGen.GenerateMapFeatures(chunkSettings[0], new Vector2Int(startPositionX, 0), spawnWidth, height, false, amountToFill, 0, tilemap);
+
+    }
+
 }

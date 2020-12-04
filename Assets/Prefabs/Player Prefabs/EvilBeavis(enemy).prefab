@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 2
-  coolDownDuration: 1
+  coolDownDuration: 0.1
   coolDownSystem: {fileID: 658734927}
   points: []
   tileMapManager: {fileID: 0}
