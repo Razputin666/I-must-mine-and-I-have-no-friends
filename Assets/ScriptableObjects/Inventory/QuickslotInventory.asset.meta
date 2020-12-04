@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+<<<<<<< HEAD:Assets/ScriptableObjects/Items/Fabric.asset.meta
+guid: c4298cff35f68a7429860ecf2be26d16
+=======
+guid: 98ff1961fed319840a7c5d0b71b5a77c
+>>>>>>> CrantBranch:Assets/ScriptableObjects/Inventory/QuickslotInventory.asset.meta
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

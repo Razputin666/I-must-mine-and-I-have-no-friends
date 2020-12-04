@@ -12,20 +12,15 @@ public class CraftingInterface : UserInterface
     [SerializeField]
     private GameObject recipePrefab;
     [SerializeField]
+    private GameObject[] materialSlots;
+    [SerializeField]
+    private GameObject resultSlot;
+
+    [SerializeField]
     private InventoryObject playerInventory;
     private CraftingChecker craftChecker;
 
     private CraftingRecipeObject selectedRecipe;
-    [SerializeField]
-    private int X_START;
-    [SerializeField]
-    private int Y_START;
-    [SerializeField]
-    private int X_SPACE_BETWEEN_ITEM;
-    [SerializeField]
-    private int NUMBER_OF_COLUMN;
-    [SerializeField]
-    private int Y_SPACE_BETWEEN_ITEM;
 
     private float craftButtonCooldown = 1f;
 
@@ -49,6 +44,47 @@ public class CraftingInterface : UserInterface
             AddEvent(newRecipe, EventTriggerType.PointerDown, delegate { OnRecipeSelectionChanged(newRecipe); });
             crafting.Add(newRecipe, craftingRecipes[i]);
         }
+
+        for (int i = 0; i < materialSlots.Length; i++)
+        {
+            GameObject itemObject = materialSlots[i];
+
+            inventory.GetSlots[i].slotObject = itemObject;
+
+            //Link the database to the itemObject
+            slotsOnInterface.Add(itemObject, inventory.GetSlots[i]);
+            inventory.GetSlots[i].OnAfterUpdate += OnSlotUpdate;
+
+            //Add events to our object inside our gameobjects array that is in the same order as our equipment database
+            AddEvent(itemObject, EventTriggerType.PointerEnter, delegate { OnEnter(itemObject); });
+            AddEvent(itemObject, EventTriggerType.PointerExit, delegate { OnExit(itemObject); });
+
+            materialSlots[i].SetActive(false);
+        }
+        inventory.GetSlots[6].slotObject = resultSlot;
+        inventory.GetSlots[6].OnAfterUpdate += OnSlotUpdate;
+
+        //Link the database to the itemObject
+        slotsOnInterface.Add(resultSlot, inventory.GetSlots[6]);
+        
+        AddEvent(resultSlot, EventTriggerType.PointerEnter, delegate { OnEnter(resultSlot); });
+        AddEvent(resultSlot, EventTriggerType.PointerExit, delegate { OnExit(resultSlot); });
+
+        UnityEngine.UI.Button button = GetComponentInChildren<UnityEngine.UI.Button>();
+
+        AddEvent(button.gameObject, EventTriggerType.PointerDown, delegate { OnCraftClick(); });
+
+        CraftingRecipeObject startCraft = craftChecker.CraftingDatabase.GetRecipeAt(0);
+
+        for (int i = 0; i < startCraft.Materials.Count; i++)
+        {
+            slotsOnInterface[materialSlots[i]].UpdateSlot(new Item(Instantiate(startCraft.Materials[i].ItemObject)), startCraft.Materials[i].Amount);
+
+            materialSlots[i].SetActive(true);
+        }
+
+        slotsOnInterface[resultSlot].UpdateSlot(new Item(Instantiate(startCraft.ResultObject.ItemObject)), startCraft.ResultObject.Amount);
+        gameObject.transform.GetChild(7).GetComponentInChildren<TextMeshProUGUI>().text = startCraft.name;
     }
 
     private void OnRecipeSelectionChanged(GameObject obj)
@@ -56,30 +92,26 @@ public class CraftingInterface : UserInterface
         craftChecker.CheckAvailableRecipes(playerInventory);
         CraftingRecipeObject craft = crafting[obj];
         selectedRecipe = craft;
-        for (int i = 0; i < craft.Materials.Count || i < 6; i++)
+        for (int i = 0; i < materialSlots.Length; i++)
         {
             if(i < craft.Materials.Count)
             {
-                gameObject.transform.GetChild(i).GetComponentInChildren<UnityEngine.UI.Image>().sprite = craft.Materials[i].ItemObject.UIDisplaySprite;
-                gameObject.transform.GetChild(i).GetComponentInChildren<UnityEngine.UI.Image>().color = new Color(1, 1, 1, 1);
-                gameObject.transform.GetChild(i).GetComponentInChildren<TextMeshProUGUI>().text = craft.Materials[i].Amount == 1 ? "" : craft.Materials[i].Amount.ToString("n0");
+                slotsOnInterface[materialSlots[i]].UpdateSlot(new Item(Instantiate(craft.Materials[i].ItemObject)), craft.Materials[i].Amount);
+                materialSlots[i].SetActive(true);
             }
             else
             {
-                gameObject.transform.GetChild(i).GetComponentInChildren<UnityEngine.UI.Image>().sprite = null;
-                gameObject.transform.GetChild(i).GetComponentInChildren<UnityEngine.UI.Image>().color = new Color(0, 70f / 255f, 168f / 255f, 1);
-                gameObject.transform.GetChild(i).GetComponentInChildren<TextMeshProUGUI>().text = "";
+                slotsOnInterface[materialSlots[i]].UpdateSlot(new Item(), 0);
+
+                materialSlots[i].SetActive(false);
             }
         }
-
-        gameObject.transform.GetChild(6).GetComponentInChildren<UnityEngine.UI.Image>().sprite = craft.ResultObject.ItemObject.UIDisplaySprite;
-        gameObject.transform.GetChild(6).GetComponentInChildren<UnityEngine.UI.Image>().color = new Color(1, 1, 1, 1);
-        gameObject.transform.GetChild(6).GetComponentInChildren<TextMeshProUGUI>().text = craft.ResultObject.Amount == 1 ? "" : craft.ResultObject.Amount.ToString("n0");
+        slotsOnInterface[resultSlot].UpdateSlot(new Item(Instantiate(craft.ResultObject.ItemObject)), craft.ResultObject.Amount);
+        
+        //resultSlot.GetComponentInChildren<UnityEngine.UI.Image>().sprite = craft.ResultObject.ItemObject.UIDisplaySprite;
+        //resultSlot.GetComponentInChildren<UnityEngine.UI.Image>().color = new Color(1, 1, 1, 1);
+        //resultSlot.GetComponentInChildren<TextMeshProUGUI>().text = craft.ResultObject.Amount == 1 ? "" : craft.ResultObject.Amount.ToString("n0");
         gameObject.transform.GetChild(7).GetComponentInChildren<TextMeshProUGUI>().text = craft.name;
-
-        UnityEngine.UI.Button button = GetComponentInChildren<UnityEngine.UI.Button>();
-        //button.on.AddListener(OnCraftClick);
-        AddEvent(button.gameObject, EventTriggerType.PointerDown, delegate { OnCraftClick(); });
     }
 
     private void Update()
@@ -137,10 +169,5 @@ public class CraftingInterface : UserInterface
     //        //}
             
     //    }
-    //}
-
-    private Vector3 GetPosition(int index)
-    {
-        return new Vector3(X_START + (X_SPACE_BETWEEN_ITEM * (index % NUMBER_OF_COLUMN)), Y_START + (-Y_SPACE_BETWEEN_ITEM * (index / NUMBER_OF_COLUMN)), 0f);
-    }    
+    //} 
 }

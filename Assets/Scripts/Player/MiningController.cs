@@ -35,7 +35,7 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
         {
             if(currentTileMap.GetTile(blockToMine) != null)
             {
-                ItemObject itemObj = itemDatabase.GetItemAt(8);
+                ItemObject itemObj = itemDatabase.GetItemAt(2);
                 if (itemObj != null)
                 {
                     ItemObject newItemObj = Instantiate(itemObj);

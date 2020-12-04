@@ -15,5 +15,40 @@ MonoBehaviour:
   savePath: /Crafting.save
   itemDatabase: {fileID: 11400000, guid: 0479499c299ce264c916f647df531e9a, type: 2}
   container:
-    inventorySlots: []
-  interfaceType: 2
+    inventorySlots:
+    - itemTypeAllowed: 
+      item:
+        name: CopperBar(Clone)
+        id: 3
+        amount: 1
+    - itemTypeAllowed: 
+      item:
+        name: StoneBlock(Clone)
+        id: 11
+        amount: 1
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+        amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+        amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+        amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: 
+        id: -1
+        amount: 0
+    - itemTypeAllowed: 
+      item:
+        name: BasicElectronicComponent(Clone)
+        id: 0
+        amount: 1
+  interfaceType: 3

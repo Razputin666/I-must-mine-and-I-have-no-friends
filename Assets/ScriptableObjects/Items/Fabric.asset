@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300000, guid: c3124b5a926485b458a3f68c8a2c8318, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 11
   description: 
   data:
     name: Fabric
