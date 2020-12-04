@@ -16,7 +16,7 @@ public class LineController : MonoBehaviour
     void Awake()
     {
         player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
-       miningLaser = gameObject.GetComponent<MiningController>();
+        miningLaser = gameObject.GetComponent<MiningController>();
         lr = GetComponent<LineRenderer>();
     }
 
@@ -34,7 +34,7 @@ public class LineController : MonoBehaviour
     void Update()
     {
         Vector3 watever = new Vector3(player.worldPosition.x, player.worldPosition.y, 0);
-         laserPoints = new Vector3[] { watever, miningLaser.endOfGun.position };
+        laserPoints = new Vector3[] { watever, miningLaser.endOfGun.position };
 
 
         // lr.SetPosition(0, miningLaser.endOfGun.position);

@@ -43,6 +43,8 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
             {
                 chunk = chunkCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
             }
+            if (chunk == null)
+                return;
             Vector3Int blockInLocal = chunk.WorldToCell(blockToMine);
             float blockStr = 0;
             string blockType = tileMapManager.BlockTypeGet(new Vector3Int(blockInLocal.x, blockInLocal.y, 0), chunk);

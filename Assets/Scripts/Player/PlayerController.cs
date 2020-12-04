@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
 
     public enum PlayerStates
     {
-        Mining, Normal, Building
+        Mining, Normal, Building, Idle
     }
 
     public PlayerStates playerStates { get; private set; }
@@ -58,9 +58,9 @@ public class PlayerController : MonoBehaviour
     {
         //inventory = GetComponentInChildren<Inventory>();
         item = gameObject.GetComponentInChildren<FaceMouse>().gameObject.transform.Find("ItemHeldInHand");
-        item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Drill");
+        item.GetComponent<SpriteRenderer>().sprite = null;
         item.GetComponent<DefaultGun>().enabled = false;
-        item.GetComponent<MiningController>().enabled = true;
+        item.GetComponent<MiningController>().enabled = false;
 
         //Get and store a reference to the Rigidbody2D component so that we can access it.
         
@@ -70,7 +70,7 @@ public class PlayerController : MonoBehaviour
         capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
         jumpController = GetComponent<JumpController>();
         itemHandler = GetComponent<ItemHandler>();
-        playerStates = PlayerStates.Mining;
+        playerStates = PlayerStates.Idle;
         mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
         _camera = GameObject.Find("Main Camera").GetComponent<Camera>();
        // itemController.SetMiningMode(); // Vi har inte combat än så den e på mining default
@@ -163,7 +163,7 @@ public class PlayerController : MonoBehaviour
             {
                 playerStates = PlayerStates.Normal;
                 item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = true;
+                item.GetComponent<DefaultGun>().enabled = false;
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -179,7 +179,7 @@ public class PlayerController : MonoBehaviour
             {
                 playerStates = PlayerStates.Normal;
                 item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = true;
+                item.GetComponent<DefaultGun>().enabled = false;
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
@@ -195,7 +195,7 @@ public class PlayerController : MonoBehaviour
             {
                 playerStates = PlayerStates.Normal;
                 item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = true;
+                item.GetComponent<DefaultGun>().enabled = false;
             }
 
         }
@@ -212,7 +212,7 @@ public class PlayerController : MonoBehaviour
             {
                 playerStates = PlayerStates.Normal;
                 item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = true;
+                item.GetComponent<DefaultGun>().enabled = false;
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha5))
@@ -228,7 +228,7 @@ public class PlayerController : MonoBehaviour
             {
                 playerStates = PlayerStates.Normal;
                 item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = true;
+                item.GetComponent<DefaultGun>().enabled = false;
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha6))
@@ -244,7 +244,7 @@ public class PlayerController : MonoBehaviour
             {
                 playerStates = PlayerStates.Normal;
                 item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = true;
+                item.GetComponent<DefaultGun>().enabled = false;
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha7))
@@ -260,7 +260,7 @@ public class PlayerController : MonoBehaviour
             {
                 playerStates = PlayerStates.Normal;
                 item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = true;
+                item.GetComponent<DefaultGun>().enabled = false;
             }
         }
     }
@@ -285,9 +285,9 @@ public class PlayerController : MonoBehaviour
                 item.GetComponent<DefaultGun>().enabled = false;
                 break;
             default:
-                playerStates = PlayerStates.Normal;
+                playerStates = PlayerStates.Idle;
                 item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = true;
+                item.GetComponent<DefaultGun>().enabled = false;
                 break;
         }
     }
