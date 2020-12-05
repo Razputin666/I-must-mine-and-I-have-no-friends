@@ -18,5 +18,5 @@ MonoBehaviour:
   description: 
   data:
     name: Iron Ore
-    id: -1
+    id: 11
     amount: 1

@@ -17,7 +17,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 	private GameObject tileChunk;
 	[Tooltip("The Tile to draw (use a RuleTile for best results)")]
 	[SerializeField]
-	private TileBase[] tiles;
+	public TileBase[] tiles;
 
 	[Tooltip("Width of our map")]
 	[SerializeField]
@@ -47,6 +47,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 	[SerializeField] private GameObject worldWrappingTeleport;
 	[SerializeField] private GrassPlanetOverworldChunk grassOverWorldChunk;
 	[SerializeField] private GameObject playerCharacter;
+	[SerializeField] private GameObject drillLaser;
 	public List<Tilemap> chunks = new List<Tilemap>();
 
 	public float grassGrowthTimeToReach;
@@ -269,6 +270,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 				if(playerSpawn.collider.gameObject.CompareTag("TileMap"))
                 {
 					Instantiate(playerCharacter, playerSpawn.point, quaternion.identity);
+					Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
 					playerSpawned = true;
 				}
 			}

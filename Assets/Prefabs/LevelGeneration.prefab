@@ -52,8 +52,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2f70c4bc8f3b6204a8847947b95871dd, type: 2}
   - {fileID: 11400000, guid: d2a454cdcf61587439cbe5ede10d0c9c, type: 2}
   - {fileID: 11400000, guid: 6cff7ee5c94bf6a4b884d29da71caa3f, type: 2}
-  - {fileID: 11400000, guid: 4613296c6d285ba4f9e600c65c82cbb0, type: 2}
-  - {fileID: 11400000, guid: cf997ec1785b2b74e89efb9475324e2e, type: 2}
+  - {fileID: 11400000, guid: f7aaaa40707a37a4bbcfc69e94f9bf45, type: 2}
+  - {fileID: 11400000, guid: 239ebe86ddba1bb48ad336fe9d92de10, type: 2}
   width: 250
   height: 250
   mapSettingsLeft:
@@ -80,6 +80,8 @@ MonoBehaviour:
     type: 3}
   grassOverWorldChunk: {fileID: 1497535763}
   playerCharacter: {fileID: 8181247841218053072, guid: 8892c9d624d2feb46b4740620f1e0891,
+    type: 3}
+  drillLaser: {fileID: 341371013522475759, guid: 5b8edf420734f8c4aa2cf8129c145dd5,
     type: 3}
   chunks: []
   grassGrowthTimeToReach: 0

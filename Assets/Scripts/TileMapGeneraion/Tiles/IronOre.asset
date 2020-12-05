@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcb72f5a6aac543479fbd3d4fcddea75, type: 3}
-  m_Name: StoneTile
+  m_Name: IronOre
   m_EditorClassIdentifier: 
   tiles:
-  - {fileID: 11400000, guid: 2f70c4bc8f3b6204a8847947b95871dd, type: 2}
-  blockType: Stone
+  - {fileID: 11400000, guid: 239ebe86ddba1bb48ad336fe9d92de10, type: 2}
+  blockType: Iron Block
   blockStrength: 2

@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1d65b42a5bf76d540bf7dd38f50e9469, type: 3}
-  m_Name: Block_Dirt
+  m_Name: Grass_Dirt
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300000, guid: 98056df016777c34dbe50b66d20c39ba, type: 3}
   stackable: 1
   itemType: 8
   description: Dirt from another world
   data:
-    name: Dirt
-    id: 3
+    name: Grass
+    id: 21
     amount: 1

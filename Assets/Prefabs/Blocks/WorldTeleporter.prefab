@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 8390871902958351600}
   - component: {fileID: 8390871902958351615}
   - component: {fileID: 8390871902958351614}
-  m_Layer: 12
-  m_Name: WorldTeleporterRight
+  m_Layer: 2
+  m_Name: WorldTeleporter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -70,4 +70,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e18ba9929c6acb48a4d50643e3b1852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sideCamera: {fileID: 0}

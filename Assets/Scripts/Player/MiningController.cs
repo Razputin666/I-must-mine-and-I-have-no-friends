@@ -70,7 +70,7 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
             Debug.Log(blockType);
             if (blockStr <= 0)
             {
-                
+                DropItemFromBlock(blockInLocal, blockType, chunk);
                 CheckBlockRules(blockInLocal, blockType, chunk);
                 chunk.SetTile(blockInLocal, null);
                 blockChecker.Remove(blockInLocal);
@@ -86,13 +86,7 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
         {
             case "Dirt":
                 //Debug.Log("DIRT!");
-                ItemObject itemObj = itemDatabase.GetItemAt(3);
-                Debug.Log(itemObj);
-                if (itemObj != null)
-                {
-                    ItemObject newItemObj = Instantiate(itemObj);
-                    SpawnManager.SpawnItemAt(chunkThis.CellToWorld(blockPosition), newItemObj);
-                }
+               
                 break;
             case "Grass":
                 
@@ -101,25 +95,40 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
                     string upperBlockType = tileMapManager.BlockTypeGet(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), chunkThis);
                     if(upperBlockType == "Plant")
                     chunkThis.SetTile(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), null);
+                    
                     //Drop block here
                 }
                 break;
 
             case "Tree":
                 List<String> upperBlocks = new List<string>();
-                
-                for (int y = 0; y < 15; y++)
+                bool isTree = true;
+                for (int y = 0; y < 50 && isTree; y++)
                 {
                     upperBlocks.Add(tileMapManager.BlockTypeGet(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), chunkThis));
                     if (upperBlocks[y] == "Tree")
                     {
                         chunkThis.SetTile(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), null);
+                        DropItemFromBlock(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), blockType, chunkThis);
                     }
+                    else
+                        isTree = false;
                 }
                 upperBlocks.Clear();
                 break;
 
 
+        }
+    }
+
+    private void DropItemFromBlock(Vector3Int blockPosition, string blockType, Tilemap tilemap)
+    {
+        ItemObject itemObj = itemDatabase.GetItemOfName(blockType);
+        Debug.Log(itemObj);
+        if (itemObj != null)
+        {
+            ItemObject newItemObj = Instantiate(itemObj);
+            SpawnManager.SpawnItemAt(tilemap.CellToWorld(blockPosition), newItemObj);
         }
     }
 

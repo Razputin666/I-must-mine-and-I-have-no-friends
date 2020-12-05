@@ -97,12 +97,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19c112c55c641704f8c5ccc162f2b607, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemDatabase: {fileID: 0}
   id: 2
   coolDownDuration: 0.1
   coolDownSystem: {fileID: 658734927}
   points: []
   tileMapManager: {fileID: 0}
-  tilemap: {fileID: 0}
+  chunk: {fileID: 0}
   endOfGun: {fileID: 0}
 --- !u!61 &896807761
 BoxCollider2D:
@@ -360,7 +361,7 @@ MonoBehaviour:
   maxFallSpeed: 0
   enemyStrength: 2
   enemyKnockBack: {x: 1250, y: 500}
-  miningStrength: 1
+  miningStrength: 3
 --- !u!114 &1296477776
 MonoBehaviour:
   m_ObjectHideFlags: 0
