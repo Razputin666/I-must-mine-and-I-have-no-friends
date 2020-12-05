@@ -18,6 +18,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] public int enemyHP;
     [SerializeField] private float enterDigModeTimer;
+    
 
 
     
@@ -39,6 +40,7 @@ public class EnemyController : MonoBehaviour
 
     public int enemyStrength;
     public Vector2 enemyKnockBack;
+    public float miningStrength;
 
 
 
@@ -61,6 +63,12 @@ public class EnemyController : MonoBehaviour
     {
         distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
         enterDigModeTimer += Time.deltaTime;
+        //Debug.DrawRay(gameObject.transform.position, player.gameObject.transform.position - transform.position, Color.red);
+
+       
+
+
+        
         // Debug.Log(player.transform.position.x - transform.position.x);
 
         //if (distanceToPlayer == whenToStop)
@@ -77,7 +85,7 @@ public class EnemyController : MonoBehaviour
 
         //}
 
-        if (enterDigModeTimer >= 5f)
+        if (enterDigModeTimer >= 3f)
         {
            
             // Debug.Log(transform.position.magnitude + " Position " + DistanceGained + " Distance gained");
@@ -87,13 +95,24 @@ public class EnemyController : MonoBehaviour
                 SetMiningMode();
             }
 
-            else if((DistanceGained * 1.5f) < transform.position.magnitude && enemyStates != EnemyStates.FrogAggressive)
+            //else if((DistanceGained * 1.5f) < transform.position.magnitude && enemyStates != EnemyStates.FrogAggressive)
+            //{
+            //    SetAggressiveMode();
+            //}
+
+            if (Vector3.Distance(transform.position, player.transform.position) <= 10f)
             {
-                SetAggressiveMode();
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, player.transform.position - transform.position, 9f);
+                if (hit.transform && hit.transform.CompareTag("Test"))
+                {
+                    SetAggressiveMode();
+                }
             }
+
             DistanceGained = transform.position.magnitude;
             enterDigModeTimer = 0f;
         }
+
 
 
 

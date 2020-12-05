@@ -178,7 +178,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590221729}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b71c9dbe330d9e47910ce0934268f8d, type: 3}
   m_Name: 
@@ -210,7 +210,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590221729}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19c112c55c641704f8c5ccc162f2b607, type: 3}
   m_Name: 
@@ -220,6 +220,8 @@ MonoBehaviour:
   coolDownDuration: 0.5
   coolDownSystem: {fileID: 658734927}
   points: []
+  tileMapManager: {fileID: 0}
+  chunk: {fileID: 0}
   endOfGun: {fileID: 0}
 --- !u!120 &1505938777
 LineRenderer:
@@ -326,7 +328,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590221729}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 735eb0431543be841a0bc67937627708, type: 3}
   m_Name: 
@@ -556,13 +558,16 @@ MonoBehaviour:
   playerHP: 10
   speed: 1
   jumpVelocity: 1200
+  miningStrength: 3
   maxFallSpeed: 0
   rb2d: {fileID: 8181247841218053084}
   worldPosition: {x: 0, y: 0, z: 0}
   mousePos: {x: 0, y: 0, z: 0}
   item: {fileID: 0}
   deathScreen: {fileID: 0}
+  mapSize: {fileID: 0}
   _camera: {fileID: 0}
+  _secondCamera: {fileID: 0}
 --- !u!70 &658734921
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -633,6 +638,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventory: {fileID: 11400000, guid: 74f6aef5271999548b36c1d127af90f2, type: 2}
   equipment: {fileID: 11400000, guid: 38df84b87fcb50d4bb42ec3aba0baf9e, type: 2}
+  quickSlots: {fileID: 11400000, guid: c4298cff35f68a7429860ecf2be26d16, type: 2}
 --- !u!1 &8181247841502162097
 GameObject:
   m_ObjectHideFlags: 0

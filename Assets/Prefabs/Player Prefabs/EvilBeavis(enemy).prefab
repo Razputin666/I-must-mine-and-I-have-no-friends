@@ -98,9 +98,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 2
-  coolDownDuration: 1
+  coolDownDuration: 0.1
   coolDownSystem: {fileID: 658734927}
   points: []
+  tileMapManager: {fileID: 0}
+  tilemap: {fileID: 0}
   endOfGun: {fileID: 0}
 --- !u!61 &896807761
 BoxCollider2D:
@@ -358,6 +360,7 @@ MonoBehaviour:
   maxFallSpeed: 0
   enemyStrength: 2
   enemyKnockBack: {x: 1250, y: 500}
+  miningStrength: 1
 --- !u!114 &1296477776
 MonoBehaviour:
   m_ObjectHideFlags: 0
