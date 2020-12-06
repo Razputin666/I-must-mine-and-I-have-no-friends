@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tiles:
   - {fileID: 11400000, guid: 0abb0f9128ca25a4396310309788a54f, type: 2}
-  blockType: Tree
+  blockName: Tree
   blockStrength: 1
+  blockType: Foliage

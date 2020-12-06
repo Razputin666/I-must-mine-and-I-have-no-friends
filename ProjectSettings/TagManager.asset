@@ -12,6 +12,8 @@ TagManager:
   - Test
   - Camera
   - GameManager
+  - InventoryHandler
+  - GroundItem
   layers:
   - Default
   - TransparentFX
@@ -27,9 +29,7 @@ TagManager:
   - Camera
   - WorldTeleporter
   - Items
-  - 
-  - 
-  - 
+  - ItemLayer
   - 
   - 
   - 

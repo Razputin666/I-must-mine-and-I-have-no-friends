@@ -337,46 +337,10 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
     }
-
-    //IEnumerator MineBlock()
-    //{
-    //    int blockHP = 1;
-
-    //    while (Input.GetMouseButton(0) && TargetedBlock != null)
-    //    {
-    //        if(blockHP == 0)
-    //        {
-    //            blockTile = TargetedBlock.GetComponent<Tilemap>();
-
-
-
-    //            Vector3Int targetBlockIntPos = Vector3Int.FloorToInt(worldPosition);
-    //            targetBlockIntPos.z = 0;
-    //            Debug.Log(targetBlockIntPos);
-
-    //            blockTile.SetTile(targetBlockIntPos, null);
-
-
-    //        }
-    //        blockHP -= 1;
-    //        yield return new WaitForSeconds(0.1f);          
-    //    }
-
-    //}
-
-    //public Tilemap TargetedBlock
-    //{
-    //    get 
-    //    {
-    //        return targetedBlock; 
-
-    //    }
-
-    //    set 
-    //    {
-    //        targetedBlock = value;
-    //    }
-    //}
+    public InventoryObject GetInventoryObject
+    {
+        get { return itemHandler.Inventory; }
+    }
 
     public float DistanceFromPlayerX
     {
@@ -392,32 +356,7 @@ public class PlayerController : MonoBehaviour
         set { distanceFromPlayery = value; }
     }
 
-    //IEnumerator MineBlockOld()
-    //{
-    //    int blockHP = 1;
-    //    Collider2D thisTargetedBlock = TargetedBlock;
-    //    while (Input.GetMouseButton(0) && TargetedBlock == thisTargetedBlock && TargetedBlock != null)
-    //    {
-    //        if (blockHP == 0)
-    //        {
-    //            TilemapVisual tilemapVisual = targetedBlock.transform.parent.GetComponent<TilemapVisual>();
-    //            if (tilemapVisual != null)
-    //            {
-    //                TilemapOLD.TilemapObject tilemapObject = tilemapVisual.GetGridObjectAtXY(targetedBlock.transform.position);
-    //                if (tilemapObject != null)
-    //                {
-    //                    tilemapObject.SetTilemapSprite(TilemapOLD.TilemapObject.TilemapSprite.None);
-
-    //                    //Destroy(TargetedBlock.gameObject);
-    //                }
-    //            }
-
-    //        }
-    //        blockHP -= 1;
-    //        yield return new WaitForSeconds(0.05f);
-    //    }
-
-    //}
+  
     #endregion
     private void Flip(float horizontal)
     {

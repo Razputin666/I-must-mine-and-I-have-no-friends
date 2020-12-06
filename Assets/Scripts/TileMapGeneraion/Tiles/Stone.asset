@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tiles:
   - {fileID: 11400000, guid: 2f70c4bc8f3b6204a8847947b95871dd, type: 2}
-  blockType: Stone
+  blockName: Stone
   blockStrength: 2
+  blockType: Common

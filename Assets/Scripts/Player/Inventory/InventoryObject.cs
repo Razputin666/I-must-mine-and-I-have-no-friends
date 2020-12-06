@@ -63,7 +63,7 @@ public class InventoryObject : ScriptableObject
     public bool AddItem(Item item, int amount)
     {
         //Check if there is an empty slot in the inventory
-        if (EmptySlotCount <= 0)
+        if (EmptySlotCount <= 0 && FindItemInInventory(item) == null)
             return false;
 
         InventorySlot slot = FindItemInInventory(item);

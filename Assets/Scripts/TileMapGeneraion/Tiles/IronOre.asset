@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tiles:
   - {fileID: 11400000, guid: 239ebe86ddba1bb48ad336fe9d92de10, type: 2}
-  blockType: Iron Block
+  blockName: Iron Block
   blockStrength: 2
+  blockType: Ore

@@ -23,7 +23,7 @@ public class EvilBeavisBaseController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Debug.Log(targetedOre.Count);
     }
 
     private IEnumerator SearchForOres()
@@ -41,7 +41,7 @@ public class EvilBeavisBaseController : MonoBehaviour
                 if (chunk.HasTile(blockInLocal))
                 {
                     blockType = tileMapManager.BlockTypeGet(blockInLocal, chunk);
-                    if(blockType == "Copper Block" || blockType == "Iron Block")
+                    if(blockType == "Ore")
                     targetedOre.Add(new Vector3Int(x, y, 0));
                 }
             }
@@ -57,8 +57,8 @@ public class EvilBeavisBaseController : MonoBehaviour
                 yield return new WaitForSeconds(0.01f);
                 if (chunk.HasTile(blockInLocal))
                 {
-                    blockType = tileMapManager.BlockTypeGet(blockInLocal, chunk);
-                    if (blockType == "Copper Block" || blockType == "Iron Block")
+                    blockType = tileMapManager.BlockNameGet(blockInLocal, chunk);
+                    if (blockType == "Ore")
                         targetedOre.Add(new Vector3Int(x, y, 0));
                 }
             }

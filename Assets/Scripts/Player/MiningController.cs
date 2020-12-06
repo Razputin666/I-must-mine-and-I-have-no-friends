@@ -30,6 +30,7 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     {
         if(itemDatabase == null)
             itemDatabase = GetComponent<ItemDatabaseObject>();
+
         tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
     }
 
@@ -60,7 +61,7 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
             }
             Vector3Int blockInLocal = chunk.WorldToCell(blockToMine);
             float blockStr = 0;
-            string blockType = tileMapManager.BlockTypeGet(new Vector3Int(blockInLocal.x, blockInLocal.y, 0), chunk);
+            string blockName = tileMapManager.BlockNameGet(new Vector3Int(blockInLocal.x, blockInLocal.y, 0), chunk);
             
 
 
@@ -84,8 +85,8 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
             {
                 //Debug.Log(blockInLocal + " position is " + blockType);
                 
-                DropItemFromBlock(blockInLocal, blockType, chunk);
-                CheckBlockRules(blockInLocal, blockType, chunk);
+                DropItemFromBlock(blockInLocal, blockName, chunk);
+                CheckBlockRules(blockInLocal, blockName, chunk);
                 chunk.SetTile(blockInLocal, null);
                 blockChecker.Remove(blockInLocal);
                 coolDownSystem.PutOnCoolDown(this);
@@ -94,9 +95,9 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
         }
     }
 
-    private void CheckBlockRules(Vector3Int blockPosition, string blockType, Tilemap chunkThis)
+    private void CheckBlockRules(Vector3Int blockPosition, string blockName, Tilemap chunkThis)
     {
-        switch (blockType)
+        switch (blockName)
         {
             case "Dirt":
                 //Debug.Log("DIRT!");
@@ -106,7 +107,7 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
                 
                 if (chunkThis.HasTile(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0)))
                 {
-                    string upperBlockType = tileMapManager.BlockTypeGet(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), chunkThis);
+                    string upperBlockType = tileMapManager.BlockNameGet(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), chunkThis);
                     if(upperBlockType == "Plant")
                     chunkThis.SetTile(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), null);
                     
@@ -119,11 +120,11 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
                 bool isTree = true;
                 for (int y = 0; y < 50 && isTree; y++)
                 {
-                    upperBlocks.Add(tileMapManager.BlockTypeGet(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), chunkThis));
+                    upperBlocks.Add(tileMapManager.BlockNameGet(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), chunkThis));
                     if (upperBlocks[y] == "Tree")
                     {
                         chunkThis.SetTile(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), null);
-                        DropItemFromBlock(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), blockType, chunkThis);
+                        DropItemFromBlock(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), blockName, chunkThis);
                     }
                     else
                         isTree = false;

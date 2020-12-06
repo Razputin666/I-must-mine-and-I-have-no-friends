@@ -65,11 +65,28 @@ public class TileMapManager : MonoBehaviour
         return -1;
     }
 
-    public string BlockTypeGet(Vector3Int target, Tilemap chunk)
+    public string BlockNameGet(Vector3Int target, Tilemap chunk)
     {
         target = new Vector3Int(target.x, target.y, 0);
         TileBase targetedBlock = chunk.GetTile(target);
         
+        if (!targetedBlock)
+        {
+            return "";
+        }
+        TileData check;
+        if (dataFromTiles.TryGetValue(targetedBlock, out check))
+        {
+            return dataFromTiles[targetedBlock].blockName;
+        }
+        return "";
+    }
+
+    public string BlockTypeGet(Vector3Int target, Tilemap chunk)
+    {
+        target = new Vector3Int(target.x, target.y, 0);
+        TileBase targetedBlock = chunk.GetTile(target);
+
         if (!targetedBlock)
         {
             return "";
