@@ -564,7 +564,8 @@ MonoBehaviour:
   worldPosition: {x: 0, y: 0, z: 0}
   mousePos: {x: 0, y: 0, z: 0}
   item: {fileID: 0}
-  deathScreen: {fileID: 0}
+  deathScreen: {fileID: 3454456197156547687, guid: 98da213e5f494ba4eb14daa0a3315696,
+    type: 3}
   mapSize: {fileID: 0}
   _camera: {fileID: 0}
   _secondCamera: {fileID: 0}

@@ -48,6 +48,8 @@ public class LevelGeneratorLayered : MonoBehaviour
 	[SerializeField] private GrassPlanetOverworldChunk grassOverWorldChunk;
 	[SerializeField] private GameObject playerCharacter;
 	[SerializeField] private GameObject drillLaser;
+	[SerializeField] private GameObject evilBeavis;
+	[SerializeField] private GameObject evilBeavisBase;
 	public List<Tilemap> chunks = new List<Tilemap>();
 
 	public float grassGrowthTimeToReach;
@@ -77,6 +79,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 		//StartCoroutine(GenerateTrees());
 
 		StartCoroutine(SpawnPlayer());
+		StartCoroutine(SpawnEnemy());
 
 	}
 
@@ -275,6 +278,26 @@ public class LevelGeneratorLayered : MonoBehaviour
 				}
 			}
         
+	}
+
+	private IEnumerator SpawnEnemy()
+	{
+		bool enemySpawned = false;
+
+		yield return new WaitForSeconds(0.8f);
+
+		if (!enemySpawned)
+		{
+			RaycastHit2D enemySpawn = Physics2D.Raycast(new Vector2(UnityEngine.Random.Range(0, startPosition.x), height * 2), Vector2.down);
+
+			if (enemySpawn.collider.gameObject.CompareTag("TileMap"))
+			{
+				Instantiate(evilBeavisBase, new Vector3(enemySpawn.point.x, enemySpawn.point.y), quaternion.identity);
+				Instantiate(evilBeavis, new Vector3(enemySpawn.point.x, enemySpawn.point.y + 10), quaternion.identity);
+				enemySpawned = true;
+			}
+		}
+
 	}
 
 	private IEnumerator GenerateTrees()

@@ -21,7 +21,6 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     // Start is called before the first frame update
     void Start()
     {
-        tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
         endOfGun = transform.Find("EndOfGun");
       //  player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
       //  tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
@@ -31,20 +30,34 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     {
         if(itemDatabase == null)
             itemDatabase = GetComponent<ItemDatabaseObject>();
+        tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
     }
 
+    public Tilemap GetChunk(Vector3Int targetedBlock)
+    {
+        RaycastHit2D chunkCheck = Physics2D.Linecast(Vector2Int.FloorToInt(transform.position), new Vector2(targetedBlock.x, targetedBlock.y));
+        if (chunkCheck.collider != null && chunkCheck.collider.gameObject.CompareTag("TileMap"))
+        {
+            chunk = chunkCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
+            return chunk;
+        }
+        else
+        {
+
+        }
+            return null;
+    }
 
     public void Mine(Vector3Int blockToMine, float miningStr)
     {
         if(!coolDownSystem.IsOnCoolDown(id))
         {
-            RaycastHit2D chunkCheck = Physics2D.Linecast(transform.position, new Vector2(blockToMine.x, blockToMine.y));
-            if(chunkCheck.collider != null && chunkCheck.collider.gameObject.CompareTag("TileMap"))
+
+            GetChunk(blockToMine);
+            if(chunk == null)
             {
-                chunk = chunkCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
-            }
-            if (chunk == null)
                 return;
+            }
             Vector3Int blockInLocal = chunk.WorldToCell(blockToMine);
             float blockStr = 0;
             string blockType = tileMapManager.BlockTypeGet(new Vector3Int(blockInLocal.x, blockInLocal.y, 0), chunk);
@@ -67,9 +80,10 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
                 blockStr -= miningStr * Time.deltaTime;
                 blockChecker[blockInLocal] = blockStr;
             }
-            Debug.Log(blockType);
             if (blockStr <= 0)
             {
+                //Debug.Log(blockInLocal + " position is " + blockType);
+                
                 DropItemFromBlock(blockInLocal, blockType, chunk);
                 CheckBlockRules(blockInLocal, blockType, chunk);
                 chunk.SetTile(blockInLocal, null);
@@ -124,7 +138,6 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     private void DropItemFromBlock(Vector3Int blockPosition, string blockType, Tilemap tilemap)
     {
         ItemObject itemObj = itemDatabase.GetItemOfName(blockType);
-        Debug.Log(itemObj);
         if (itemObj != null)
         {
             ItemObject newItemObj = Instantiate(itemObj);

@@ -6,6 +6,7 @@ public class EnemyCollisionDetection : MonoBehaviour
 {
 
     private EnemyController enemy;
+    
 
 
     private void Start()
@@ -43,6 +44,19 @@ public class EnemyCollisionDetection : MonoBehaviour
             enemy.SetAggressiveMode();
         }
 
+    }
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        GroundItem groundItem = other.GetComponentInParent<GroundItem>();
+        if (groundItem != null && groundItem.PickupTime <= 0f)
+        {
+            Item newItem = new Item(groundItem.Item);
+            if (enemy.GetInventoryObject.AddItem(newItem, newItem.Amount))
+            {
+                Debug.Log("Picked up stuff");
+                Destroy(other.transform.parent.gameObject);
+            }
+        }
     }
 
     //private void OnTriggerEnter2D(Collider2D collision)

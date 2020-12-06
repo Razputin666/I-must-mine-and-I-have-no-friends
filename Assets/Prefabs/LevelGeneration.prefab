@@ -75,13 +75,17 @@ MonoBehaviour:
   randomized: 0
   mainMap: {fileID: 11400000, guid: 142c074dbc6f1554eb927690b627468c, type: 2}
   customCaveLoops: 50
-  numberOfChunks: 3
+  numberOfChunks: 5
   worldWrappingTeleport: {fileID: 8390871902958351613, guid: dcafde4813b34eb41bcd40306c9533f7,
     type: 3}
   grassOverWorldChunk: {fileID: 1497535763}
   playerCharacter: {fileID: 8181247841218053072, guid: 8892c9d624d2feb46b4740620f1e0891,
     type: 3}
   drillLaser: {fileID: 341371013522475759, guid: 5b8edf420734f8c4aa2cf8129c145dd5,
+    type: 3}
+  evilBeavis: {fileID: 8181247841218053072, guid: a30216263475d1b4692d6f122da9391a,
+    type: 3}
+  evilBeavisBase: {fileID: 435527571453386109, guid: 2180373741857834a85ff5494ac088ca,
     type: 3}
   chunks: []
   grassGrowthTimeToReach: 0

@@ -18,6 +18,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] public int enemyHP;
     [SerializeField] private float enterDigModeTimer;
+    [SerializeField] private InventoryObject inventory;
     
 
 
@@ -55,6 +56,7 @@ public class EnemyController : MonoBehaviour
         item = gameObject.GetComponentInChildren<FacePlayer>().gameObject.transform.Find("ItemHeldInHand");
         item.GetComponent<MiningController>().enabled = false;
         enemyStates = EnemyStates.FrogAggressive;
+        inventory = Instantiate(inventory);
        
     }
 
@@ -63,27 +65,6 @@ public class EnemyController : MonoBehaviour
     {
         distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
         enterDigModeTimer += Time.deltaTime;
-        //Debug.DrawRay(gameObject.transform.position, player.gameObject.transform.position - transform.position, Color.red);
-
-       
-
-
-        
-        // Debug.Log(player.transform.position.x - transform.position.x);
-
-        //if (distanceToPlayer == whenToStop)
-        //{
-        //    speed = 0;
-        //}
-        //if (distanceToPlayer < whenToBack)
-        //{
-        //    speed = -0.4f;
-        //}
-        //if (distanceToPlayer > whenToMove)
-        //{
-        //    speed = 0.4f;
-
-        //}
 
         if (enterDigModeTimer >= 3f)
         {
@@ -250,4 +231,9 @@ public class EnemyController : MonoBehaviour
         enemyStates = EnemyStates.FrogAggressive;
     }
 
+
+    public InventoryObject GetInventoryObject
+    {
+        get { return inventory; }
+    }
 }

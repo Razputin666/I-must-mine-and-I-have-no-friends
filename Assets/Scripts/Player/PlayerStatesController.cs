@@ -36,6 +36,10 @@ public class PlayerStatesController : MonoBehaviour
                 Vector3Int distanceFromPlayer = targetBlockIntPos - playerIntPos;
                // TargetedBlock = tileMapChecker.currentTilemap;
                 //Debug.Log(targetBlockIntPos + " player mousepos");
+                if(Input.GetMouseButtonDown(0))
+                {
+                    Debug.Log(player.worldPosition);
+                }
 
                 if (Input.GetMouseButton(0) && distanceFromPlayer.x > -5 && distanceFromPlayer.x < 5 && distanceFromPlayer.y > -5 && distanceFromPlayer.y < 5)
                 {

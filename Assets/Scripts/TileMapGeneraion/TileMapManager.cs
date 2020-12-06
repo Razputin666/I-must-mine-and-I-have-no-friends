@@ -20,7 +20,7 @@ public class TileMapManager : MonoBehaviour
 
     private IEnumerator TileChecker()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.1f);
         chunks = mapgGen.chunks;
         dataFromTiles = new Dictionary<TileBase, TileData>();
 
@@ -51,6 +51,7 @@ public class TileMapManager : MonoBehaviour
 
     public float BlockStrengthGet(Vector3Int target, Tilemap chunk)
     {
+        target = new Vector3Int(target.x, target.y, 0);
         TileBase targetedBlock = chunk.GetTile(target);
         if(!targetedBlock)
         {
@@ -66,7 +67,9 @@ public class TileMapManager : MonoBehaviour
 
     public string BlockTypeGet(Vector3Int target, Tilemap chunk)
     {
+        target = new Vector3Int(target.x, target.y, 0);
         TileBase targetedBlock = chunk.GetTile(target);
+        
         if (!targetedBlock)
         {
             return "";
