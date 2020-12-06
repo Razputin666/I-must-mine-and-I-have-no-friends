@@ -12,7 +12,7 @@ public class SpawnManager : MonoBehaviour
         GameObject groundObject = Instantiate(groundItemPrefab, spawnPos + Vector3.up, Quaternion.identity, parentObject.transform);
 
         GroundItem gItem = groundObject.GetComponent<GroundItem>();
-        gItem.Item = item;
+        gItem.SetItemObject(item, 0f);
     }
 
     public static void SpawnItem(Vector3 spawnPos, Sprite sprite)
