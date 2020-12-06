@@ -7,7 +7,8 @@ public class PlayerMovementController : NetworkBehaviour
 {
     [SerializeField] private float movementSpeed = 1f;
     [SerializeField] Rigidbody2D rb2d;
-
+    private JumpController jumpController;
+    
     private Vector2 previousInput;
 
     public float jumpVelocity;
@@ -17,13 +18,20 @@ public class PlayerMovementController : NetworkBehaviour
     float widthTimer;
     float jumpTimer;
     private bool facingRight = true;
+    private bool isJumping = false;
 
     public override void OnStartAuthority()
     {
         enabled = true;
 
+        rb2d = gameObject.GetComponent<Rigidbody2D>();
+        jumpController = GetComponent<JumpController>();
+
         InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
         InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
+
+        InputManager.Controls.Player.Jump.performed += ctx => isJumping = true;
+        InputManager.Controls.Player.Jump.canceled += ctx => isJumping = false;
     }
 
     [ClientCallback]
@@ -34,9 +42,11 @@ public class PlayerMovementController : NetworkBehaviour
     [Client]
     private void ResetMovement() => previousInput = Vector2.zero;
 
-    [Client]
     private void Move()
     {
+        if (!isLocalPlayer)
+            return;
+        
         rb2d.velocity += previousInput * movementSpeed;
         Flip(previousInput.x);
 
@@ -67,6 +77,11 @@ public class PlayerMovementController : NetworkBehaviour
             rb2d.velocity -= Vector2.left * asedf;
             if (maxSpeed > 30f)
                 widthTimer = 1f;
+        }
+
+        if (isJumping && jumpController.IsGrounded())
+        {
+            jumpController.Jump();
         }
     }
 

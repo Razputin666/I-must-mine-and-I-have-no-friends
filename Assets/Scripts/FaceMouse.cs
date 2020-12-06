@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class FaceMouse : MonoBehaviour
+public class FaceMouse : NetworkBehaviour
 {
     [SerializeField] private PlayerController player;
 
@@ -10,7 +11,7 @@ public class FaceMouse : MonoBehaviour
     {
         player = GetComponentInParent<PlayerController>();
     }
-
+    [Client]
     void Update()
     {
         Vector2 direction = new Vector2(
@@ -19,5 +20,4 @@ public class FaceMouse : MonoBehaviour
 
         transform.up = direction;
     }
-
 }

@@ -178,7 +178,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590221729}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b71c9dbe330d9e47910ce0934268f8d, type: 3}
   m_Name: 
@@ -196,7 +196,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590221729}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 54deb7f355fc87548bc7837afc2f912e, type: 3}
   m_Name: 
@@ -210,7 +210,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590221729}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19c112c55c641704f8c5ccc162f2b607, type: 3}
   m_Name: 
@@ -326,7 +326,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590221729}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 735eb0431543be841a0bc67937627708, type: 3}
   m_Name: 
@@ -449,7 +449,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3099071328677749061}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.195, y: 0.59, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1841439184513963579}
@@ -482,7 +482,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6412465759251402667}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.217, y: 0.075, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 2236160247200035700}
@@ -541,7 +541,7 @@ TextMesh:
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
-  m_Anchor: 0
+  m_Anchor: 4
   m_Alignment: 0
   m_TabSize: 4
   m_FontSize: 0
@@ -571,6 +571,7 @@ GameObject:
   - component: {fileID: 175909222}
   - component: {fileID: 1284842940383734445}
   - component: {fileID: -8734172430640283002}
+  - component: {fileID: 1175973617190096779}
   m_Layer: 2
   m_Name: Buttface-guy
   m_TagString: Player
@@ -683,7 +684,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   movementSpeed: 1
-  rb2d: {fileID: 8181247841218053084}
+  rb2d: {fileID: 0}
   jumpVelocity: 1200
   maxFallSpeed: 0
 --- !u!114 &1398906487
@@ -704,9 +705,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   playerHP: 10
-  speed: 1
-  jumpVelocity: 1200
-  maxFallSpeed: 0
   rb2d: {fileID: 8181247841218053084}
   worldPosition: {x: 0, y: 0, z: 0}
   mousePos: {x: 0, y: 0, z: 0}
@@ -743,6 +741,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5222abaed5a21784c965df073835eb22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   id: 1
   coolDownDuration: 0.4
   jumpVelocity: 1200
@@ -783,9 +783,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e65608fcc3036348aa8aa4cc9bac9a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   inventory: {fileID: 11400000, guid: 74f6aef5271999548b36c1d127af90f2, type: 2}
   equipment: {fileID: 11400000, guid: 38df84b87fcb50d4bb42ec3aba0baf9e, type: 2}
   quickSlots: {fileID: 11400000, guid: c4298cff35f68a7429860ecf2be26d16, type: 2}
+  playerUIsPrefab: {fileID: 5964422683072726058, guid: d2ecf4c3fe0d2d54bbd4db6c746f6be2,
+    type: 3}
 --- !u!114 &1284842940383734445
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -820,6 +824,25 @@ MonoBehaviour:
   localPositionSensitivity: 0.01
   localRotationSensitivity: 0.01
   localScaleSensitivity: 0.01
+--- !u!114 &1175973617190096779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8181247841218053072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 734b48bea0b204338958ee3d885e11f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  clientAuthority: 1
+  localPositionSensitivity: 0.01
+  localRotationSensitivity: 0.01
+  localScaleSensitivity: 0.01
+  target: {fileID: 8181247841502162096}
 --- !u!1 &8181247841502162097
 GameObject:
   m_ObjectHideFlags: 0
@@ -831,6 +854,7 @@ GameObject:
   - component: {fileID: 8181247841502162096}
   - component: {fileID: 8181247841502162098}
   - component: {fileID: 8181247841502162099}
+  - component: {fileID: 3975306266795055348}
   m_Layer: 2
   m_Name: Gubb_arm
   m_TagString: Untagged
@@ -916,7 +940,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d05306d0bd663eb4c8d87b177706a75a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   player: {fileID: 1398906487}
+--- !u!114 &3975306266795055348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8181247841502162097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &8813983133946599639
 GameObject:
   m_ObjectHideFlags: 0

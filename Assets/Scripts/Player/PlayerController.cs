@@ -34,7 +34,6 @@ public class PlayerController : NetworkBehaviour
     private ItemController itemController;
     private ItemHandler itemHandler;
     public Transform item;
-    private JumpController jumpController;
    [SerializeField]
     private DeathScreen deathScreen;
 
@@ -50,13 +49,20 @@ public class PlayerController : NetworkBehaviour
 
     [SyncVar(hook = nameof(OnNameChanged))]
     public string playerName;
-  
+    [SyncVar(hook = nameof(OnActiveItemChanged))]
+    private int activeItemID = -1;
     private SceneScript sceneScript;
 
     private void Awake()
     {
         //allow all players to run this
         sceneScript = GameObject.FindObjectOfType<SceneScript>();
+        item = gameObject.GetComponentInChildren<FaceMouse>().gameObject.transform.Find("ItemHeldInHand");
+        itemHandler = GetComponent<ItemHandler>();
+        if (!isLocalPlayer)
+        {
+            
+        }
     }
 
     #region Network
@@ -64,26 +70,34 @@ public class PlayerController : NetworkBehaviour
     {
         playerNameText.text = playerName;
     }
-    private void OnActiveItemChanged(ItemObject _Old, ItemObject _new)
+    private void OnActiveItemChanged(int _Old, int _New)
     {
-        if (_new == null)
-            return;
-
-        item.GetComponent<SpriteRenderer>().sprite = _new.UIDisplaySprite;
+        ItemObject itemObj = itemHandler.ItemDatabase.GetItemAt(_New);
+        if (itemObj != null)
+        {
+            SetPlayerState(itemObj.ItemType);
+            item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
+        }
+        else
+        {
+            SetPlayerState(ITEM_TYPE.None);
+            item.GetComponent<SpriteRenderer>().sprite = null;
+        }
     }
 
     public override void OnStartLocalPlayer()
     {
         if (camera == null)
             camera = Instantiate(Camera.main);
-        
+
+        Camera.main.GetComponentInParent<AudioListener>().enabled = false;
         camera.GetComponent<AudioListener>().enabled = true;
         camera.transform.SetParent(transform);
         camera.transform.localPosition = new Vector3(0, 0, -20);
 
         //Camera.main.CopyFrom(camera);
-        floatingInfo.transform.localPosition = new Vector3(-0.1f, 1f, 0f);
-        floatingInfo.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        //floatingInfo.transform.localPosition = new Vector3(0.1f, 1f, 0f);
+        //floatingInfo.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
 
         string name = "Player" + Random.Range(100, 999);
 
@@ -91,7 +105,7 @@ public class PlayerController : NetworkBehaviour
 
         //old
         //inventory = GetComponentInChildren<Inventory>();
-        item = gameObject.GetComponentInChildren<FaceMouse>().gameObject.transform.Find("ItemHeldInHand");
+        
         item.GetComponent<SpriteRenderer>().sprite = null;// Resources.Load<Sprite>("Sprites/Items/Drill");
         item.GetComponent<DefaultGun>().enabled = false;
         item.GetComponent<MiningController>().enabled = false;
@@ -102,19 +116,18 @@ public class PlayerController : NetworkBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         //boxCollider2d = transform.GetComponent<BoxCollider2D>();
         //capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
-        jumpController = GetComponent<JumpController>();
-        itemHandler = GetComponent<ItemHandler>();
+        
         playerStates = PlayerStates.Idle;
         // itemController.SetMiningMode(); // Vi har inte combat än så den e på mining default
         StartCoroutine(CoroutineCoordinator());
     }
 
     #region Commands
-    [Command]
-    public void CmdActiveItemChanged(string spriteName)
-    {
-        UpdateSprite(spriteName);
-    }
+    //[Command]
+    //public void CmdActiveItemChanged(int itemID)
+    //{
+    //    UpdatePlayerState(itemID);
+    //}
 
     [Command]
     public void CmdSetupPlayer(string name)
@@ -136,20 +149,26 @@ public class PlayerController : NetworkBehaviour
 
             StartCoroutine(FadeServerMessage());
         }
-            
     }
 
     #endregion
 
-    [ClientRpc]
-    private void UpdateSprite(string spriteName)
-    {
-        Debug.Log(spriteName);
-        if (spriteName != "")
-            item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/" + spriteName);
-        else
-            item.GetComponent<SpriteRenderer>().sprite = null;
-    }
+    //[ClientRpc]
+    //private void UpdatePlayerState(int itemID)
+    //{
+    //    ItemDatabaseObject idat = itemHandler.ItemDatabase;
+    //    ItemObject itemObj = idat.GetItemAt(itemID);
+    //    if (itemObj != null)
+    //    {
+    //        SetPlayerState(itemObj.ItemType);
+    //        item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
+    //    }
+    //    else
+    //    {
+    //        SetPlayerState(ITEM_TYPE.None);
+    //        item.GetComponent<SpriteRenderer>().sprite = null;
+    //    }
+    //}
 
     #endregion
 
@@ -169,14 +188,14 @@ public class PlayerController : NetworkBehaviour
     {
         if (!isLocalPlayer)
         {
-            if(camera)
-                floatingInfo.transform.LookAt(camera.transform);
+            //if(camera)
+            //    floatingInfo.transform.LookAt(camera.transform);
             return;
         }
 
         CheckQuickslotInput();
     }
-
+    [Client]
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     void FixedUpdate()
     {
@@ -185,14 +204,6 @@ public class PlayerController : NetworkBehaviour
 
         mousePos = Input.mousePosition;
         worldPosition = camera.ScreenToWorldPoint(mousePos);
-        //camera.transform.position = new Vector3(rb2d.transform.position.x, rb2d.transform.position.y, -1);
-
-        //CalculateMovement();
-
-        if (Input.GetKey("space") && jumpController.IsGrounded())
-        {
-            jumpController.Jump();
-        }
 
         if (playerHP <= 0)
         {
@@ -201,63 +212,56 @@ public class PlayerController : NetworkBehaviour
 
     }
     #endregion
-    private void UpdateState(ItemObject itemObj)
-    {
-        if (itemObj != null)
-        {
-            CmdActiveItemChanged(itemObj.UIDisplaySprite.name);
 
-            SetPlayerState(itemObj.ItemType);
-        }
-        else
-        {
-            CmdActiveItemChanged("");
-
-            playerStates = PlayerStates.Idle;
-            item.GetComponent<MiningController>().enabled = false;
-            item.GetComponent<DefaultGun>().enabled = false;
-        }
-    }
-
+    [Client]
     private void CheckQuickslotInput()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[0].ItemObject;
-            UpdateState(itemObj);
+            int id = itemObj != null ? itemObj.Data.ID : -1;
+            activeItemID = id;
+            //CmdActiveItemChanged(id);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[1].ItemObject;
-            UpdateState(itemObj);
+            int id = itemObj != null ? itemObj.Data.ID : -1;
+            activeItemID = id;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[2].ItemObject;
-            UpdateState(itemObj);
+            int id = itemObj != null ? itemObj.Data.ID : -1;
+            activeItemID = id;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[3].ItemObject;
-            UpdateState(itemObj);
+            int id = itemObj != null ? itemObj.Data.ID : -1;
+            activeItemID = id;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha5))
         {
             ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[4].ItemObject;
-            UpdateState(itemObj);
+            int id = itemObj != null ? itemObj.Data.ID : -1;
+            activeItemID = id;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha6))
         {
             ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[5].ItemObject;
-            UpdateState(itemObj);
+            int id = itemObj != null ? itemObj.Data.ID : -1;
+            activeItemID = id;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha7))
         {
             ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[6].ItemObject;
-            UpdateState(itemObj);
+            int id = itemObj != null ? itemObj.Data.ID : -1;
+            activeItemID = id;
         }
     }
 
+    [Client]
     private void SetPlayerState(ITEM_TYPE itemType)
     {
         switch (itemType)
@@ -285,6 +289,7 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    [Client]
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.collider.CompareTag("EnemyWeapon"))

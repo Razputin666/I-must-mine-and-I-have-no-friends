@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class ItemHandler : MonoBehaviour
+public class ItemHandler : NetworkBehaviour
 {
     [SerializeField]
     private InventoryObject inventory;
@@ -11,13 +12,58 @@ public class ItemHandler : MonoBehaviour
     [SerializeField]
     private InventoryObject quickSlots;
 
+    //[SerializeField]
+    //private GameObject inventoryUI;
+    //[SerializeField]
+    //private GameObject equipmentUI;
+    //[SerializeField]
+    //private GameObject quickSlotsUI;
+
+    [SerializeField]
+    private GameObject playerUIsPrefab;
+
     private void Start()
     {
+        inventory = Instantiate(inventory);
+        inventory.Clear();
+
+        equipment = Instantiate(equipment);
+        equipment.Clear();
+
+        quickSlots = Instantiate(quickSlots);
+        quickSlots.Clear();
+
+        if (!isLocalPlayer)
+            return;
+
+        //GameObject.FindGameObjectWithTag("PlayerInventoryUI");
+
+        
         for (int i = 0; i < equipment.GetSlots.Length; i++)
         {
             equipment.GetSlots[i].OnBeforeUpdate += OnBeforeSlotUpdate;
             equipment.GetSlots[i].OnAfterUpdate += OnAfterSlotUpdate;
         }
+
+        GameObject canvas = Instantiate(playerUIsPrefab, transform);
+
+        GameObject inventoryUI = canvas.transform.Find("InventoryScreen").gameObject;
+
+        DynamicInterface inventoryUserInterface = inventoryUI.GetComponent<DynamicInterface>();
+        inventoryUserInterface.Inventory = inventory;
+        inventoryUserInterface.enabled = true;
+
+        GameObject equipmentUI = canvas.gameObject.transform.Find("EquipmentScreen").gameObject;
+
+        StaticInterface equipmentUserInterface = equipmentUI.GetComponent<StaticInterface>();
+        equipmentUserInterface.Inventory = equipment;
+        equipmentUserInterface.enabled = true;
+
+        GameObject quickSlotsUI = canvas.gameObject.transform.Find("QuickSlotScreen").gameObject;
+
+        StaticInterface quickslotsUserInterface = quickSlotsUI.GetComponent<StaticInterface>();
+        quickslotsUserInterface.Inventory = quickSlots;
+        quickslotsUserInterface.enabled = true;
     }
 
     public void OnBeforeSlotUpdate(InventorySlot slot)
@@ -69,13 +115,16 @@ public class ItemHandler : MonoBehaviour
             Item newItem = new Item(groundItem.Item);
             if (inventory.AddItem(newItem, newItem.Amount))
             {
-                Destroy(other.transform.parent.gameObject);
+                NetworkServer.Destroy(other.transform.parent.gameObject);
             }           
         }
     }
-
+    [Client]
     private void Update()
     {
+        if (!isLocalPlayer)
+            return;
+
         if(Input.GetKeyDown(KeyCode.P))
         {
             inventory.Save();

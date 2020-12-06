@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum ITEM_TYPE
 {
+    None,
     HelmetMod,
     ChestMod,
     LegMod,
@@ -15,7 +16,7 @@ public enum ITEM_TYPE
     TileBlock,
     Weapon,
     MiningLaser,
-    Component
+    Component 
 }
 
 public abstract class ItemObject : ScriptableObject

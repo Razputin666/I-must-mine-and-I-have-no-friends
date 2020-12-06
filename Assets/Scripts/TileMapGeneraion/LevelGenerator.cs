@@ -86,9 +86,9 @@ public class LevelGenerator : MonoBehaviour
 				break;
 			case Algorithm.RandomWalkTopSmoothed:
 				//First generate our array
-				map = MapFunctions.GenerateArray(width, height, true);
+				map = MapFunctions.GenerateArray(width, height, false);
 				//Next generate the smoothed random top
-				map = MapFunctions.RandomWalkTopSmoothed(map, seed, mapSetting.interval);
+				//map = MapFunctions.RandomWalkTopSmoothed(map, seed, mapSetting.interval);
 				break;
 			case Algorithm.RandomWalkCave:
 				//First generate our array
