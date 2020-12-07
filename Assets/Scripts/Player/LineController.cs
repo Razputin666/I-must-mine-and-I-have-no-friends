@@ -16,7 +16,7 @@ public class LineController : MonoBehaviour
     void Awake()
     {
         player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
-       miningLaser = gameObject.GetComponent<MiningController>();
+        miningLaser = gameObject.GetComponent<MiningController>();
         lr = GetComponent<LineRenderer>();
     }
 

@@ -26,6 +26,7 @@ public class JumpController : NetworkBehaviour, HasCoolDownInterFace
     public bool IsGrounded()
     {
         RaycastHit2D raycastHit2D = Physics2D.CapsuleCast(capsuleCollider2d.bounds.center, capsuleCollider2d.bounds.size, CapsuleDirection2D.Vertical, 0f, Vector2.down, 0.5f);
+      //  Physics2D.IgnoreCollision(, GetComponent<CapsuleCollider2D>());
         return raycastHit2D.collider != null;
     }
     [Client]

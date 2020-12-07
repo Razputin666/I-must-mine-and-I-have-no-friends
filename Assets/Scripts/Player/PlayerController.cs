@@ -19,6 +19,7 @@ public class PlayerController : NetworkBehaviour
 
     #region PlayerValues    
     public int playerHP;
+
     public Rigidbody2D rb2d;        //Store a reference to the Rigidbody2D component required to use 2D Physics.
     public Vector3 worldPosition;
     public Vector3 mousePos;
@@ -34,6 +35,10 @@ public class PlayerController : NetworkBehaviour
     private DeathScreen deathScreen;
     private Camera camera;
 
+    private JumpController jumpController;
+   [SerializeField]private DeathScreen deathScreen;
+    [SerializeField] private LevelGeneratorLayered mapSize;
+
     //Network
     [SerializeField]
     private TextMesh playerNameText;
@@ -46,6 +51,10 @@ public class PlayerController : NetworkBehaviour
     private int activeItemID = -1;
     private int activeQuickslot = -1;
 
+    Camera _camera;
+    [SerializeField]
+    Camera _secondCamera;
+
     private SceneScript sceneScript;
 
     private void Awake()
@@ -53,6 +62,7 @@ public class PlayerController : NetworkBehaviour
         //allow all players to run this
         sceneScript = GameObject.FindObjectOfType<SceneScript>();
         item = gameObject.GetComponentInChildren<FaceMouse>().gameObject.transform.Find("ItemHeldInHand");
+
         itemHandler = GetComponent<ItemHandler>();
         if (!isLocalPlayer)
         {
@@ -90,6 +100,8 @@ public class PlayerController : NetworkBehaviour
         camera.transform.SetParent(transform);
         camera.transform.localPosition = new Vector3(0, 0, -20);
 
+        //_camera.transform.position = new Vector3(Mathf.Clamp(rb2d.transform.position.x, (0) + 26.7f, (mapSize.startPosition.x) - 26.7f), rb2d.transform.position.y, -1);
+
         //Camera.main.CopyFrom(camera);
         //floatingInfo.transform.localPosition = new Vector3(0.1f, 1f, 0f);
         //floatingInfo.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
@@ -101,7 +113,7 @@ public class PlayerController : NetworkBehaviour
         //old
         //inventory = GetComponentInChildren<Inventory>();
         
-        item.GetComponent<SpriteRenderer>().sprite = null;// Resources.Load<Sprite>("Sprites/Items/Drill");
+        item.GetComponent<SpriteRenderer>().sprite = null;
         item.GetComponent<DefaultGun>().enabled = false;
         item.GetComponent<MiningController>().enabled = false;
 
@@ -113,7 +125,15 @@ public class PlayerController : NetworkBehaviour
         //capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
         
         playerStates = PlayerStates.Idle;
-        // itemController.SetMiningMode(); // Vi har inte combat än så den e på mining default
+
+        boxCollider2d = transform.GetComponent<BoxCollider2D>();
+        capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
+        jumpController = GetComponent<JumpController>();
+        itemHandler = GetComponent<ItemHandler>();
+        playerStates = PlayerStates.Idle;
+        mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
+        _camera = GameObject.Find("Main Camera").GetComponent<Camera>();
+
         StartCoroutine(CoroutineCoordinator());
     }
 
@@ -127,12 +147,14 @@ public class PlayerController : NetworkBehaviour
     [Command]
     public void CmdSetupPlayer(string name)
     {
+
         //player info sent to server, then server updates sync vars which handles it on all clients
         playerName = name;
         //sceneScript.statusText = $"{playerName} joined.";
         //sceneScript.canvasStatusText.enabled = true;
         StartCoroutine(FadeServerMessage());
     }
+        
 
     [Command]
     public void CmdSendPlayerMessage()
@@ -211,6 +233,7 @@ public class PlayerController : NetworkBehaviour
     {
         CmdActiveItemChanged(itemID);
     }
+
     private void QuickslotActiveChanged(int index)
     {
         if (activeQuickslot != index)

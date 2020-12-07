@@ -86,9 +86,9 @@ public class LevelGenerator : MonoBehaviour
 				break;
 			case Algorithm.RandomWalkTopSmoothed:
 				//First generate our array
-				map = MapFunctions.GenerateArray(width, height, false);
+				map = MapFunctions.GenerateArray(width, height, true);
 				//Next generate the smoothed random top
-				//map = MapFunctions.RandomWalkTopSmoothed(map, seed, mapSetting.interval);
+				map = MapFunctions.RandomWalkTopSmoothed(map, seed, mapSetting.interval, mapSetting.randomHeightStart);
 				break;
 			case Algorithm.RandomWalkCave:
 				//First generate our array
@@ -100,7 +100,7 @@ public class LevelGenerator : MonoBehaviour
 				//First generate our array
 				map = MapFunctions.GenerateArray(width, height, false);
 				//Next generate the custom random walk cave
-				map = MapFunctions.RandomWalkCaveCustom(map, seed, mapSetting.clearAmount);
+				map = MapFunctions.RandomWalkCaveCustom(map, seed, mapSetting.clearAmount, 100);
 				break;
 			case Algorithm.CellularAutomataVonNeuman:
 				//First generate the cellular automata array
@@ -130,7 +130,7 @@ public class LevelGenerator : MonoBehaviour
 		tilemap.ClearAllTiles();
 	}
 }
-#if UNITY_EDITOR
+
 [CustomEditor(typeof(LevelGenerator))]
 public class LevelGeneratorEditor : Editor
 {
@@ -159,4 +159,3 @@ public class LevelGeneratorEditor : Editor
 		}
 	}
 }
-#endif

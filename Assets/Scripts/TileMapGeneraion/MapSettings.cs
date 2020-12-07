@@ -14,7 +14,7 @@ using UnityEditor;
 
 public enum Algorithm
 {
-    Perlin, PerlinSmoothed, PerlinCave, RandomWalkTop, RandomWalkTopSmoothed, RandomWalkCave, RandomWalkCaveCustom, CellularAutomataVonNeuman, CellularAutomataMoore, DirectionalTunnel
+   Default, Perlin, PerlinSmoothed, PerlinCave, RandomWalkTop, RandomWalkTopSmoothed, RandomWalkCave, RandomWalkCaveCustom, CellularAutomataVonNeuman, CellularAutomataMoore, DirectionalTunnel, BlockWalkGeneration
 }
 
 [System.Serializable]
@@ -31,6 +31,7 @@ public class MapSettings : ScriptableObject
     public int minPathWidth, maxPathWidth, maxPathChange, roughness, windyness;
     public bool edgesAreWalls;
     public float modifier;
+    public int randomHeightStart;
 }
 #if UNITY_EDITOR
 //Custom UI for our class
@@ -55,6 +56,9 @@ public class MapSettings_Editor : Editor
 		//Shows different options depending on what algorithm is selected
         switch (mapLayer.algorithm)
         {
+            case Algorithm.Default:
+                //No additional Variables
+                break;
             case Algorithm.Perlin:
                 //No additional Variables
                 break;
@@ -70,6 +74,7 @@ public class MapSettings_Editor : Editor
                 break;
             case Algorithm.RandomWalkTopSmoothed:
                 mapLayer.interval = EditorGUILayout.IntSlider("Minimum Section Length", mapLayer.interval, 1, 10);
+                mapLayer.randomHeightStart = EditorGUILayout.IntSlider("Minimum Random Start", mapLayer.randomHeightStart, 1, 10);
                 break;
             case Algorithm.RandomWalkCave:
                 mapLayer.clearAmount = EditorGUILayout.IntSlider("Amount To Clear", mapLayer.clearAmount, 0, 100);
@@ -93,6 +98,9 @@ public class MapSettings_Editor : Editor
                 mapLayer.maxPathChange = EditorGUILayout.IntField("Maximum Path Change", mapLayer.maxPathChange);
                 mapLayer.windyness = EditorGUILayout.IntSlider(new GUIContent("Windyness", "This is checked against a random number to determine if we can change the paths current x position"), mapLayer.windyness, 0, 100);
                 mapLayer.roughness = EditorGUILayout.IntSlider(new GUIContent("Roughness", "This is checked against a random number to determine if we can change the width of the tunnel"), mapLayer.roughness, 0, 100);
+                break;
+            case Algorithm.BlockWalkGeneration:
+                mapLayer.clearAmount = EditorGUILayout.IntSlider("Amount To Clear", mapLayer.clearAmount, 0, 100);
                 break;
         }
 

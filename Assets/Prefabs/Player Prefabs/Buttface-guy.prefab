@@ -220,6 +220,8 @@ MonoBehaviour:
   coolDownDuration: 0.5
   coolDownSystem: {fileID: 658734927}
   points: []
+  tileMapManager: {fileID: 0}
+  chunk: {fileID: 0}
   endOfGun: {fileID: 0}
 --- !u!120 &1505938777
 LineRenderer:
@@ -707,6 +709,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   playerHP: 10
+  speed: 1
+  jumpVelocity: 1200
+  miningStrength: 3
+  maxFallSpeed: 0
   rb2d: {fileID: 8181247841218053084}
   worldPosition: {x: 0, y: 0, z: 0}
   mousePos: {x: 0, y: 0, z: 0}
@@ -715,6 +721,9 @@ MonoBehaviour:
   playerNameText: {fileID: 2460479744885717627}
   floatingInfo: {fileID: 3099071328677749061}
   playerName: 
+  mapSize: {fileID: 0}
+  _camera: {fileID: 0}
+  _secondCamera: {fileID: 0}
 --- !u!70 &658734921
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

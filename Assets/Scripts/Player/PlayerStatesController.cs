@@ -34,19 +34,18 @@ public class PlayerStatesController : MonoBehaviour
                 targetBlockIntPos.z = 0;
                 Vector3Int playerIntPos = Vector3Int.FloorToInt(transform.position);
                 Vector3Int distanceFromPlayer = targetBlockIntPos - playerIntPos;
-                //TargetedBlock = tileMapChecker.currentTilemap;
                 //Debug.Log(targetBlockIntPos + " player mousepos");
 
                 if (Input.GetMouseButton(0) && distanceFromPlayer.x > -5 && distanceFromPlayer.x < 5 && distanceFromPlayer.y > -5 && distanceFromPlayer.y < 5)
                 {
                     line.enabled = true;
-                    //miningMode.Mine(targetBlockIntPos, TargetedBlock);
+
+                    miningMode.Mine(targetBlockIntPos, player.miningStrength);
                 }
                 break;
             case PlayerController.PlayerStates.Normal:
                 break;
             case PlayerController.PlayerStates.Building:
-
                 break;
             case PlayerController.PlayerStates.Idle:
                 break;
