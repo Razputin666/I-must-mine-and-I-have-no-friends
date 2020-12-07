@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Unity.Mathematics;
+using Mirror;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-public class LevelGeneratorLayered : MonoBehaviour
+public class LevelGeneratorLayered : NetworkBehaviour
 {
 	[Tooltip("The Tilemap to draw onto")]
 	//[SerializeField]
@@ -57,7 +58,6 @@ public class LevelGeneratorLayered : MonoBehaviour
 		ClearMap();
 		GameObject grid = GameObject.Find("Grid");
 		startPosition = new Vector2Int(0, (-height / 2));
-
 
 		for (int i = 0; i < numberOfChunks; i++)
         {
@@ -262,16 +262,20 @@ public class LevelGeneratorLayered : MonoBehaviour
 
 		yield return new WaitForSeconds(0.5f);
         
-			if(!playerSpawned)
-            {
-				RaycastHit2D playerSpawn = Physics2D.Raycast(new Vector2(UnityEngine.Random.Range(0, startPosition.x), height * 2), Vector2.down);
+		if(!playerSpawned)
+        {
+			RaycastHit2D playerSpawn = Physics2D.Raycast(new Vector2(UnityEngine.Random.Range(0, startPosition.x), height * 2), Vector2.down);
 
-				if(playerSpawn.collider.gameObject.CompareTag("TileMap"))
-                {
-					Instantiate(playerCharacter, playerSpawn.point, quaternion.identity);
-					playerSpawned = true;
-				}
+			if(playerSpawn.collider.gameObject.CompareTag("TileMap"))
+            {
+				GameObject start = GameObject.Find("StartPosition");
+				start.transform.position = playerSpawn.point;
+				NetworkManager.RegisterStartPosition(start.transform);
+					
+				//Instantiate(playerCharacter, playerSpawn.point, quaternion.identity);
+				playerSpawned = true;
 			}
+		}
         
 	}
 
@@ -287,12 +291,9 @@ public class LevelGeneratorLayered : MonoBehaviour
 			Debug.Log("TreeSpawned");
 			if (treeSpawn.collider.gameObject.CompareTag("TileMap"))
 			{
-
 				treeSpawn.collider.gameObject.GetComponent<Tilemap>().SetTile(treeSpawn.collider.gameObject.GetComponent<Tilemap>().WorldToCell(treeSpawn.point), tiles[3]);
-
 			}
 		}	
-
 	}
 
 	[ExecuteInEditMode]

@@ -40,7 +40,7 @@ public class PlayerStatesController : MonoBehaviour
                 {
                     line.enabled = true;
 
-                    miningMode.Mine(targetBlockIntPos, player.miningStrength);
+                    miningMode.Mine(targetBlockIntPos, player.MiningStrength);
                 }
                 break;
             case PlayerController.PlayerStates.Normal:

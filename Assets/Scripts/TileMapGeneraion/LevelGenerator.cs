@@ -131,31 +131,31 @@ public class LevelGenerator : MonoBehaviour
 	}
 }
 
-[CustomEditor(typeof(LevelGenerator))]
-public class LevelGeneratorEditor : Editor
-{
-	public override void OnInspectorGUI()
-	{
-		base.OnInspectorGUI();
+//[CustomEditor(typeof(LevelGenerator))]
+//public class LevelGeneratorEditor : Editor
+//{
+//	public override void OnInspectorGUI()
+//	{
+//		base.OnInspectorGUI();
 
-		//Reference to our script
-		LevelGenerator levelGen = (LevelGenerator)target;
+//		//Reference to our script
+//		LevelGenerator levelGen = (LevelGenerator)target;
 
-		//Only show the mapsettings UI if we have a reference set up in the editor
-		if (levelGen.mapSetting != null)
-		{
-			Editor mapSettingEditor = CreateEditor(levelGen.mapSetting);
-			mapSettingEditor.OnInspectorGUI();
+//		//Only show the mapsettings UI if we have a reference set up in the editor
+//		if (levelGen.mapSetting != null)
+//		{
+//			Editor mapSettingEditor = CreateEditor(levelGen.mapSetting);
+//			mapSettingEditor.OnInspectorGUI();
 
-			if (GUILayout.Button("Generate"))
-			{
-				levelGen.GenerateMap();
-			}
+//			if (GUILayout.Button("Generate"))
+//			{
+//				levelGen.GenerateMap();
+//			}
 
-			if (GUILayout.Button("Clear"))
-			{
-				levelGen.ClearMap();
-			}
-		}
-	}
-}
+//			if (GUILayout.Button("Clear"))
+//			{
+//				levelGen.ClearMap();
+//			}
+//		}
+//	}
+//}

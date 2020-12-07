@@ -14,7 +14,7 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     [SerializeField] private TileMapManager tileMapManager;
 
     [SerializeField] private Tilemap chunk;
-
+    private SpawnManager spawnManager;
     public Transform endOfGun;
     private Dictionary<Vector3Int, float> blockChecker = new Dictionary<Vector3Int, float>();
 
@@ -25,8 +25,9 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
             endOfGun = transform.Find("EndOfGun");
 
         tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
-      //  player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
-      //  tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
+        spawnManager = GameObject.Find("ItemSpawner").GetComponent<SpawnManager>();
+        //  player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
+        //  tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
     }
 
     private void OnEnable()
@@ -48,13 +49,13 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
             {
                 chunk = chunkCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
             }
+
             if (chunk == null)
                 return;
+
             Vector3Int blockInLocal = chunk.WorldToCell(blockToMine);
             float blockStr = 0;
             string blockType = tileMapManager.BlockTypeGet(new Vector3Int(blockInLocal.x, blockInLocal.y, 0), chunk);
-            
-
 
             if (!blockChecker.TryGetValue(blockInLocal, out blockStr))
             {
@@ -72,7 +73,6 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
                 blockStr -= miningStr * Time.deltaTime;
                 blockChecker[blockInLocal] = blockStr;
             }
-            Debug.Log(blockType);
             if (blockStr <= 0)
             {
                 
@@ -92,11 +92,10 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
             case "Dirt":
                 //Debug.Log("DIRT!");
                 ItemObject itemObj = itemDatabase.GetItemAt(3);
-                Debug.Log(itemObj);
                 if (itemObj != null)
                 {
                     ItemObject newItemObj = Instantiate(itemObj);
-                    SpawnManager.SpawnItemAt(chunkThis.CellToWorld(blockPosition), newItemObj);
+                    spawnManager.CmdSpawnItemAt(chunkThis.CellToWorld(blockPosition), itemObj.Data.ID, itemObj.Data.Amount);
                 }
                 break;
             case "Grass":
@@ -123,16 +122,10 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
                 }
                 upperBlocks.Clear();
                 break;
-
-
         }
     }
-
 
     public int Id => id;
 
     public float CoolDownDuration => coolDownDuration;
-
-
-
 }

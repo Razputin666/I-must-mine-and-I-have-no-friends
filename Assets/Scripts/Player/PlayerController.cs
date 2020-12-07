@@ -25,6 +25,8 @@ public class PlayerController : NetworkBehaviour
     public Vector3 mousePos;
     private float distanceFromPlayerx;
     private float distanceFromPlayery;
+    [SerializeField]
+    private int miningStrength;
     #endregion
 
     public Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
@@ -36,8 +38,8 @@ public class PlayerController : NetworkBehaviour
     private Camera camera;
 
     private JumpController jumpController;
-   [SerializeField]private DeathScreen deathScreen;
-    [SerializeField] private LevelGeneratorLayered mapSize;
+    [SerializeField] 
+    private LevelGeneratorLayered mapSize;
 
     //Network
     [SerializeField]
@@ -51,7 +53,6 @@ public class PlayerController : NetworkBehaviour
     private int activeItemID = -1;
     private int activeQuickslot = -1;
 
-    Camera _camera;
     [SerializeField]
     Camera _secondCamera;
 
@@ -110,29 +111,18 @@ public class PlayerController : NetworkBehaviour
 
         CmdSetupPlayer(name);
 
-        //old
-        //inventory = GetComponentInChildren<Inventory>();
-        
         item.GetComponent<SpriteRenderer>().sprite = null;
         item.GetComponent<DefaultGun>().enabled = false;
         item.GetComponent<MiningController>().enabled = false;
 
-        //Get and store a reference to the Rigidbody2D component so that we can access it.
-
-        //facingRight = true;
         rb2d = GetComponent<Rigidbody2D>();
-        //boxCollider2d = transform.GetComponent<BoxCollider2D>();
-        //capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
         
         playerStates = PlayerStates.Idle;
 
-        boxCollider2d = transform.GetComponent<BoxCollider2D>();
-        capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
         jumpController = GetComponent<JumpController>();
         itemHandler = GetComponent<ItemHandler>();
         playerStates = PlayerStates.Idle;
         mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
-        _camera = GameObject.Find("Main Camera").GetComponent<Camera>();
 
         StartCoroutine(CoroutineCoordinator());
     }
@@ -359,6 +349,14 @@ public class PlayerController : NetworkBehaviour
         get
         {
             return activeQuickslot;
+        }
+    }
+
+    public int MiningStrength
+    {
+        get
+        {
+            return miningStrength;
         }
     }
 
