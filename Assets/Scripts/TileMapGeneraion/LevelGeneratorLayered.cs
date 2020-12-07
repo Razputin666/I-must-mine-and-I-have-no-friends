@@ -8,6 +8,11 @@ using Unity.Mathematics;
 using UnityEditor;
 #endif
 
+public enum TypeOfPlanet
+{
+	Earthlike, meme
+}
+
 public class LevelGeneratorLayered : MonoBehaviour
 {
 	[Tooltip("The Tilemap to draw onto")]
@@ -54,35 +59,53 @@ public class LevelGeneratorLayered : MonoBehaviour
 
 	public float grassGrowthTimeToReach;
 	public Vector2Int startPosition;
+	private TypeOfPlanet typeOfPlanet { get;  set; }
 	int widthPosition;
 	private void Start()
 	{
-		ClearMap();
-		GameObject grid = GameObject.Find("Grid");
-		startPosition = new Vector2Int(0, (-height / 2));
-
-
-		for (int i = 0; i < numberOfChunks; i++)
-        {
-		    GameObject chunk = Instantiate(tileChunk, grid.transform);
-			chunks.Add(chunk.GetComponent<Tilemap>());
-			GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
-			grassOverWorldChunk.GenerateGrassPlanetOverworldChunk(chunks[i]);
-			chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
-			startPosition.x +=width - 1;
-			chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
-
-		}
-
-		Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
-		Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
-		//StartCoroutine(GenerateTrees());
-
-		StartCoroutine(SpawnPlayer());
-		StartCoroutine(SpawnEnemy());
+		typeOfPlanet = TypeOfPlanet.Earthlike;
+		WorldGeneration();
 
 	}
 
+	private void WorldGeneration()
+    {
+        switch (typeOfPlanet)
+        {
+            case TypeOfPlanet.Earthlike:
+				ClearMap();
+				GameObject grid = GameObject.Find("Grid");
+				startPosition = new Vector2Int(0, (-height / 2));
+
+
+				for (int i = 0; i < numberOfChunks; i++)
+				{
+					GameObject chunk = Instantiate(tileChunk, grid.transform);
+					chunks.Add(chunk.GetComponent<Tilemap>());
+					GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
+					grassOverWorldChunk.GenerateGrassPlanetOverworldChunk(chunks[i]);
+					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
+					startPosition.x += width - 1;
+					chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
+
+				}
+
+				Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
+				Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
+				//StartCoroutine(GenerateTrees());
+
+				StartCoroutine(SpawnPlayer());
+				StartCoroutine(SpawnEnemy());
+
+				break;
+            case TypeOfPlanet.meme:
+                break;
+            default:
+                break;
+        }
+
+        
+	}
 
     #region
     void CreateFeatures(MapSettings mapSettings, MapSettings otherSettings, Tilemap tilemap)

@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcb72f5a6aac543479fbd3d4fcddea75, type: 3}
-  m_Name: GoldOre
+  m_Name: CoalOre
   m_EditorClassIdentifier: 
   tiles:
-  - {fileID: 11400000, guid: 417e14d843f47dc45940df80ff579a44, type: 2}
-  blockName: Gold Block
+  - {fileID: 11400000, guid: 6c7f547ab2fa0c64fbf5d04548be30f6, type: 2}
+  blockName: Copper Block
   blockStrength: 2
   blockType: Ore
