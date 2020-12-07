@@ -78,28 +78,28 @@ public class InventoryObject : ScriptableObject
         return true;
     }
 
-    public void SwapItems(InventorySlot item1, InventorySlot item2)
+    public void SwapItems(InventorySlot slot1, InventorySlot slot2)
     {
-        if (item1 == item2)
+        if (slot1 == slot2)
             return;
         
         //Check if the items can swap used for the equipment slots.
-        if (item2.CanPlaceInSlot(item1.ItemObject) && item1.CanPlaceInSlot(item2.ItemObject))
+        if (slot2.CanPlaceInSlot(slot1.ItemObject) && slot1.CanPlaceInSlot(slot2.ItemObject))
         {
             //check so that both slots arent empty
-            if(item1.ID >= 0 || item2.ID >= 0)
+            if(slot1.ID >= 0 || slot2.ID >= 0)
             {
                 //check if the items are of the same type then stack them and is stackable
-                if (item1.ID == item2.ID && ItemDatabase.GetItemAt(item1.ID).Stackable)
+                if (slot1.ID == slot2.ID && ItemDatabase.GetItemAt(slot1.ID).Stackable)
                 {
-                    item2.UpdateSlot(item2.Item, item2.Amount + item1.Amount);
-                    item1.RemoveItem();
+                    slot2.UpdateSlot(slot2.Item, slot2.Amount + slot1.Amount);
+                    slot1.RemoveItem();
                 }
                 else
                 {
-                    InventorySlot temp = new InventorySlot(item2.Item, item2.Amount);
-                    item2.UpdateSlot(item1.Item, item1.Amount);
-                    item1.UpdateSlot(temp.Item, temp.Amount);
+                    InventorySlot temp = new InventorySlot(slot2.Item, slot2.Amount);
+                    slot2.UpdateSlot(slot1.Item, slot1.Amount);
+                    slot1.UpdateSlot(temp.Item, temp.Amount);
                 }
             }
         }

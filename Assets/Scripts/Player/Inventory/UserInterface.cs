@@ -29,9 +29,8 @@ public abstract class UserInterface : MonoBehaviour
         CreateSlots();
         AddEvent(gameObject, EventTriggerType.PointerEnter, delegate { OnEnterInterface(gameObject); });
         AddEvent(gameObject, EventTriggerType.PointerExit, delegate { OnExitInterface(gameObject); });
-
+        
         spawnManager = GameObject.Find("ItemSpawner").GetComponent<SpawnManager>();
-        Debug.Log(spawnManager);
     }
 
     protected void OnSlotUpdate(InventorySlot slot)
@@ -129,7 +128,7 @@ public abstract class UserInterface : MonoBehaviour
 
         if(MouseData.interfaceMouseIsOver == null)
         {
-            Camera cam = gameObject.transform.parent.gameObject.transform.parent.GetComponentInChildren<Camera>();
+            Camera cam = transform.parent.transform.parent.GetComponentInChildren<Camera>();
             ItemObject newItem = slotsOnInterface[obj].ItemObject;
             newItem.Data.Amount = slotsOnInterface[obj].Item.Amount;
             //CmdSpawnItemAt(cam.ScreenToWorldPoint(Input.mousePosition), newItem.Data.ID, newItem.Data.Amount);

@@ -27,22 +27,25 @@ public class ItemHandler : NetworkBehaviour
         inventory = Instantiate(inventory);
         inventory.Clear();
 
+        if (!isLocalPlayer)
+            return;
+
         equipment = Instantiate(equipment);
         equipment.Clear();
 
         quickSlots = Instantiate(quickSlots);
         quickSlots.Clear();
 
-        if (!isLocalPlayer)
-            return;
-
-        //GameObject.FindGameObjectWithTag("PlayerInventoryUI");
-
-        
         for (int i = 0; i < equipment.GetSlots.Length; i++)
         {
             equipment.GetSlots[i].OnBeforeUpdate += OnBeforeSlotUpdate;
             equipment.GetSlots[i].OnAfterUpdate += OnAfterSlotUpdate;
+        }
+
+        for (int i = 0; i < quickSlots.GetSlots.Length; i++)
+        {
+            quickSlots.GetSlots[i].OnBeforeUpdate += OnBeforeSlotUpdate;
+            quickSlots.GetSlots[i].OnAfterUpdate += OnAfterSlotUpdate;
         }
 
         GameObject canvas = Instantiate(playerUIsPrefab, transform);
@@ -68,7 +71,7 @@ public class ItemHandler : NetworkBehaviour
 
     public void OnBeforeSlotUpdate(InventorySlot slot)
     {
-        if (slot.ItemObject == null)
+        if (slot.ItemObject == null && slot.parent.Inventory.InterfaceType != INTERFACE_TYPE.Quickslots)
             return;
 
         switch (slot.parent.Inventory.InterfaceType)
@@ -82,6 +85,26 @@ public class ItemHandler : NetworkBehaviour
                 break;
             case INTERFACE_TYPE.Chest:
                 break;
+            case INTERFACE_TYPE.Quickslots:
+                PlayerController player = GetComponentInParent<PlayerController>();
+
+                if (player.ActiveQuickslot == -1)
+                    return;
+
+                InventorySlot[] invSlots = quickSlots.Container.InventorySlot;
+
+                for (int i = 0; i < invSlots.Length; i++)
+                {
+                    if (invSlots[i].ID == slot.ID)
+                    {
+                        if (player.ActiveQuickslot == i)
+                        {
+                            player.UpdateActiveItem(slot.ID);
+                            return;
+                        }
+                    }
+                }
+                break;
             default:
                 break;
         }
@@ -89,7 +112,7 @@ public class ItemHandler : NetworkBehaviour
 
     public void OnAfterSlotUpdate(InventorySlot slot)
     {
-        if (slot.ItemObject == null)
+        if (slot.ItemObject == null && slot.parent.Inventory.InterfaceType != INTERFACE_TYPE.Quickslots)
             return;
 
         switch (slot.parent.Inventory.InterfaceType)
@@ -102,12 +125,38 @@ public class ItemHandler : NetworkBehaviour
                 break;
             case INTERFACE_TYPE.Chest:
                 break;
+            case INTERFACE_TYPE.Quickslots:
+                PlayerController player = GetComponentInParent<PlayerController>();
+
+                if (player.ActiveQuickslot == -1)
+                    return;
+
+                InventorySlot[] invSlots = quickSlots.Container.InventorySlot;
+
+                for (int i = 0; i < invSlots.Length; i++)
+                {
+                    if (invSlots[i].ID == slot.ID)
+                    {
+                        if (player.ActiveQuickslot == i)
+                        {
+                            player.UpdateActiveItem(slot.ID);
+                            return;
+                        }
+                    }
+                }
+                break;
             default:
                 break;
         }
     }
+    [Command]
+    private void CmdRemoveGroundItem(GameObject obj)
+    {
+        NetworkServer.Destroy(obj);
+    }
 
-    public void OnTriggerEnter2D(Collider2D other)
+    [Client]
+    private void OnTriggerEnter2D(Collider2D other)
     {
         GroundItem groundItem = other.GetComponentInParent<GroundItem>();
         if(groundItem != null && groundItem.PickupTime <= 1f)
@@ -115,7 +164,7 @@ public class ItemHandler : NetworkBehaviour
             Item newItem = new Item(groundItem.Item);
             if (inventory.AddItem(newItem, newItem.Amount))
             {
-                NetworkServer.Destroy(other.transform.parent.gameObject);
+                CmdRemoveGroundItem(other.transform.parent.gameObject);
             }           
         }
     }

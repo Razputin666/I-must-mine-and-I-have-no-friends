@@ -8,7 +8,8 @@ public class PlayerMovementController : NetworkBehaviour
     [SerializeField] private float movementSpeed = 1f;
     [SerializeField] Rigidbody2D rb2d;
     private JumpController jumpController;
-    
+    private FaceMouse faceMouse;
+
     private Vector2 previousInput;
 
     public float jumpVelocity;
@@ -20,18 +21,35 @@ public class PlayerMovementController : NetworkBehaviour
     private bool facingRight = true;
     private bool isJumping = false;
 
+    public void Start()
+    {
+        if(!isLocalPlayer)
+        {
+            GetComponent<Rigidbody2D>().simulated = false;
+        }
+    }
+
     public override void OnStartAuthority()
     {
         enabled = true;
 
-        rb2d = gameObject.GetComponent<Rigidbody2D>();
+        rb2d = GetComponent<Rigidbody2D>();
         jumpController = GetComponent<JumpController>();
+        faceMouse = GetComponentInChildren<FaceMouse>();
 
         InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
         InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
 
         InputManager.Controls.Player.Jump.performed += ctx => isJumping = true;
         InputManager.Controls.Player.Jump.canceled += ctx => isJumping = false;
+    }
+    
+    private void Update()
+    {
+        if (!isLocalPlayer)
+            return;
+
+        faceMouse.RotateArm();
     }
 
     [ClientCallback]

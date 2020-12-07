@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class FaceMouse : NetworkBehaviour
+public class FaceMouse : MonoBehaviour
 {
     [SerializeField] private PlayerController player;
 
@@ -11,8 +11,8 @@ public class FaceMouse : NetworkBehaviour
     {
         player = GetComponentInParent<PlayerController>();
     }
-    [Client]
-    void Update()
+
+    public void RotateArm()
     {
         Vector2 direction = new Vector2(
         player.worldPosition.x - transform.position.x,

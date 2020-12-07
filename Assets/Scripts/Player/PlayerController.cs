@@ -20,26 +20,19 @@ public class PlayerController : NetworkBehaviour
     #region PlayerValues    
     public int playerHP;
     public Rigidbody2D rb2d;        //Store a reference to the Rigidbody2D component required to use 2D Physics.
-    //private BoxCollider2D boxCollider2d;
-    //private CapsuleCollider2D capsuleCollider2d;
-    //private bool facingRight;
     public Vector3 worldPosition;
     public Vector3 mousePos;
     private float distanceFromPlayerx;
     private float distanceFromPlayery;
     #endregion
 
-
     public Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
     private ItemController itemController;
     private ItemHandler itemHandler;
     public Transform item;
-   [SerializeField]
+    [SerializeField]
     private DeathScreen deathScreen;
-
-
-    //[SerializeField]
-    Camera camera;
+    private Camera camera;
 
     //Network
     [SerializeField]
@@ -51,6 +44,8 @@ public class PlayerController : NetworkBehaviour
     public string playerName;
     [SyncVar(hook = nameof(OnActiveItemChanged))]
     private int activeItemID = -1;
+    private int activeQuickslot = -1;
+
     private SceneScript sceneScript;
 
     private void Awake()
@@ -123,11 +118,11 @@ public class PlayerController : NetworkBehaviour
     }
 
     #region Commands
-    //[Command]
-    //public void CmdActiveItemChanged(int itemID)
-    //{
-    //    UpdatePlayerState(itemID);
-    //}
+    [Command]
+    public void CmdActiveItemChanged(int itemID)
+    {
+        activeItemID = itemID;
+    }
 
     [Command]
     public void CmdSetupPlayer(string name)
@@ -212,52 +207,56 @@ public class PlayerController : NetworkBehaviour
 
     }
     #endregion
+    public void UpdateActiveItem(int itemID)
+    {
+        CmdActiveItemChanged(itemID);
+    }
+    private void QuickslotActiveChanged(int index)
+    {
+        if (activeQuickslot != index)
+        {
+            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[index].ItemObject;
+            int id = itemObj != null ? itemObj.Data.ID : -1;
+            CmdActiveItemChanged(id);
+            activeQuickslot = index;
+        }
+        else
+        {
+            CmdActiveItemChanged(-1);
+            activeQuickslot = -1;
+        }
+    }
 
     [Client]
     private void CheckQuickslotInput()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[0].ItemObject;
-            int id = itemObj != null ? itemObj.Data.ID : -1;
-            activeItemID = id;
-            //CmdActiveItemChanged(id);
+            QuickslotActiveChanged(0);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[1].ItemObject;
-            int id = itemObj != null ? itemObj.Data.ID : -1;
-            activeItemID = id;
+            QuickslotActiveChanged(1);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[2].ItemObject;
-            int id = itemObj != null ? itemObj.Data.ID : -1;
-            activeItemID = id;
+            QuickslotActiveChanged(2);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[3].ItemObject;
-            int id = itemObj != null ? itemObj.Data.ID : -1;
-            activeItemID = id;
+            QuickslotActiveChanged(3);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[4].ItemObject;
-            int id = itemObj != null ? itemObj.Data.ID : -1;
-            activeItemID = id;
+            QuickslotActiveChanged(4);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha6))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[5].ItemObject;
-            int id = itemObj != null ? itemObj.Data.ID : -1;
-            activeItemID = id;
+            QuickslotActiveChanged(5);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha7))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[6].ItemObject;
-            int id = itemObj != null ? itemObj.Data.ID : -1;
-            activeItemID = id;
+            QuickslotActiveChanged(6);
         }
     }
 
@@ -329,6 +328,14 @@ public class PlayerController : NetworkBehaviour
                 yield return StartCoroutine(coroutineQueue.Dequeue());
             }
             yield return null;
+        }
+    }
+
+    public int ActiveQuickslot
+    {
+        get
+        {
+            return activeQuickslot;
         }
     }
 
