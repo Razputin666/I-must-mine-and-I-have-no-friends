@@ -16,7 +16,8 @@ public enum ITEM_TYPE
     TileBlock,
     Weapon,
     MiningLaser,
-    Component 
+    Component,
+    Ore
 }
 
 public abstract class ItemObject : ScriptableObject

@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c24a72b71acf7341adb69095f866761, type: 3}
-  m_Name: BasicElectronicComponent
-  m_EditorClassIdentifier: Assembly-CSharp::NewComponentObject
-  uiDisplaySprite: {fileID: 21300000, guid: 165571d0075e7bd4b8c2f42fd9f5d117, type: 3}
+  m_Name: IronOre
+  m_EditorClassIdentifier: 
+  uiDisplaySprite: {fileID: 21300000, guid: 8f72a2e6153b8594896ff44115edbaa3, type: 3}
   stackable: 1
-  itemType: 11
+  itemType: 12
   description: 
   data:
-    name: Basic Electronic Componenet
-    id: 0
+    name: Iron Ore
+    id: 17
     amount: 1
+  maxStackSize: 0

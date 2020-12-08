@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class ItemCollision : MonoBehaviour
+public class ItemCollision : NetworkBehaviour
 {
     private PlayerController player;
     private EnemyController enemy;
     private InventoryObject inventory;
+
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         if(GetComponentInParent<PlayerController>() == null)
         {
@@ -22,11 +24,6 @@ public class ItemCollision : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public void OnTriggerEnter2D(Collider2D other)
     {
         if(other.transform.CompareTag("GroundItem"))
@@ -37,7 +34,8 @@ public class ItemCollision : MonoBehaviour
                 Item newItem = new Item(groundItem.Item);
                 if (inventory.AddItem(newItem, newItem.Amount))
                 {
-                    Destroy(other.gameObject);
+                    if(player != null)
+                        player.RemoveItemFromGround(other.gameObject);
                 }
             }
         }

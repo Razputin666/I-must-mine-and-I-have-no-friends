@@ -109,7 +109,7 @@ public class PlayerController : NetworkBehaviour
 
         string name = "Player" + Random.Range(100, 999);
 
-        CmdSetupPlayer(name);
+        //CmdSetupPlayer(name);
 
         item.GetComponent<SpriteRenderer>().sprite = null;
         item.GetComponent<DefaultGun>().enabled = false;
@@ -144,7 +144,13 @@ public class PlayerController : NetworkBehaviour
         //sceneScript.canvasStatusText.enabled = true;
         StartCoroutine(FadeServerMessage());
     }
-        
+
+    [Command]
+    private void CmdRemoveGroundItem(GameObject obj)
+    {
+        NetworkServer.Destroy(obj);
+    }
+
 
     [Command]
     public void CmdSendPlayerMessage()
@@ -299,6 +305,12 @@ public class PlayerController : NetworkBehaviour
                 item.GetComponent<DefaultGun>().enabled = false;
                 break;
         }
+    }
+
+    public void RemoveItemFromGround(GameObject obj)
+    {
+        if(isLocalPlayer)
+            CmdRemoveGroundItem(obj);
     }
 
     [Client]

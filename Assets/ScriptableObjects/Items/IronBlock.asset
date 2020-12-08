@@ -9,14 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c24a72b71acf7341adb69095f866761, type: 3}
-  m_Name: CopperOre
+  m_Script: {fileID: 11500000, guid: 1d65b42a5bf76d540bf7dd38f50e9469, type: 3}
+  m_Name: IronBlock
   m_EditorClassIdentifier: 
-  uiDisplaySprite: {fileID: 21300000, guid: 98bfad98e8f1c5149951df9e773e47ce, type: 3}
+  uiDisplaySprite: {fileID: 21300000, guid: 314beeca9ae3a9d4699c2e7d532f1777, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 9
   description: 
   data:
-    name: Copper Ore
-    id: -1
+    name: Iron Block
+    id: 16
     amount: 1
+  maxStackSize: 0

@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tiles:
   - {fileID: 11400000, guid: 417e14d843f47dc45940df80ff579a44, type: 2}
-  blockName: Gold Block
+  blockName: Gold Ore
   blockStrength: 2
   blockType: Ore

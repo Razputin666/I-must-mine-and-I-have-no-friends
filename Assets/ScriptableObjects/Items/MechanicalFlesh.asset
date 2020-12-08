@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c24a72b71acf7341adb69095f866761, type: 3}
-  m_Name: CopperBar
+  m_Name: MechanicalFlesh
   m_EditorClassIdentifier: 
-  uiDisplaySprite: {fileID: 21300000, guid: 219184d1697080d4b8f806df4677e82b, type: 3}
+  uiDisplaySprite: {fileID: 21300000, guid: 66d124378a02ba942bff6ca8d65bf22d, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 12
   description: 
   data:
-    name: Copper Bar
-    id: 3
+    name: Mechanical Flesh
+    id: 18
     amount: 1
+  maxStackSize: 0

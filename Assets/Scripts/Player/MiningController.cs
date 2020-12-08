@@ -38,7 +38,8 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
         if (itemDatabase == null)
             itemDatabase = GetComponent<ItemDatabaseObject>();
 
-        tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
+        if(tileMapManager == null)
+            tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
     }
 
     public Tilemap GetChunk(Vector3Int targetedBlock)
@@ -49,25 +50,19 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
             chunk = chunkCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
             return chunk;
         }
-        else
-        {
-
-        }
-            return null;
+        return null;
     }
 
     public void Mine(Vector3Int blockToMine, float miningStr)
     {
         if(!coolDownSystem.IsOnCoolDown(id))
         {
-
             GetChunk(blockToMine);
             if(chunk == null)
-            {
                 return;
-            }
+
             Vector3Int blockInLocal = chunk.WorldToCell(blockToMine);
-            float blockStr = 0;
+            float blockStr;
             string blockName = tileMapManager.BlockNameGet(new Vector3Int(blockInLocal.x, blockInLocal.y, 0), chunk);
 
             if (!blockChecker.TryGetValue(blockInLocal, out blockStr))

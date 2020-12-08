@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300000, guid: 1881936df0c3047449484961fdcabf0e, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 12
   description: 
   data:
     name: Gold Ore
-    id: -1
+    id: 13
     amount: 0
+  maxStackSize: 0

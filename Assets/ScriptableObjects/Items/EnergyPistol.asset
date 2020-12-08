@@ -9,14 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c24a72b71acf7341adb69095f866761, type: 3}
-  m_Name: IronBar
+  m_Script: {fileID: 11500000, guid: b803ab4e97863de489903733e52deac2, type: 3}
+  m_Name: EnergyPistol
   m_EditorClassIdentifier: 
-  uiDisplaySprite: {fileID: 21300000, guid: 08a166b1ef13af746b18345c0303c0f3, type: 3}
-  stackable: 1
-  itemType: 8
-  description: 
+  uiDisplaySprite: {fileID: 21300000, guid: 8aa676687ba98ae4e9e0ffb7da7c2b46, type: 3}
+  stackable: 0
+  itemType: 10
+  description: Basic energy weapon.
   data:
-    name: Iron Bar
-    id: -1
+    name: Energy Pistol
+    id: 9
     amount: 1
+  maxStackSize: 0

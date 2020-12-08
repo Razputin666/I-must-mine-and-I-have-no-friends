@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Unity.Mathematics;
+using Mirror;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -13,7 +14,7 @@ public enum TypeOfPlanet
 	Earthlike, meme
 }
 
-public class LevelGeneratorLayered : MonoBehaviour
+public class LevelGeneratorLayered : NetworkBehaviour
 {
 	[Tooltip("The Tilemap to draw onto")]
 	//[SerializeField]
@@ -62,13 +63,18 @@ public class LevelGeneratorLayered : MonoBehaviour
 	public Vector2Int startPosition;
 	private TypeOfPlanet typeOfPlanet { get;  set; }
 	private List<int> chunkHeightOffset;
-	private void Start()
+	public void Start()
 	{
+		
 		typeOfPlanet = TypeOfPlanet.Earthlike;
 		WorldGeneration();
 
 	}
+	//[ClientRpc]
+	//private void ClientRenderMap(int[,] map, start)
+ //   {
 
+ //   }
 	private void WorldGeneration()
     {
         switch (typeOfPlanet)
@@ -77,7 +83,6 @@ public class LevelGeneratorLayered : MonoBehaviour
 				ClearMap();
 				GameObject grid = GameObject.Find("Grid");
 				startPosition = new Vector2Int(0, (-height / 2));
-
 
                 for (int i = 0; i < numberOfChunks; i++)
                 {
@@ -93,7 +98,6 @@ public class LevelGeneratorLayered : MonoBehaviour
 				chunkHeightOffset = grassOverWorldChunk.GetChunkHeightOffset;
 				startPosition = new Vector2Int(0, 0);
 				startPosition.y = -height + 1;
-				Debug.Log(chunks.Count);
 				int overWorldChunks = chunks.Count;
 				int offset;
 				for (int i = overWorldChunks; i < numberOfChunks + overWorldChunks; i++)
@@ -117,9 +121,11 @@ public class LevelGeneratorLayered : MonoBehaviour
 				Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
 				Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
 				//StartCoroutine(GenerateTrees());
-
-				StartCoroutine(SpawnPlayer());
-				StartCoroutine(SpawnEnemy());
+				
+				SetPlayerSpawnLocation();
+				
+				//StartCoroutine(SpawnPlayer());
+				//StartCoroutine(SpawnEnemy());
 
 				break;
             case TypeOfPlanet.meme:
@@ -307,23 +313,42 @@ public class LevelGeneratorLayered : MonoBehaviour
 
     #endregion
 
+	//[Server]
+	private void SetPlayerSpawnLocation()
+    {
+		RaycastHit2D playerSpawn = Physics2D.Raycast(new Vector2(UnityEngine.Random.Range(0, startPosition.x), height * 2), Vector2.down);
+
+		if (playerSpawn.collider.gameObject.CompareTag("TileMap"))
+		{
+			GameObject start = GameObject.Find("StartPosition");
+			start.transform.position = playerSpawn.point;
+			NetworkManager.RegisterStartPosition(start.transform);
+
+			GameObject drill = Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
+
+			NetworkServer.Spawn(drill);
+		}
+	}
 	private IEnumerator SpawnPlayer()
     {
 		bool playerSpawned = false;
 
 		yield return new WaitForSeconds(0.5f);
         
-			if(!playerSpawned)
-            {
-				RaycastHit2D playerSpawn = Physics2D.Raycast(new Vector2(UnityEngine.Random.Range(0, startPosition.x), height * 2), Vector2.down);
+		if(!playerSpawned)
+        {
+			RaycastHit2D playerSpawn = Physics2D.Raycast(new Vector2(UnityEngine.Random.Range(0, startPosition.x), height * 2), Vector2.down);
 
-				if(playerSpawn.collider.gameObject.CompareTag("TileMap"))
-                {
-					Instantiate(playerCharacter, playerSpawn.point, quaternion.identity);
-					Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
-					playerSpawned = true;
-				}
+			if(playerSpawn.collider.gameObject.CompareTag("TileMap"))
+            {
+				GameObject start = GameObject.Find("StartPosition");
+				start.transform.position = playerSpawn.point;
+				NetworkManager.RegisterStartPosition(start.transform);
+				Instantiate(playerCharacter, playerSpawn.point, quaternion.identity);
+				Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
+				playerSpawned = true;
 			}
+		}
         
 	}
 
@@ -573,12 +598,6 @@ public class LevelGeneratorLayered : MonoBehaviour
         {
 			MapFunctions.RenderMap(map, tilemap, tiles);
 		}
-		
-
-
-
-
-
 		//	StartCoroutine(MapFunctions.RenderMapWithDelay(map, tilemap, tiles[0], startPosition, addTiles));
 	}
 

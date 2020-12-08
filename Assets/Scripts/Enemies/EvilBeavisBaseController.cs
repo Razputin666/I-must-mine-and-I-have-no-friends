@@ -47,7 +47,6 @@ public class EvilBeavisBaseController : MonoBehaviour
                     blockType = tileMapManager.BlockTypeGet(blockInLocal, chunk);
                     if(blockType == "Ore")
                     {
-                        Debug.Log("FOUND ORE");
                         targetedOre.Add(new Vector3Int(x, y, 0));
                     }
                     

@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tiles:
   - {fileID: 11400000, guid: 6c7f547ab2fa0c64fbf5d04548be30f6, type: 2}
-  blockName: Coal Block
+  blockName: Coal Ore
   blockStrength: 2
   blockType: Ore
