@@ -26,6 +26,7 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
     [Tooltip("The settings of this chunk")]
     [SerializeField]
     public List<MapSettings> chunkSettings = new List<MapSettings>();
+    private List<int> chunkHeightOffset = new List<int>();
     private List<Tilemap> chunkList;
 
     public void GenerateGrassPlanetOverworldChunk(Tilemap tilemap)
@@ -310,8 +311,13 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
         if (firstChunkHasValue && secondChunkHasValue)
         {
             chunk.transform.position = new Vector3(transform.position.x, (firstChunkHeight + firstChunk.gameObject.transform.position.y) - Mathf.Abs(secondChunkHeight), 0);
-
+            chunkHeightOffset.Add((firstChunkHeight + (int)firstChunk.gameObject.transform.position.y) - Mathf.Abs(secondChunkHeight));
         }
 
+    }
+
+    public List<int> GetChunkHeightOffset
+    {
+        get { return chunkHeightOffset; }
     }
 }

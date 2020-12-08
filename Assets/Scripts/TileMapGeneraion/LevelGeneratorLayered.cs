@@ -51,6 +51,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 	[SerializeField] private int numberOfChunks;
 	[SerializeField] private GameObject worldWrappingTeleport;
 	[SerializeField] private GrassPlanetOverworldChunk grassOverWorldChunk;
+	[SerializeField] private GrassPlanetUnderworldChunk grassUnderWorldChunk;
 	[SerializeField] private GameObject playerCharacter;
 	[SerializeField] private GameObject drillLaser;
 	[SerializeField] private GameObject evilBeavis;
@@ -60,7 +61,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 	public float grassGrowthTimeToReach;
 	public Vector2Int startPosition;
 	private TypeOfPlanet typeOfPlanet { get;  set; }
-	int widthPosition;
+	private List<int> chunkHeightOffset;
 	private void Start()
 	{
 		typeOfPlanet = TypeOfPlanet.Earthlike;
@@ -78,13 +79,36 @@ public class LevelGeneratorLayered : MonoBehaviour
 				startPosition = new Vector2Int(0, (-height / 2));
 
 
-				for (int i = 0; i < numberOfChunks; i++)
+                for (int i = 0; i < numberOfChunks; i++)
+                {
+                    GameObject chunk = Instantiate(tileChunk, grid.transform);
+                    chunks.Add(chunk.GetComponent<Tilemap>());
+                    GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
+                    grassOverWorldChunk.GenerateGrassPlanetOverworldChunk(chunks[i]);
+                    chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
+                    startPosition.x += width - 1;
+                    chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
+
+                }
+				chunkHeightOffset = grassOverWorldChunk.GetChunkHeightOffset;
+				startPosition = new Vector2Int(0, 0);
+				startPosition.y = -height + 1;
+				Debug.Log(chunks.Count);
+				int overWorldChunks = chunks.Count;
+				int offset;
+				for (int i = overWorldChunks; i < numberOfChunks + overWorldChunks; i++)
 				{
+					
+					if (i - overWorldChunks != 0)
+					{
+						offset = i - overWorldChunks - 1;
+						startPosition.y = startPosition.y + chunkHeightOffset[offset];
+					}
 					GameObject chunk = Instantiate(tileChunk, grid.transform);
 					chunks.Add(chunk.GetComponent<Tilemap>());
 					GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
-					grassOverWorldChunk.GenerateGrassPlanetOverworldChunk(chunks[i]);
-					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
+					grassUnderWorldChunk.GenerateGrassPlanetUnderWorldChunk(chunks[i]);
+					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y + startPosition.y);
 					startPosition.x += width - 1;
 					chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
 

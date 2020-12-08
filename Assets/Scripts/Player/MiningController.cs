@@ -136,9 +136,9 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
         }
     }
 
-    private void DropItemFromBlock(Vector3Int blockPosition, string blockType, Tilemap tilemap)
+    private void DropItemFromBlock(Vector3Int blockPosition, string blockName, Tilemap tilemap)
     {
-        ItemObject itemObj = itemDatabase.GetItemOfName(blockType);
+        ItemObject itemObj = itemDatabase.GetItemOfName(blockName);
         if (itemObj != null)
         {
             ItemObject newItemObj = Instantiate(itemObj);
