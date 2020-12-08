@@ -17,6 +17,6 @@ MonoBehaviour:
   itemType: 8
   description: 
   data:
-    name: Stone Block
-    id: -1
+    name: Stone
+    id: 20
     amount: 1

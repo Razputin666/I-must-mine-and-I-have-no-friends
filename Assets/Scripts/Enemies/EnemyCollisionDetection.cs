@@ -6,6 +6,7 @@ public class EnemyCollisionDetection : MonoBehaviour
 {
 
     private EnemyController enemy;
+    
 
 
     private void Start()
@@ -44,6 +45,7 @@ public class EnemyCollisionDetection : MonoBehaviour
         }
 
     }
+   
 
     //private void OnTriggerEnter2D(Collider2D collision)
     //{

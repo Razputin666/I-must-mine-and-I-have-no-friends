@@ -98,6 +98,24 @@ public class MapFunctions
         }
     }
 
+    public static void RemoveExistingBlocks(int[,] map, Tilemap tilemap, Vector2Int offset)
+    {
+        for (int x = 0; x < map.GetUpperBound(0); x++)
+        {
+            for (int y = 0; y < map.GetUpperBound(1); y++)
+            {
+
+                if (x + 1 < map.GetUpperBound(0) && x - 1 >= 0 && y + 1 < map.GetUpperBound(1) && y - 1 >= 0)
+                {
+                    if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
+                    {
+                        tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                    }
+                }
+            }
+        }
+    }
+
     public static void RenderFeaturesWithOffset(int[,] map, Tilemap tilemap, TileBase[] tiles, Vector2Int offset, bool addTiles)
     {
 
@@ -119,6 +137,24 @@ public class MapFunctions
                     if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
                     {
                         tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void ChangeExistingBlocks(int[,] map, Tilemap tilemap, TileBase tile, Vector2Int offset)
+    {
+
+        for (int x = 0; x < map.GetUpperBound(0); x++)
+        {
+            for (int y = 0; y < map.GetUpperBound(1); y++)
+            {
+                if (x + 1 < map.GetUpperBound(0) && x - 1 >= 0 && y + 1 < map.GetUpperBound(1) && y - 1 >= 0)
+                {
+                    if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
+                    {
+                        tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tile);
                     }
                 }
             }

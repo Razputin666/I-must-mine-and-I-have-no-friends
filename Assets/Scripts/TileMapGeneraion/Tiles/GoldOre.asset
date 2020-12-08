@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcb72f5a6aac543479fbd3d4fcddea75, type: 3}
-  m_Name: GrassTile
+  m_Name: GoldOre
   m_EditorClassIdentifier: 
   tiles:
-  - {fileID: 11400000, guid: de19a2843a821bf408d85079724df125, type: 2}
-  blockType: Grass
-  blockStrength: 1
+  - {fileID: 11400000, guid: 417e14d843f47dc45940df80ff579a44, type: 2}
+  blockName: Gold Block
+  blockStrength: 2
+  blockType: Ore

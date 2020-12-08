@@ -16,20 +16,22 @@ public class GroundItem : MonoBehaviour, ISerializationCallbackReceiver
         if (pickupCooldown >= 0f)
             pickupCooldown -= Time.deltaTime;
     }
+
+    public void SetItemObject(ItemObject item, float cooldown = 2f)
+    {
+        this.item = item;
+        if (item != null)
+        {
+            pickupCooldown = cooldown;
+            GetComponentInChildren<SpriteRenderer>().sprite = item.UIDisplaySprite;
+        }
+    }
+
     public ItemObject Item
     {
         get 
         {
             return this.item;
-        }
-        set
-        {
-            this.item = value;
-            if(item != null)
-            {
-                pickupCooldown = 2f;
-                GetComponentInChildren<SpriteRenderer>().sprite = item.UIDisplaySprite;
-            }
         }
     }
 

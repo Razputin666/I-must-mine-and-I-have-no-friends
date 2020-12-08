@@ -344,6 +344,25 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    public InventoryObject GetInventoryObject
+    {
+        get { return itemHandler.Inventory; }
+    }
+
+    public float DistanceFromPlayerX
+    {
+        get { return distanceFromPlayerx; }
+
+        set { distanceFromPlayerx = value; }
+    }
+
+    public float DistanceFromPlayerY
+    {
+        get { return distanceFromPlayery; }
+
+        set { distanceFromPlayery = value; }
+    }
+    
     public int ActiveQuickslot
     {
         get

@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 679449955}
   m_Layer: 13
   m_Name: GroundItemObject
-  m_TagString: Untagged
+  m_TagString: GroundItem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -154,7 +154,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4102673868482130337}
   - component: {fileID: 6124364957804798876}
-  - component: {fileID: 883258249}
   m_Layer: 0
   m_Name: ItemSprite
   m_TagString: Untagged
@@ -232,29 +231,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &883258249
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5098719019020179616}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0.008419573, y: 0.0056124926}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 5.12, y: 5.12}
-    newSize: {x: 1.28, y: 1.28}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.0295793, y: 1.0878148}
-  m_EdgeRadius: 0

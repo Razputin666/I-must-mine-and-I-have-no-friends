@@ -32,6 +32,8 @@ public abstract class ItemObject : ScriptableObject
     protected string description;
     [SerializeField]
     protected Item data = new Item();
+    [SerializeField]
+    protected int maxStackSize;
 
     public Item CreateItem()
     {
@@ -74,5 +76,10 @@ public abstract class ItemObject : ScriptableObject
             return this.data;
         }
     }
+    public int MaxStackSize
+    {
+        get {return this.maxStackSize; }
+    }
+
     #endregion
 }

@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcb72f5a6aac543479fbd3d4fcddea75, type: 3}
-  m_Name: Plants
+  m_Name: CopperOre
   m_EditorClassIdentifier: 
   tiles:
-  - {fileID: 11400000, guid: 5a0a7bdf6e67e0e41a91d2f211690cef, type: 2}
-  blockType: Plant
-  blockStrength: 1
+  - {fileID: 11400000, guid: f7aaaa40707a37a4bbcfc69e94f9bf45, type: 2}
+  blockName: Copper Block
+  blockStrength: 2
+  blockType: Ore

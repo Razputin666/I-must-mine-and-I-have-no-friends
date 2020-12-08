@@ -9,7 +9,7 @@ public class EnemyStatesController : MonoBehaviour
     private EnemyController enemy;
     private MiningController miningMode;
     private TileMapChecker tileMapChecker;
-    private Tilemap targetedBlock;
+    private Tilemap targetedChunk;
 
 
     Vector3Int[] blockPositions;
@@ -21,7 +21,7 @@ public class EnemyStatesController : MonoBehaviour
         tileMapChecker = GetComponentInChildren<TileMapChecker>();
         miningMode = GetComponentInChildren<FacePlayer>().GetComponentInChildren<MiningController>();
         GameObject tileMapAtStart = GameObject.FindGameObjectWithTag("TileMap");
-        TargetedBlock = tileMapAtStart.GetComponent<Tilemap>();
+        TargetedChunk = tileMapAtStart.GetComponent<Tilemap>();
     }
 
     // Update is called once per frame
@@ -33,76 +33,88 @@ public class EnemyStatesController : MonoBehaviour
 
                 
 
-                Vector3 temp = enemy.player.transform.position - transform.position;
+                Vector3 distanceToTarget = enemy.player.transform.position - transform.position;
 
-                if (temp.x > 0)
+
+                if (distanceToTarget.x > 0)
                 {
-                    temp.x = 1;
+                    distanceToTarget.x = 1;
                 }
-                else if(temp.x < 0)
+                else if(distanceToTarget.x < 0)
                 {
-                    temp.x = -1;
+                    distanceToTarget.x = -1;
                 }
-                if(temp.y > 0)
+                if(distanceToTarget.y > 0)
                 {
-                    temp.y = 1;
+                    distanceToTarget.y = 1;
                 }
-                else if (temp.y < 0)
+                else if (distanceToTarget.y < 0)
                 {
-                    temp.y = -1;
+                    distanceToTarget.y = -1;
                 }
 
+               
                 
-                targetBlockIntPos.z = 0;
                 Vector3Int enemyIntPos = Vector3Int.FloorToInt(transform.position);
-                targetBlockIntPos = Vector3Int.FloorToInt(transform.position + temp);
+                targetBlockIntPos = enemyIntPos + new Vector3Int ((int)distanceToTarget.x, (int)distanceToTarget.y, 0);
+                targetBlockIntPos.z = 0;
                 Vector3Int distanceFromEnemy = targetBlockIntPos - enemyIntPos;
-               // TargetedBlock = tileMapChecker.currentTilemap;
 
+                Tilemap chunk = miningMode.GetChunk(targetBlockIntPos);
 
-                if(!TargetedBlock.HasTile(targetBlockIntPos))
+                bool foundBlock = false;
+                if (chunk == null)
                 {
-                    bool foundBlock = false;
-
-                    for (int j = 1; j <= 2 && !foundBlock; j++)
+                    for (int j = 1; j <= 2 && foundBlock == false; j++)
                     {
-                        Vector3Int[] newBlockPos = GetNextBlocks(temp, j);
-
-
+                        Vector3Int[] newBlockPos = GetNextBlocks(distanceToTarget, j);
                         for (int i = 0; i < newBlockPos.Length; i++)
                         {
-                            if (targetedBlock.HasTile(newBlockPos[i]))
+                            
+                            chunk = miningMode.GetChunk(newBlockPos[i]);
+                            if (chunk != null && chunk.HasTile(chunk.WorldToCell(newBlockPos[i])))
                             {
                                 targetBlockIntPos = newBlockPos[i];
                                 foundBlock = true;
+                                
                                 break;
                             }
                         }
                     }
+                }
+               else if(chunk.HasTile(targetBlockIntPos))
+               {
+                    foundBlock = true;
+                    
+               }
+               else
+               {
+                    for (int j = 1; j <= 2 && foundBlock == false; j++)
+                    {
+                        Vector3Int[] newBlockPos = GetNextBlocks(distanceToTarget, j);
+                        for (int i = 0; i < newBlockPos.Length; i++)
+                        {
 
+                            chunk = miningMode.GetChunk(newBlockPos[i]);
+                            if (chunk != null && chunk.HasTile(chunk.WorldToCell(newBlockPos[i])))
+                            {
+                                targetBlockIntPos = newBlockPos[i];
+                                foundBlock = true;
 
+                                break;
+                            }
+                        }
+                    }
                 }
 
-                if (distanceFromEnemy.x > -5 && distanceFromEnemy.x < 5 && distanceFromEnemy.y > -5 && distanceFromEnemy.y < 5)
+                if(!foundBlock)
+                {
+                    return;
+                }
+
+                if (distanceFromEnemy.x > -10 && distanceFromEnemy.x < 10 && distanceFromEnemy.y > -10 && distanceFromEnemy.y < 10)
                 {
                     miningMode.Mine(targetBlockIntPos, enemy.miningStrength);
-                    //for (int i = 1; i <= 5; i++)
-                    //{
-                    //    Vector3Int[] lookingForPlayer = GetNextBlocks(temp, i);
-                    //    for (int j = 0; j < lookingForPlayer.Length; j++)
-                    //    {
-                    //        if (targetedBlock.HasTile(lookingForPlayer[j]))
-                    //        {
-                    //            break;
-                    //        }
-
-                    //        else if (!targetedBlock.HasTile(lookingForPlayer[j]) && Vector3Int.FloorToInt(enemy.player.transform.position) == lookingForPlayer[j])
-                    //        {
-                    //            Debug.Log("sees player");
-                    //            enemy.SetAggressiveMode();
-                    //        }
-                    //    }
-                    //}
                 }
 
                 break;
@@ -113,26 +125,26 @@ public class EnemyStatesController : MonoBehaviour
         }
     }
 
-    public Tilemap TargetedBlock
+    public Tilemap TargetedChunk
     {
         get
         {
-            return targetedBlock;
+            return targetedChunk;
 
         }
 
         set
         {
-            targetedBlock = value;
+            targetedChunk = value;
         }
     }
 
     #region NextBlockGetter
-    private Vector3Int[] GetNextBlocks(Vector3 temp, int blocksOut)
+    private Vector3Int[] GetNextBlocks(Vector3 distanceToTarget, int blocksOut)
     {
         Vector3Int[] newBlockPos = new Vector3Int[8];
 
-        if(temp.x > 0 && temp.y > 0)
+        if(distanceToTarget.x > 0 && distanceToTarget.y > 0)
         {
             newBlockPos[0] = new Vector3Int(targetBlockIntPos.x + blocksOut, targetBlockIntPos.y + blocksOut, 0); // topright
             newBlockPos[1] = new Vector3Int(targetBlockIntPos.x, targetBlockIntPos.y + blocksOut, 0);// up
@@ -144,7 +156,7 @@ public class EnemyStatesController : MonoBehaviour
             newBlockPos[7] = new Vector3Int(targetBlockIntPos.x - blocksOut, targetBlockIntPos.y - blocksOut, 0); //bottomleft
         }
 
-        else if(temp.x > 0 && temp.y <= 0)
+        else if(distanceToTarget.x > 0 && distanceToTarget.y <= 0)
         {
             newBlockPos[0] = new Vector3Int(targetBlockIntPos.x + blocksOut, targetBlockIntPos.y - blocksOut, 0);//bottomright
             newBlockPos[1] = new Vector3Int(targetBlockIntPos.x, targetBlockIntPos.y - blocksOut, 0);// down
@@ -156,7 +168,7 @@ public class EnemyStatesController : MonoBehaviour
             newBlockPos[7] = new Vector3Int(targetBlockIntPos.x - blocksOut, targetBlockIntPos.y + blocksOut, 0);//topleft
         }
 
-        else if(temp.x <= 0 && temp.y <= 0)
+        else if(distanceToTarget.x <= 0 && distanceToTarget.y <= 0)
         {
             newBlockPos[0] = new Vector3Int(targetBlockIntPos.x - blocksOut, targetBlockIntPos.y - blocksOut, 0); //bottomleft
             newBlockPos[1] = new Vector3Int(targetBlockIntPos.x, targetBlockIntPos.y - blocksOut, 0);// down
@@ -168,7 +180,7 @@ public class EnemyStatesController : MonoBehaviour
             newBlockPos[7] = new Vector3Int(targetBlockIntPos.x + blocksOut, targetBlockIntPos.y + blocksOut, 0); // topright
         }
 
-        else if(temp.x <= 0 && temp.y > 0)
+        else if(distanceToTarget.x <= 0 && distanceToTarget.y > 0)
         {
             newBlockPos[0] = new Vector3Int(targetBlockIntPos.x - blocksOut, targetBlockIntPos.y + blocksOut, 0);//topleft
             newBlockPos[1] = new Vector3Int(targetBlockIntPos.x - blocksOut, targetBlockIntPos.y, 0);// left
@@ -183,7 +195,7 @@ public class EnemyStatesController : MonoBehaviour
         else
 
         {
-            if (temp.x > 0)
+            if (distanceToTarget.x > 0)
             {
                 newBlockPos[0] = new Vector3Int(targetBlockIntPos.x + blocksOut, targetBlockIntPos.y, 0);// right
                 newBlockPos[1] = new Vector3Int(targetBlockIntPos.x + blocksOut, targetBlockIntPos.y + blocksOut, 0); // topright
@@ -195,7 +207,7 @@ public class EnemyStatesController : MonoBehaviour
                 newBlockPos[7] = new Vector3Int(targetBlockIntPos.x - blocksOut, targetBlockIntPos.y - blocksOut, 0); //bottomleft
             }
 
-            else if (temp.x <= 0)
+            else if (distanceToTarget.x <= 0)
             {
                 newBlockPos[0] = new Vector3Int(targetBlockIntPos.x - blocksOut, targetBlockIntPos.y, 0);// left
                 newBlockPos[1] = new Vector3Int(targetBlockIntPos.x - blocksOut, targetBlockIntPos.y + blocksOut, 0);//topleft
@@ -207,7 +219,7 @@ public class EnemyStatesController : MonoBehaviour
                 newBlockPos[7] = new Vector3Int(targetBlockIntPos.x + blocksOut, targetBlockIntPos.y - blocksOut, 0);//bottomright
             }
 
-            if (temp.y > 0)
+            if (distanceToTarget.y > 0)
             {
                 newBlockPos[0] = new Vector3Int(targetBlockIntPos.x, targetBlockIntPos.y + blocksOut, 0);// up
                 newBlockPos[1] = new Vector3Int(targetBlockIntPos.x + blocksOut, targetBlockIntPos.y + blocksOut, 0); // topright
@@ -219,7 +231,7 @@ public class EnemyStatesController : MonoBehaviour
                 newBlockPos[7] = new Vector3Int(targetBlockIntPos.x, targetBlockIntPos.y - blocksOut, 0);// down
             }
 
-            else if (temp.y <= 0)
+            else if (distanceToTarget.y <= 0)
             {
                 newBlockPos[0] = new Vector3Int(targetBlockIntPos.x, targetBlockIntPos.y - blocksOut, 0);// down
                 newBlockPos[1] = new Vector3Int(targetBlockIntPos.x + blocksOut, targetBlockIntPos.y - blocksOut, 0);//bottomright

@@ -5,17 +5,17 @@ using Mirror;
 
 public class SpawnManager : NetworkBehaviour
 {
-    public static void SpawnItemAt(Vector3 spawnPos, ItemObject item)
-    {
-        spawnPos.z = 0;
-        GameObject parentObject = GameObject.Find("ItemSpawner");
-        GameObject groundItemPrefab = Resources.Load<GameObject>("Prefabs/GroundItemObject") as GameObject;
-        GameObject groundObject = Instantiate(groundItemPrefab, spawnPos + Vector3.up, Quaternion.identity, parentObject.transform);
+    //public static void SpawnItemAt(Vector3 spawnPos, ItemObject item)
+    //{
+    //    spawnPos.z = 0;
+    //    GameObject parentObject = GameObject.Find("ItemSpawner");
+    //    GameObject groundItemPrefab = Resources.Load<GameObject>("Prefabs/GroundItemObject") as GameObject;
+    //    GameObject groundObject = Instantiate(groundItemPrefab, spawnPos + Vector3.up, Quaternion.identity, parentObject.transform);
 
-        GroundItem gItem = groundObject.GetComponent<GroundItem>();
-        gItem.Item = item;
-        NetworkServer.Spawn(groundObject);
-    }
+    //    GroundItem gItem = groundObject.GetComponent<GroundItem>();
+    //    gItem.Item = item;
+    //    NetworkServer.Spawn(groundObject);
+    //}
 
     [Command(ignoreAuthority = true)]
     public void CmdSpawnItemAt(Vector3 spawnPos, int itemID, int itemAmount)
@@ -31,7 +31,7 @@ public class SpawnManager : NetworkBehaviour
         GameObject groundObject = Instantiate(groundItemPrefab, spawnPos + Vector3.up, Quaternion.identity, parentObject.transform);
 
         GroundItem gItem = groundObject.GetComponent<GroundItem>();
-        gItem.Item = item;
+        gItem.SetItemObject(item, 0f);
         NetworkServer.Spawn(groundObject);
     }
 

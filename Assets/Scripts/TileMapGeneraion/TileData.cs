@@ -8,9 +8,9 @@ public class TileData : ScriptableObject
 {
     public TileBase[] tiles;
 
-    public string blockType;
+    public string blockName;
 
     public float blockStrength;
- 
 
+    public string blockType;
 }

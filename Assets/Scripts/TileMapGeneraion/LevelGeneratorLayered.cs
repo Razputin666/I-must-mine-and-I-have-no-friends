@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Unity.Mathematics;
-using Mirror;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-public class LevelGeneratorLayered : NetworkBehaviour
+public enum TypeOfPlanet
+{
+	Earthlike, meme
+}
+
+public class LevelGeneratorLayered : MonoBehaviour
 {
 	[Tooltip("The Tilemap to draw onto")]
 	//[SerializeField]
@@ -18,7 +22,7 @@ public class LevelGeneratorLayered : NetworkBehaviour
 	private GameObject tileChunk;
 	[Tooltip("The Tile to draw (use a RuleTile for best results)")]
 	[SerializeField]
-	private TileBase[] tiles;
+	public TileBase[] tiles;
 
 	[Tooltip("Width of our map")]
 	[SerializeField]
@@ -47,38 +51,85 @@ public class LevelGeneratorLayered : NetworkBehaviour
 	[SerializeField] private int numberOfChunks;
 	[SerializeField] private GameObject worldWrappingTeleport;
 	[SerializeField] private GrassPlanetOverworldChunk grassOverWorldChunk;
+	[SerializeField] private GrassPlanetUnderworldChunk grassUnderWorldChunk;
 	[SerializeField] private GameObject playerCharacter;
+	[SerializeField] private GameObject drillLaser;
+	[SerializeField] private GameObject evilBeavis;
+	[SerializeField] private GameObject evilBeavisBase;
 	public List<Tilemap> chunks = new List<Tilemap>();
 
 	public float grassGrowthTimeToReach;
 	public Vector2Int startPosition;
-	int widthPosition;
+	private TypeOfPlanet typeOfPlanet { get;  set; }
+	private List<int> chunkHeightOffset;
 	private void Start()
 	{
-		ClearMap();
-		GameObject grid = GameObject.Find("Grid");
-		startPosition = new Vector2Int(0, (-height / 2));
-
-		for (int i = 0; i < numberOfChunks; i++)
-        {
-		    GameObject chunk = Instantiate(tileChunk, grid.transform);
-			chunks.Add(chunk.GetComponent<Tilemap>());
-			GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
-			grassOverWorldChunk.GenerateGrassPlanetOverworldChunk(chunks[i]);
-			chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
-			startPosition.x +=width - 1;
-			chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
-
-		}
-
-		Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
-		Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
-		//StartCoroutine(GenerateTrees());
-
-		StartCoroutine(SpawnPlayer());
+		typeOfPlanet = TypeOfPlanet.Earthlike;
+		WorldGeneration();
 
 	}
 
+	private void WorldGeneration()
+    {
+        switch (typeOfPlanet)
+        {
+            case TypeOfPlanet.Earthlike:
+				ClearMap();
+				GameObject grid = GameObject.Find("Grid");
+				startPosition = new Vector2Int(0, (-height / 2));
+
+
+                for (int i = 0; i < numberOfChunks; i++)
+                {
+                    GameObject chunk = Instantiate(tileChunk, grid.transform);
+                    chunks.Add(chunk.GetComponent<Tilemap>());
+                    GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
+                    grassOverWorldChunk.GenerateGrassPlanetOverworldChunk(chunks[i]);
+                    chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
+                    startPosition.x += width - 1;
+                    chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
+
+                }
+				chunkHeightOffset = grassOverWorldChunk.GetChunkHeightOffset;
+				startPosition = new Vector2Int(0, 0);
+				startPosition.y = -height + 1;
+				Debug.Log(chunks.Count);
+				int overWorldChunks = chunks.Count;
+				int offset;
+				for (int i = overWorldChunks; i < numberOfChunks + overWorldChunks; i++)
+				{
+					
+					if (i - overWorldChunks != 0)
+					{
+						offset = i - overWorldChunks - 1;
+						startPosition.y = startPosition.y + chunkHeightOffset[offset];
+					}
+					GameObject chunk = Instantiate(tileChunk, grid.transform);
+					chunks.Add(chunk.GetComponent<Tilemap>());
+					GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
+					grassUnderWorldChunk.GenerateGrassPlanetUnderWorldChunk(chunks[i]);
+					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y + startPosition.y);
+					startPosition.x += width - 1;
+					chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
+
+				}
+
+				Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
+				Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
+				//StartCoroutine(GenerateTrees());
+
+				StartCoroutine(SpawnPlayer());
+				StartCoroutine(SpawnEnemy());
+
+				break;
+            case TypeOfPlanet.meme:
+                break;
+            default:
+                break;
+        }
+
+        
+	}
 
     #region
     void CreateFeatures(MapSettings mapSettings, MapSettings otherSettings, Tilemap tilemap)
@@ -262,21 +313,38 @@ public class LevelGeneratorLayered : NetworkBehaviour
 
 		yield return new WaitForSeconds(0.5f);
         
-		if(!playerSpawned)
-        {
-			RaycastHit2D playerSpawn = Physics2D.Raycast(new Vector2(UnityEngine.Random.Range(0, startPosition.x), height * 2), Vector2.down);
-
-			if(playerSpawn.collider.gameObject.CompareTag("TileMap"))
+			if(!playerSpawned)
             {
-				GameObject start = GameObject.Find("StartPosition");
-				start.transform.position = playerSpawn.point;
-				NetworkManager.RegisterStartPosition(start.transform);
-					
-				//Instantiate(playerCharacter, playerSpawn.point, quaternion.identity);
-				playerSpawned = true;
+				RaycastHit2D playerSpawn = Physics2D.Raycast(new Vector2(UnityEngine.Random.Range(0, startPosition.x), height * 2), Vector2.down);
+
+				if(playerSpawn.collider.gameObject.CompareTag("TileMap"))
+                {
+					Instantiate(playerCharacter, playerSpawn.point, quaternion.identity);
+					Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
+					playerSpawned = true;
+				}
+			}
+        
+	}
+
+	private IEnumerator SpawnEnemy()
+	{
+		bool enemySpawned = false;
+
+		yield return new WaitForSeconds(0.8f);
+
+		if (!enemySpawned)
+		{
+			RaycastHit2D enemySpawn = Physics2D.Raycast(new Vector2(UnityEngine.Random.Range(0, startPosition.x), height * 2), Vector2.down);
+
+			if (enemySpawn.collider.gameObject.CompareTag("TileMap"))
+			{
+				Instantiate(evilBeavisBase, new Vector3(enemySpawn.point.x, enemySpawn.point.y), quaternion.identity);
+				Instantiate(evilBeavis, new Vector3(enemySpawn.point.x, enemySpawn.point.y + 10), quaternion.identity);
+				enemySpawned = true;
 			}
 		}
-        
+
 	}
 
 	private IEnumerator GenerateTrees()
@@ -291,9 +359,12 @@ public class LevelGeneratorLayered : NetworkBehaviour
 			Debug.Log("TreeSpawned");
 			if (treeSpawn.collider.gameObject.CompareTag("TileMap"))
 			{
+
 				treeSpawn.collider.gameObject.GetComponent<Tilemap>().SetTile(treeSpawn.collider.gameObject.GetComponent<Tilemap>().WorldToCell(treeSpawn.point), tiles[3]);
+
 			}
 		}	
+
 	}
 
 	[ExecuteInEditMode]

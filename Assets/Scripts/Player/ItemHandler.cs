@@ -155,20 +155,33 @@ public class ItemHandler : NetworkBehaviour
         NetworkServer.Destroy(obj);
     }
 
-    [Client]
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        GroundItem groundItem = other.GetComponentInParent<GroundItem>();
-        if(groundItem != null && groundItem.PickupTime <= 1f)
-        {
-            Item newItem = new Item(groundItem.Item);
-            if (inventory.AddItem(newItem, newItem.Amount))
-            {
-                CmdRemoveGroundItem(other.transform.parent.gameObject);
-            }           
-        }
-    }
-    [Client]
+    // [Client]
+    // private void OnTriggerEnter2D(Collider2D other)
+    // {
+    //     GroundItem groundItem = other.GetComponentInParent<GroundItem>();
+    //     if(groundItem != null && groundItem.PickupTime <= 1f)
+    //     {
+    //         Item newItem = new Item(groundItem.Item);
+    //         if (inventory.AddItem(newItem, newItem.Amount))
+    //         {
+    //             CmdRemoveGroundItem(other.transform.parent.gameObject);
+    //         }           
+    //     }
+    // }
+    //[Client]
+    //public void OnTriggerEnter2D(Collider2D other)
+    //{
+    //    GroundItem groundItem = other.GetComponentInParent<GroundItem>();
+    //    if (groundItem != null && groundItem.PickupTime <= 0f)
+    //    {
+    //        Item newItem = new Item(groundItem.Item);
+    //        if (inventory.AddItem(newItem, newItem.Amount))
+    //        {
+    //            Destroy(other.transform.parent.gameObject);
+    //        }
+    //    }
+    //}
+
     private void Update()
     {
         if (!isLocalPlayer)

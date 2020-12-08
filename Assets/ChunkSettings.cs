@@ -22,10 +22,10 @@ public class ChunkSettings : MonoBehaviour
     {
         mapGen = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
         width = (int)gameObject.transform.position.x + mapGen.width;
-        height = mapGen.height;
+        height = (int)gameObject.transform.position.y + mapGen.height;
         tileChunk = GetComponent<Tilemap>();
         TreeGrowth();
-        
+        Debug.Log(width + " width " + height + " height");
 
         StartCoroutine(GrassGrowth());
 

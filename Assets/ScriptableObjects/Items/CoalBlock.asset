@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: CoalBlock
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300000, guid: 89412b662eb8cf94fb02f32ee99a0a5f, type: 3}
-  stackable: 0
+  stackable: 1
   itemType: 8
   description: 
   data:
     name: Coal Block
-    id: -1
+    id: 5
     amount: 1
+  maxStackSize: 0

@@ -37,29 +37,41 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
 
         if (itemDatabase == null)
             itemDatabase = GetComponent<ItemDatabaseObject>();
+
+        tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
     }
 
+    public Tilemap GetChunk(Vector3Int targetedBlock)
+    {
+        RaycastHit2D chunkCheck = Physics2D.Linecast(Vector2Int.FloorToInt(transform.position), new Vector2(targetedBlock.x, targetedBlock.y));
+        if (chunkCheck.collider != null && chunkCheck.collider.gameObject.CompareTag("TileMap"))
+        {
+            chunk = chunkCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
+            return chunk;
+        }
+        else
+        {
+
+        }
+            return null;
+    }
 
     public void Mine(Vector3Int blockToMine, float miningStr)
     {
         if(!coolDownSystem.IsOnCoolDown(id))
         {
-            RaycastHit2D chunkCheck = Physics2D.Linecast(transform.position, new Vector2(blockToMine.x, blockToMine.y));
-            if(chunkCheck.collider != null && chunkCheck.collider.gameObject.CompareTag("TileMap"))
+
+            GetChunk(blockToMine);
+            if(chunk == null)
             {
-                chunk = chunkCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
-            }
-
-            if (chunk == null)
                 return;
-
+            }
             Vector3Int blockInLocal = chunk.WorldToCell(blockToMine);
             float blockStr = 0;
-            string blockType = tileMapManager.BlockTypeGet(new Vector3Int(blockInLocal.x, blockInLocal.y, 0), chunk);
+            string blockName = tileMapManager.BlockNameGet(new Vector3Int(blockInLocal.x, blockInLocal.y, 0), chunk);
 
             if (!blockChecker.TryGetValue(blockInLocal, out blockStr))
             {
-                
                 blockStr = tileMapManager.BlockStrengthGet(blockInLocal, chunk);
                 if(blockStr >= 0)
                 {
@@ -75,8 +87,10 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
             }
             if (blockStr <= 0)
             {
+                //Debug.Log(blockInLocal + " position is " + blockType);
                 
-                CheckBlockRules(blockInLocal, blockType, chunk);
+                DropItemFromBlock(blockInLocal, blockName, chunk);
+                CheckBlockRules(blockInLocal, blockName, chunk);
                 chunk.SetTile(blockInLocal, null);
                 blockChecker.Remove(blockInLocal);
                 coolDownSystem.PutOnCoolDown(this);
@@ -85,46 +99,61 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
         }
     }
 
-    private void CheckBlockRules(Vector3Int blockPosition, string blockType, Tilemap chunkThis)
+    private void CheckBlockRules(Vector3Int blockPosition, string blockName, Tilemap chunkThis)
     {
-        switch (blockType)
+        switch (blockName)
         {
             case "Dirt":
                 //Debug.Log("DIRT!");
-                ItemObject itemObj = itemDatabase.GetItemAt(3);
-                if (itemObj != null)
-                {
-                    ItemObject newItemObj = Instantiate(itemObj);
-                    spawnManager.CmdSpawnItemAt(chunkThis.CellToWorld(blockPosition), itemObj.Data.ID, itemObj.Data.Amount);
-                }
+                //ItemObject itemObj = itemDatabase.GetItemAt(3);
+                //if (itemObj != null)
+                //{
+                //    ItemObject newItemObj = Instantiate(itemObj);
+                //    spawnManager.CmdSpawnItemAt(chunkThis.CellToWorld(blockPosition), itemObj.Data.ID, itemObj.Data.Amount);
+                //}
                 break;
             case "Grass":
                 
                 if (chunkThis.HasTile(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0)))
                 {
-                    string upperBlockType = tileMapManager.BlockTypeGet(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), chunkThis);
+                    string upperBlockType = tileMapManager.BlockNameGet(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), chunkThis);
                     if(upperBlockType == "Plant")
                     chunkThis.SetTile(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), null);
+                    
                     //Drop block here
                 }
                 break;
 
             case "Tree":
                 List<String> upperBlocks = new List<string>();
-                
-                for (int y = 0; y < 15; y++)
+                bool isTree = true;
+                for (int y = 0; y < 50 && isTree; y++)
                 {
-                    upperBlocks.Add(tileMapManager.BlockTypeGet(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), chunkThis));
+                    upperBlocks.Add(tileMapManager.BlockNameGet(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), chunkThis));
                     if (upperBlocks[y] == "Tree")
                     {
                         chunkThis.SetTile(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), null);
+                        DropItemFromBlock(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), blockName, chunkThis);
                     }
+                    else
+                        isTree = false;
                 }
                 upperBlocks.Clear();
                 break;
         }
     }
 
+    private void DropItemFromBlock(Vector3Int blockPosition, string blockName, Tilemap tilemap)
+    {
+        ItemObject itemObj = itemDatabase.GetItemOfName(blockName);
+        if (itemObj != null)
+        {
+            ItemObject newItemObj = Instantiate(itemObj);
+            //SpawnManager.SpawnItemAt(tilemap.CellToWorld(blockPosition), newItemObj);
+            spawnManager.CmdSpawnItemAt(tilemap.CellToWorld(blockPosition), itemObj.Data.ID, itemObj.Data.Amount);
+        }
+    }
+    
     public int Id => id;
 
     public float CoolDownDuration => coolDownDuration;
