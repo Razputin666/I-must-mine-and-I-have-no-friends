@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d65b42a5bf76d540bf7dd38f50e9469, type: 3}
-  m_Name: StoneBlock
+  m_Script: {fileID: 11500000, guid: b803ab4e97863de489903733e52deac2, type: 3}
+  m_Name: EnergyBaton
   m_EditorClassIdentifier: 
-  uiDisplaySprite: {fileID: 21300000, guid: 212046d11af4df847b97bf65df7204a9, type: 3}
-  stackable: 1
-  itemType: 8
+  uiDisplaySprite: {fileID: 21300000, guid: c11b7d2f21463f348885ed2aa981e8e2, type: 3}
+  stackable: 0
+  itemType: 9
   description: 
   data:
-    name: Stone Block
-    id: 13
+    name: Energy Baton
+    id: -1
     amount: 1

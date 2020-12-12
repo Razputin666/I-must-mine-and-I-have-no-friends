@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1d65b42a5bf76d540bf7dd38f50e9469, type: 3}
-  m_Name: StoneBlock
+  m_Name: SandBlock
   m_EditorClassIdentifier: 
-  uiDisplaySprite: {fileID: 21300000, guid: 212046d11af4df847b97bf65df7204a9, type: 3}
+  uiDisplaySprite: {fileID: 21300000, guid: 4f59e42ca3d128247a1110e01201c2c3, type: 3}
   stackable: 1
   itemType: 8
   description: 
   data:
-    name: Stone Block
-    id: 13
+    name: Sand Block
+    id: -1
     amount: 1
