@@ -18,5 +18,7 @@ MonoBehaviour:
   description: 
   data:
     name: Copper Ore
-    id: -1
+    id: 8
     amount: 1
+    type: Ore
+  maxStackSize: 0

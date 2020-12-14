@@ -23,6 +23,8 @@ public class EnemyCollisionDetection : MonoBehaviour
         {
             enemy.enemyHP -= collision.collider.GetComponent<Bullet>().projectileStrength;
         }
+        
+
         if (collision.collider.CompareTag("Enemy"))
         {
             EnemyController ally = collision.collider.gameObject.GetComponentInParent<EnemyController>();

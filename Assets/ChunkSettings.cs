@@ -25,7 +25,6 @@ public class ChunkSettings : MonoBehaviour
         height = (int)gameObject.transform.position.y + mapGen.height;
         tileChunk = GetComponent<Tilemap>();
         TreeGrowth();
-        Debug.Log(width + " width " + height + " height");
 
         StartCoroutine(GrassGrowth());
 

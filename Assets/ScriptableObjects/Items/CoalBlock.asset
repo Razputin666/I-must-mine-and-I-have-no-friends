@@ -20,4 +20,5 @@ MonoBehaviour:
     name: Coal Block
     id: 5
     amount: 1
+    type: Ore
   maxStackSize: 0

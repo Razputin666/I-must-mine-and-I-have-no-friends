@@ -9,6 +9,8 @@ public class Item
     private int id = -1;
     [SerializeField]
     private int amount;
+    [SerializeField]
+    private string type;
     //public ItemBuff[] buffs;
     private ItemObject itemObject;
     public Item()
@@ -16,13 +18,15 @@ public class Item
         name = "";
         id = -1;
         amount = 0;
+        type = "";
         itemObject = null;
     }
     public Item(ItemObject item)
     {
         itemObject = item;
-        name = item.name;
+        name = item.Data.Name;
         id = item.Data.id;
+        type = item.Data.type;
         amount = item.Data.amount;
         //buffs = new ItemBuff[item.buffs.Length];
         //for(int i = 0; i < buffs.Length; i++)
@@ -36,6 +40,13 @@ public class Item
         get
         {
             return this.name;
+        }
+    }
+    public string Type
+    {
+        get
+        {
+            return this.type;
         }
     }
 

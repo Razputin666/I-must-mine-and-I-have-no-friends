@@ -20,3 +20,5 @@ MonoBehaviour:
     name: Gold Ore
     id: -1
     amount: 0
+    type: Ore
+  maxStackSize: 0

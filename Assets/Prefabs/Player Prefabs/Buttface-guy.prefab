@@ -217,7 +217,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemDatabase: {fileID: 11400000, guid: 0479499c299ce264c916f647df531e9a, type: 2}
   id: 2
-  coolDownDuration: 0.5
+  coolDownDuration: 0.01
   coolDownSystem: {fileID: 658734927}
   points: []
   tileMapManager: {fileID: 0}
@@ -474,6 +474,7 @@ GameObject:
   - component: {fileID: 658734927}
   - component: {fileID: 1800691689235569727}
   - component: {fileID: 175909222}
+  - component: {fileID: 2220654408671283079}
   m_Layer: 0
   m_Name: Buttface-guy
   m_TagString: Player
@@ -490,7 +491,7 @@ Transform:
   m_GameObject: {fileID: 8181247841218053072}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 166.0413, y: 287.79117, z: 0}
-  m_LocalScale: {x: 5, y: 3, z: 1}
+  m_LocalScale: {x: 8, y: 3, z: 1}
   m_Children:
   - {fileID: 8181247841502162096}
   - {fileID: 9142298629270204090}
@@ -606,7 +607,7 @@ CapsuleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8181247841218053072}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -670,6 +671,32 @@ MonoBehaviour:
   inventory: {fileID: 11400000, guid: 74f6aef5271999548b36c1d127af90f2, type: 2}
   equipment: {fileID: 11400000, guid: 38df84b87fcb50d4bb42ec3aba0baf9e, type: 2}
   quickSlots: {fileID: 11400000, guid: c4298cff35f68a7429860ecf2be26d16, type: 2}
+--- !u!61 &2220654408671283079
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8181247841218053072}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.28, y: 1.28}
+    newSize: {x: 1.28, y: 1.28}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.25, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &8181247841502162097
 GameObject:
   m_ObjectHideFlags: 0

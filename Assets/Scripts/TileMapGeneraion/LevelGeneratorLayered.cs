@@ -56,6 +56,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 	[SerializeField] private GameObject drillLaser;
 	[SerializeField] private GameObject evilBeavis;
 	[SerializeField] private GameObject evilBeavisBase;
+	[SerializeField] private PathfindingSettings pathfindingSettings;
 	public List<Tilemap> chunks = new List<Tilemap>();
 
 	public float grassGrowthTimeToReach;
@@ -93,12 +94,10 @@ public class LevelGeneratorLayered : MonoBehaviour
 				chunkHeightOffset = grassOverWorldChunk.GetChunkHeightOffset;
 				startPosition = new Vector2Int(0, 0);
 				startPosition.y = -height + 1;
-				Debug.Log(chunks.Count);
 				int overWorldChunks = chunks.Count;
 				int offset;
 				for (int i = overWorldChunks; i < numberOfChunks + overWorldChunks; i++)
 				{
-					
 					if (i - overWorldChunks != 0)
 					{
 						offset = i - overWorldChunks - 1;
@@ -118,8 +117,9 @@ public class LevelGeneratorLayered : MonoBehaviour
 				Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
 				//StartCoroutine(GenerateTrees());
 
-				StartCoroutine(SpawnPlayer());
-				StartCoroutine(SpawnEnemy());
+				//StartCoroutine(SpawnPlayer());
+				pathfindingSettings.prank();
+				StartCoroutine(SpawnEnemyBase());
 
 				break;
             case TypeOfPlanet.meme:
@@ -327,7 +327,7 @@ public class LevelGeneratorLayered : MonoBehaviour
         
 	}
 
-	private IEnumerator SpawnEnemy()
+	private IEnumerator SpawnEnemyBase()
 	{
 		bool enemySpawned = false;
 
@@ -340,7 +340,6 @@ public class LevelGeneratorLayered : MonoBehaviour
 			if (enemySpawn.collider.gameObject.CompareTag("TileMap"))
 			{
 				Instantiate(evilBeavisBase, new Vector3(enemySpawn.point.x, enemySpawn.point.y), quaternion.identity);
-				Instantiate(evilBeavis, new Vector3(enemySpawn.point.x, enemySpawn.point.y + 10), quaternion.identity);
 				enemySpawned = true;
 			}
 		}

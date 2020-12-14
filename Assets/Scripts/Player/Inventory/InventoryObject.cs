@@ -2,6 +2,8 @@
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Collections;
+using System.Collections.Generic;
 
 public enum INTERFACE_TYPE
 {
@@ -48,6 +50,30 @@ public class InventoryObject : ScriptableObject
         return null;
     }
 
+    public InventorySlot FindItemInInventory(string itemName)
+    {
+        for (int i = 0; i < GetSlots.Length; i++)
+        {
+            if (GetSlots[i].Item.Name == itemName)
+            {
+                return GetSlots[i];
+            }
+        }
+        return null;
+    }
+
+    public List<InventorySlot> FindItemsInInventory(string itemType)
+    {
+        List<InventorySlot> itemList = new List<InventorySlot>(); 
+        for (int i = 0; i < GetSlots.Length; i++)
+        {
+            if (GetSlots[i].Item.Type == itemType)
+            {
+                itemList.Add(GetSlots[i]);
+            }
+        }
+        return itemList;
+    }
     public bool IsItemInInventory(Item item)
     {
         for (int i = 0; i < GetSlots.Length; i++)
@@ -150,6 +176,16 @@ public class InventoryObject : ScriptableObject
                     GetSlots[i].UpdateSlot(item, item.Amount - amount);
                 else
                     GetSlots[i].RemoveItem();
+            }
+        }
+    }
+    public void RemoveAllItems()
+    {
+        for (int i = 0; i < GetSlots.Length; i++)
+        {
+            if (GetSlots[i].Item != null)
+            {
+                GetSlots[i].RemoveItem();
             }
         }
     }
