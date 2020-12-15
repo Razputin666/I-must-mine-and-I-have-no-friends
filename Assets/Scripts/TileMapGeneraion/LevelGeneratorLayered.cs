@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Unity.Mathematics;
 using Mirror;
-
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -61,40 +63,140 @@ public class LevelGeneratorLayered : NetworkBehaviour
 
 	public float grassGrowthTimeToReach;
 	public Vector2Int startPosition;
-	private TypeOfPlanet typeOfPlanet { get;  set; }
+	private TypeOfPlanet typeOfPlanet { get; set; }
 	private List<int> chunkHeightOffset;
-	public void Start()
+
+	private GameTiles gameTiles;
+
+	private NetworkTransmitter networkTransmitter;
+
+	[SyncVar]
+	private int mapSeed = 0;
+
+    public override void OnStartServer()
 	{
-		
+		//if (gameTiles == null)
+		//	gameTiles = new GameTiles();
+
+		//if (networkTransmitter == null)
+		//	networkTransmitter = GetComponent<NetworkTransmitter>();
+
+		mapSeed = UnityEngine.Random.Range(1, 100000);
+
+		UnityEngine.Random.InitState(mapSeed);
 		typeOfPlanet = TypeOfPlanet.Earthlike;
 		WorldGeneration();
-
+		//LoadMap();
 	}
-	//[ClientRpc]
-	//private void ClientRenderMap(int[,] map, start)
- //   {
 
- //   }
-	private void WorldGeneration()
-    {
-        switch (typeOfPlanet)
-        {
-            case TypeOfPlanet.Earthlike:
+	//public override void OnStartClient()
+	//{
+	//	if (isServer)
+	//		return;
+
+	//	if (gameTiles == null)
+	//		gameTiles = new GameTiles();
+
+	//	if (networkTransmitter == null)
+	//		networkTransmitter = GetComponent<NetworkTransmitter>();
+	//	Debug.Log(mapSeed);
+	//	UnityEngine.Random.InitState(mapSeed);
+
+	//	typeOfPlanet = TypeOfPlanet.Earthlike;
+	//	WorldGeneration();
+	//	//LoadMap();
+	//}
+
+    //[Client]
+    //private void MyCompletlyRecievedHandler(int transmissionID, byte[] data)
+    //{
+    //    Debug.Log("Transmission: " + transmissionID);
+
+    //    GameObject grid = GameObject.Find("Grid");
+    //    GameObject chunk = Instantiate(GameObject.Find("tilechunk"), grid.transform);
+
+    //    chunk.GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
+
+    //    Tilemap tm = chunk.GetComponent<Tilemap>();
+
+    //    List<WorldTile> saveData = DeserializeMap(data);
+    //    gameTiles.saveTiles = saveData;
+    //    gameTiles.SetWorldTiles(tm, "");
+
+    //}
+
+    //[Server]
+    //private void SendMapData(NetworkConnection conn, List<Tilemap> tilemaps)
+    //{
+    //    for (int i = 0; i < tilemaps.Count; i++)
+    //    {
+    //        gameTiles.GetWorldTiles(tilemaps[i], false);
+    //        byte[] tmByte = SerializeTileMap(gameTiles.saveTiles);
+
+    //        networkTransmitter.SendBytesToClient(conn, i, tmByte);
+    //    }
+    //}
+
+    //[Server]
+    //private byte[] SerializeTileMap(List<WorldTile> saveTiles)
+    //{
+    //    BinaryFormatter bf = new BinaryFormatter();
+    //    MemoryStream mf = new MemoryStream();
+
+    //    bf.Serialize(mf, saveTiles);
+    //    mf.Close();
+
+    //    return mf.ToArray();
+    //}
+
+    //[Client]
+    //private List<WorldTile> DeserializeMap(byte[] data)
+    //{
+    //    BinaryFormatter bf = new BinaryFormatter();
+    //    MemoryStream mf = new MemoryStream(data);
+
+    //    List<WorldTile> saveTiles = (List<WorldTile>)bf.Deserialize(mf);
+    //    mf.Close();
+
+    //    return saveTiles;
+    //}
+
+    //[Command(ignoreAuthority = true)]
+    //private void CmdRequestCurrentMap(NetworkIdentity target)
+    //{
+    //    Debug.Log(target.connectionToClient);
+    //    SendMapData(target.connectionToClient, chunks);
+    //}
+    //[Client]
+    //private void MyFragmentReceivedHandler(int transmissionID, byte[] data)
+    //   {
+    //	Debug.Log("Partly recieved data");
+    //   }
+
+    private void WorldGeneration()
+	{
+		//List<int[,]> mapList = new List<int[,]>();
+		//mapList = LoadMap();
+		switch (typeOfPlanet)
+		{
+			case TypeOfPlanet.Earthlike:
 				ClearMap();
 				GameObject grid = GameObject.Find("Grid");
 				startPosition = new Vector2Int(0, (-height / 2));
 
-                for (int i = 0; i < numberOfChunks; i++)
-                {
-                    GameObject chunk = Instantiate(tileChunk, grid.transform);
-                    chunks.Add(chunk.GetComponent<Tilemap>());
-                    GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
-                    grassOverWorldChunk.GenerateGrassPlanetOverworldChunk(chunks[i]);
-                    chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
-                    startPosition.x += width - 1;
-                    chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
+				for (int i = 0; i < numberOfChunks; i++)
+				{
+					GameObject chunk = Instantiate(tileChunk, grid.transform);
+					
+					chunks.Add(chunk.GetComponent<Tilemap>());
+					GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
 
-                }
+					grassOverWorldChunk.GenerateGrassPlanetOverworldChunk(chunks[i]);
+					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
+					startPosition.x += width - 1;
+					chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
+					chunk.name = "tilemap_" + i;
+				}
 				chunkHeightOffset = grassOverWorldChunk.GetChunkHeightOffset;
 				startPosition = new Vector2Int(0, 0);
 				startPosition.y = -height + 1;
@@ -102,39 +204,63 @@ public class LevelGeneratorLayered : NetworkBehaviour
 				int offset;
 				for (int i = overWorldChunks; i < numberOfChunks + overWorldChunks; i++)
 				{
-					
 					if (i - overWorldChunks != 0)
 					{
 						offset = i - overWorldChunks - 1;
 						startPosition.y = startPosition.y + chunkHeightOffset[offset];
 					}
 					GameObject chunk = Instantiate(tileChunk, grid.transform);
+					
 					chunks.Add(chunk.GetComponent<Tilemap>());
 					GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
+
 					grassUnderWorldChunk.GenerateGrassPlanetUnderWorldChunk(chunks[i]);
 					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y + startPosition.y);
 					startPosition.x += width - 1;
 					chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
-
+					chunk.name = "tilemap_" + i;
 				}
-
 				Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
 				Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
 				//StartCoroutine(GenerateTrees());
-				
-				SetPlayerSpawnLocation();
-				
-				//StartCoroutine(SpawnPlayer());
+
+				//SetPlayerSpawnLocation();
+
+				StartCoroutine(SpawnPlayer());
 				//StartCoroutine(SpawnEnemy());
-
+				//SaveMap();
 				break;
-            case TypeOfPlanet.meme:
-                break;
-            default:
-                break;
-        }
+			case TypeOfPlanet.meme:
+				break;
+			default:
+				break;
+		}
+	}
 
-        
+	private void SaveMap()
+	{
+		gameTiles.index = 0;
+		for(int i = 0; i < chunks.Count; i++)
+        {
+			gameTiles.GetWorldTiles(chunks[i], true);
+			gameTiles.index++;
+        }
+	
+	}
+
+	private void LoadMap()
+    {
+		GameObject grid = GameObject.Find("Grid");
+        for (int i = 0; i < numberOfChunks * 2; i++)
+        {
+			GameObject chunk = Instantiate(tileChunk, grid.transform);
+			Tilemap tm = chunk.GetComponent<Tilemap>();
+			chunks.Add(tm);
+
+			gameTiles.LoadWorldTiles(tm, i, tiles);
+
+			chunk.GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
+		}
 	}
 
     #region
@@ -333,10 +459,10 @@ public class LevelGeneratorLayered : NetworkBehaviour
     {
 		bool playerSpawned = false;
 
-		yield return new WaitForSeconds(0.5f);
-        
-		if(!playerSpawned)
+		while(!playerSpawned)
         {
+			yield return new WaitForSeconds(0.5f);
+
 			RaycastHit2D playerSpawn = Physics2D.Raycast(new Vector2(UnityEngine.Random.Range(0, startPosition.x), height * 2), Vector2.down);
 
 			if(playerSpawn.collider.gameObject.CompareTag("TileMap"))
@@ -344,12 +470,16 @@ public class LevelGeneratorLayered : NetworkBehaviour
 				GameObject start = GameObject.Find("StartPosition");
 				start.transform.position = playerSpawn.point;
 				NetworkManager.RegisterStartPosition(start.transform);
-				Instantiate(playerCharacter, playerSpawn.point, quaternion.identity);
-				Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
+
+				GameObject drill = Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
+
+				NetworkServer.Spawn(drill);
+
+				//Instantiate(playerCharacter, playerSpawn.point, quaternion.identity);
+				//Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
 				playerSpawned = true;
 			}
 		}
-        
 	}
 
 	private IEnumerator SpawnEnemy()
@@ -495,18 +625,16 @@ public class LevelGeneratorLayered : NetworkBehaviour
 				MapFunctions.RenderMapWithOffset(map, tilemap, tiles[0], offset, true);
 				offset.y += -height + 1;
 			}
-
 			else
             {
 				MapFunctions.RenderMapWithOffset(map, tilemap, tiles[1], offset, true);
 				offset.y += -height + 1;
 			}
-
 		}
 	}
 
 	[ExecuteInEditMode]
-	public void GenerateMainMap(MapSettings mapSettings, Vector2Int startPosition, int width, int height, bool addTiles, Tilemap tilemap) 
+	public int[,] GenerateMainMap(MapSettings mapSettings, Vector2Int startPosition, int width, int height, bool addTiles, Tilemap tilemap) 
 	{
 		//ClearMap();
 		
@@ -590,14 +718,15 @@ public class LevelGeneratorLayered : NetworkBehaviour
 				break;
 		}
 
-		if (!addTiles)
+        if (!addTiles)
         {
-			MapFunctions.RenderMapWithOffset(map, tilemap, tiles[0], startPosition, addTiles);
-		}
-		else
+            MapFunctions.RenderMapWithOffset(map, tilemap, tiles[0], startPosition, addTiles);
+        }
+        else
         {
-			MapFunctions.RenderMap(map, tilemap, tiles);
-		}
+            MapFunctions.RenderMap(map, tilemap, tiles);
+        }
+		return map;
 		//	StartCoroutine(MapFunctions.RenderMapWithDelay(map, tilemap, tiles[0], startPosition, addTiles));
 	}
 

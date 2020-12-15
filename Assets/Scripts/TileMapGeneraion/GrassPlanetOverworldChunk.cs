@@ -72,6 +72,7 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
 
     void CreateFeatures(Tilemap tilemap)
     {
+        
         int spawnPositionX = 0;
         int spawnPositionY = 0;
         int spawnWidthX = width;
@@ -81,7 +82,7 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
         int amountToLeave = chunkSettings[0].fillAmount;
         int[,] mapCoords = new int[width, height];
         float seed = UnityEngine.Random.Range(0f, 1f);
-
+        
         // mapGen.GenerateMapFeatures(chunkSettings[0], new Vector2Int(spawnPositionX, spawnPositionY), spawnWidthX, spawnHeightY, false, amountToFill, 0, tilemap);
 
         for (int i = 0; i < numberOfLoops - 1; i++)

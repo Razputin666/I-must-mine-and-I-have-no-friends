@@ -31,6 +31,7 @@ public class ItemCollision : NetworkBehaviour
             GroundItem groundItem = other.GetComponentInParent<GroundItem>();
             if (groundItem != null && groundItem.PickupTime <= 0f)
             {
+                
                 Item newItem = new Item(groundItem.Item);
                 if (inventory.AddItem(newItem, newItem.Amount))
                 {

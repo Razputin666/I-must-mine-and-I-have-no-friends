@@ -29,7 +29,7 @@ public class PlayerMovementController : NetworkBehaviour
         }
     }
 
-    public override void OnStartAuthority()
+    public override void OnStartClient()
     {
         enabled = true;
 

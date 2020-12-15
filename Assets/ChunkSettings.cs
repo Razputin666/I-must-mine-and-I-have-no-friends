@@ -62,33 +62,26 @@ public class ChunkSettings : MonoBehaviour
 
     public void TreeGrowth()
     {
+        for (int i = 0; i < width; i++)
         {
-
-        
-            for (int i = 0; i < width; i++)
+            int randomizer = UnityEngine.Random.Range(1, 100);
+            if (randomizer > 95)
             {
-                int randomizer = UnityEngine.Random.Range(1, 100);
-                if (randomizer > 95)
-                    for (int j = height; j < height * 2; j++)
+                for (int j = height; j < height * 2; j++)
                 {
                     // yield return new WaitForSeconds(0.02f);
                     if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i, j + 1, 0)))
                     {
                         int randomValue = UnityEngine.Random.Range(1, 6);
-                           
+
                         for (int k = 1; k < randomValue; k++)
                         {
-                                if(!tileChunk.HasTile(new Vector3Int(i, j + 1, 0)))
-                                {
-                                    tileChunk.SetTile(new Vector3Int(i, j + k, 0), tilesChunk[1]);
-                                }
-                                
+                            if (!tileChunk.HasTile(new Vector3Int(i, j + 1, 0)))
+                            {
+                                tileChunk.SetTile(new Vector3Int(i, j + k, 0), tilesChunk[1]);
+                            }
                         }
-                        
-                    
                     }
-
-
                 }
             }
         }
@@ -96,12 +89,11 @@ public class ChunkSettings : MonoBehaviour
 
     private void Update()
     {
-       
         grassGrowthTimer += Time.deltaTime;
         
         if(grassGrowthTimer > 30)
         {
-           StartCoroutine(GrassGrowth());
+            StartCoroutine(GrassGrowth());
             grassGrowthTimer = 0f;
         }
     }

@@ -122,7 +122,7 @@ public class PlayerController : NetworkBehaviour
         jumpController = GetComponent<JumpController>();
         itemHandler = GetComponent<ItemHandler>();
         playerStates = PlayerStates.Idle;
-        mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
+        //mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
 
         StartCoroutine(CoroutineCoordinator());
     }

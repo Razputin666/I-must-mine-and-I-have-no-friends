@@ -1359,7 +1359,8 @@ namespace Mirror
             if (!clientLoadedScene)
             {
                 // Ready/AddPlayer is usually triggered by a scene load completing. if no scene was loaded, then Ready/AddPlayer it here instead.
-                if (!ClientScene.ready) ClientScene.Ready(conn);
+                if (!ClientScene.ready) 
+                    ClientScene.Ready(conn);
                 if (autoCreatePlayer)
                 {
                     ClientScene.AddPlayer(conn);
@@ -1458,6 +1459,10 @@ namespace Mirror
         /// </summary>
         public virtual void OnStopHost() { }
 
+        public void StartGame()
+        {
+            ServerChangeScene("NetworkTestScene");
+        }
         #endregion
     }
 }

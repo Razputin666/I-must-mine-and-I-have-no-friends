@@ -43,27 +43,15 @@ public class MapFunctions
         tilemap.ClearAllTiles(); //Clear the map (ensures we dont overlap)
         for (int x = 0; x < map.GetUpperBound(0); x++) //Loop through the width of the map
         {
-            bool isGround = true;
             for (int y = map.GetUpperBound(1); y >= 0; y--) //Loop through the height of the map
             {
                 if (map[x, y] == 1) // 1 = tile, 0 = no tile
                 {
-                  //  Debug.Log(x + "," + y);
-                    //if we are at ground level set the tile to Grass else set it to Dirt
-                    if (isGround)
-                    {
-                        isGround = false;
-                        tilemap.SetTile(new Vector3Int(x, y, 0), tiles[0]);
-                    }
-                    else
-                    {
-                        tilemap.SetTile(new Vector3Int(x, y, 0), tiles[0]);
-                    }
+                   tilemap.SetTile(new Vector3Int(x, y, 0), tiles[0]);
                 }
             }
         }
     }
-
  
     /// <summary>
     /// Renders a map using an offset provided, Useful for having multiple maps on one tilemap
