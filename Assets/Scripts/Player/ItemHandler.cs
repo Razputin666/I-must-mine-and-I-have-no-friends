@@ -47,7 +47,10 @@ public class ItemHandler : NetworkBehaviour
             quickSlots.GetSlots[i].OnBeforeUpdate += OnBeforeSlotUpdate;
             quickSlots.GetSlots[i].OnAfterUpdate += OnAfterSlotUpdate;
         }
+    }
 
+    public void ShowGUI()
+    {
         GameObject canvas = Instantiate(playerUIsPrefab, transform);
 
         GameObject inventoryUI = canvas.transform.Find("InventoryScreen").gameObject;

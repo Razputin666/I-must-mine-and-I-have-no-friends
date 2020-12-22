@@ -23,13 +23,13 @@ public class PlayerMovementController : NetworkBehaviour
 
     public void Start()
     {
-        if(!isLocalPlayer)
-        {
-            GetComponent<Rigidbody2D>().simulated = false;
-        }
+        //if(!isLocalPlayer)
+        //{
+        //    GetComponent<Rigidbody2D>().simulated = false;
+        //}
     }
 
-    public override void OnStartClient()
+    public override void OnStartLocalPlayer()
     {
         enabled = true;
 

@@ -57,6 +57,8 @@ public class PlayerController : NetworkBehaviour
     Camera _secondCamera;
 
     private SceneScript sceneScript;
+    
+    private bool isReady = false;
 
     private void Awake()
     {
@@ -65,10 +67,7 @@ public class PlayerController : NetworkBehaviour
         item = gameObject.GetComponentInChildren<FaceMouse>().gameObject.transform.Find("ItemHeldInHand");
 
         itemHandler = GetComponent<ItemHandler>();
-        if (!isLocalPlayer)
-        {
-            
-        }
+        isReady = false;
     }
 
     #region Network
@@ -93,9 +92,11 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
+        isReady = false;
+
         if (camera == null)
             camera = Instantiate(Camera.main);
-
+        
         Camera.main.GetComponentInParent<AudioListener>().enabled = false;
         camera.GetComponent<AudioListener>().enabled = true;
         camera.transform.SetParent(transform);
@@ -113,7 +114,7 @@ public class PlayerController : NetworkBehaviour
 
         item.GetComponent<SpriteRenderer>().sprite = null;
         item.GetComponent<DefaultGun>().enabled = false;
-        item.GetComponent<MiningController>().enabled = false;
+        //GetComponent<MiningController>().enabled = false;
 
         rb2d = GetComponent<Rigidbody2D>();
         
@@ -145,12 +146,11 @@ public class PlayerController : NetworkBehaviour
         StartCoroutine(FadeServerMessage());
     }
 
-    [Command]
+    [Command(ignoreAuthority = true)]
     private void CmdRemoveGroundItem(GameObject obj)
     {
         NetworkServer.Destroy(obj);
     }
-
 
     [Command]
     public void CmdSendPlayerMessage()
@@ -199,30 +199,36 @@ public class PlayerController : NetworkBehaviour
     [Client]
     private void Update()
     {
-        if (!isLocalPlayer)
+        if(isReady)
         {
-            //if(camera)
-            //    floatingInfo.transform.LookAt(camera.transform);
-            return;
-        }
+            if (!isLocalPlayer)
+            {
+                //if(camera)
+                //    floatingInfo.transform.LookAt(camera.transform);
+                return;
+            }
 
-        CheckQuickslotInput();
+            CheckQuickslotInput();
+        }
+        
     }
     [Client]
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     void FixedUpdate()
     {
-        if (!isLocalPlayer)
-            return;
-
-        mousePos = Input.mousePosition;
-        worldPosition = camera.ScreenToWorldPoint(mousePos);
-
-        if (playerHP <= 0)
+        if(isReady)
         {
-            Die();
-        }
+            if (!isLocalPlayer)
+                return;
 
+            mousePos = Input.mousePosition;
+            worldPosition = camera.ScreenToWorldPoint(mousePos);
+
+            if (playerHP <= 0)
+            {
+                Die();
+            }
+        }
     }
     #endregion
     public void UpdateActiveItem(int itemID)
@@ -235,6 +241,7 @@ public class PlayerController : NetworkBehaviour
         if (activeQuickslot != index)
         {
             ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[index].ItemObject;
+            
             int id = itemObj != null ? itemObj.Data.ID : -1;
             CmdActiveItemChanged(id);
             activeQuickslot = index;
@@ -286,24 +293,39 @@ public class PlayerController : NetworkBehaviour
         {
             case ITEM_TYPE.TileBlock:
                 playerStates = PlayerStates.Building;
-                item.GetComponent<MiningController>().enabled = false;
+                GetComponent<MiningController>().enabled = false;
                 item.GetComponent<DefaultGun>().enabled = false;
                 break;
             case ITEM_TYPE.Weapon:
                 playerStates = PlayerStates.Normal;
-                item.GetComponent<MiningController>().enabled = false;
+                GetComponent<MiningController>().enabled = false;
                 item.GetComponent<DefaultGun>().enabled = true;
                 break;
             case ITEM_TYPE.MiningLaser:
                 playerStates = PlayerStates.Mining;
-                item.GetComponent<MiningController>().enabled = true;
+                GetComponent<MiningController>().enabled = true;
                 item.GetComponent<DefaultGun>().enabled = false;
                 break;
             default:
                 playerStates = PlayerStates.Idle;
-                item.GetComponent<MiningController>().enabled = false;
+                GetComponent<MiningController>().enabled = false;
                 item.GetComponent<DefaultGun>().enabled = false;
                 break;
+        }
+    }
+
+    [Client]
+    public void SetReady(bool ready)
+    {
+        if (!isLocalPlayer)
+            return;
+
+        isReady = ready;
+        if(isReady)
+        {
+            itemHandler.ShowGUI();
+            GetComponent<MiningController>().UpdateTiles();
+            GetComponent<Rigidbody2D>().simulated = true;
         }
     }
 
@@ -316,26 +338,27 @@ public class PlayerController : NetworkBehaviour
     [Client]
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.collider.CompareTag("EnemyWeapon"))
+        if(isReady)
         {
-            EnemyController enemy = collision.collider.gameObject.GetComponentInParent<EnemyController>();
-            playerHP -= enemy.enemyStrength;
-
-            if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x > 0f)
+            if (collision.collider.CompareTag("EnemyWeapon"))
             {
-                rb2d.AddForceAtPosition(enemy.enemyKnockBack, transform.position);
-            }
+                EnemyController enemy = collision.collider.gameObject.GetComponentInParent<EnemyController>();
+                playerHP -= enemy.enemyStrength;
 
-            else if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x < 0f)
-            {
-                rb2d.AddForceAtPosition(-enemy.enemyKnockBack, transform.position);
+                if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x > 0f)
+                {
+                    rb2d.AddForceAtPosition(enemy.enemyKnockBack, transform.position);
+                }
+
+                else if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x < 0f)
+                {
+                    rb2d.AddForceAtPosition(-enemy.enemyKnockBack, transform.position);
+                }
             }
         }
-
-
     }
 
-    #region GameLogic
+    
 
     void Die()
     {
@@ -355,7 +378,7 @@ public class PlayerController : NetworkBehaviour
             yield return null;
         }
     }
-
+    #region Getter
     public InventoryObject GetInventoryObject
     {
         get { return itemHandler.Inventory; }
@@ -391,6 +414,13 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    public bool IsReady
+    {
+        get
+        {
+            return isReady;
+        }
+    }
     
     #endregion
 }

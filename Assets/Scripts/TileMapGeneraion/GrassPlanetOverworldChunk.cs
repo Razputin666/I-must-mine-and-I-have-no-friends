@@ -67,7 +67,7 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
         //Next generate the smoothed random top
         mapCoords = MapFunctions.RandomWalkTopSmoothed(mapCoords, seed, 3, heighRandomize);
            
-        MapFunctions.RenderMapWithOffset(mapCoords, tilemap, mapGen.tiles[2], startPosition, true);
+        MapFunctions.RenderMapWithOffset(mapCoords, tilemap, mapGen.tiles[0], startPosition, true);
     }
 
     void CreateFeatures(Tilemap tilemap)

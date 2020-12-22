@@ -8,20 +8,17 @@ using UnityEngine.Tilemaps;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-public class LoadingScreen : NetworkBehaviour
+public class MapSync : NetworkBehaviour
 {
     [SerializeField] private TMP_Text loadingScreenProgressText = null;
     [SerializeField] private Image loadingScreenProgressBar = null;
     [SerializeField] private GameObject tilemapPrefab = null;
-    [SerializeField] private GameObject playerPrefab = null;
     private GameTiles gameTiles = null;
     private NetworkTransmitter networkTransmitter = null;
-    
+
     private int messagesRecieved = 0;
     private int totalMessages = 0;
-
-    GameObject playerInstance;
-
+    private int tilemapsSynced = 0;
     //private System.Diagnostics.Stopwatch stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
     public void Start()
@@ -32,7 +29,7 @@ public class LoadingScreen : NetworkBehaviour
         if (networkTransmitter == null)
             networkTransmitter = GetComponent<NetworkTransmitter>();
     }
-    public override void OnStartClient()
+    public override void OnStartLocalPlayer()
     {
         if (!isLocalPlayer)
             return;
@@ -46,6 +43,8 @@ public class LoadingScreen : NetworkBehaviour
         if (gameTiles == null)
             gameTiles = GetComponent<GameTiles>();
 
+        gameTiles.OnWorldTilesSet += OnTilemapSet;
+
         if (networkTransmitter == null)
             networkTransmitter = GetComponent<NetworkTransmitter>();
 
@@ -53,21 +52,13 @@ public class LoadingScreen : NetworkBehaviour
 
         StartCoroutine(RequestTerrainData());
     }
-  
+    [Server]
     private IEnumerator SpawnPlayer(NetworkConnection conn)
     {
         yield return new WaitForSeconds(1f);
-
-        //Spawn player
-        GameObject playerInstance = Instantiate(playerPrefab, NetworkManager.startPositions[0].position, Quaternion.identity);
-
-        //Destroy gameobject
-        GameObject go = conn.identity.gameObject;
-
-        NetworkServer.ReplacePlayerForConnection(conn, playerInstance, true);
-        NetworkServer.Spawn(playerInstance, conn);
-
-        NetworkServer.Destroy(go);
+        gameObject.transform.position = NetworkManager.startPositions[0].position;
+        
+        GetComponent<PlayerController>().SetReady(true);
     }
 
     private IEnumerator RequestTerrainData()
@@ -93,16 +84,15 @@ public class LoadingScreen : NetworkBehaviour
     [Command]
     private void CmdMapSyncComplete()
     {
-        //Spawn player
-        playerInstance = Instantiate(playerPrefab, NetworkManager.startPositions[0].position, Quaternion.identity);
-        
-        //Destroy gameobject
-        GameObject go = connectionToClient.identity.gameObject;
+        //GetComponent<PlayerController>().SetReady(true);
+        RpcSetReady();
+        gameObject.transform.position = NetworkManager.startPositions[0].position;
+    }
 
-        NetworkServer.ReplacePlayerForConnection(connectionToClient, playerInstance, true);
-        NetworkServer.Spawn(playerInstance, connectionToClient);
-
-        NetworkServer.Destroy(go);
+    [TargetRpc]
+    private void RpcSetReady()
+    {
+        GetComponent<PlayerController>().SetReady(true);
     }
 
     [Server]
@@ -184,10 +174,16 @@ public class LoadingScreen : NetworkBehaviour
         //    ts.Milliseconds / 10);
 
         //Debug.Log("setTile time: " + elapsedTime);
-        if (messagesRecieved == totalMessages)
+    }
+
+    [Client]
+    private void OnTilemapSet(string tilemap)
+    {
+        tilemapsSynced++;
+
+        if(tilemapsSynced == totalMessages)
         {
-            Debug.Log(messagesRecieved);
-            //GetComponentInChildren<Canvas>().enabled = false;
+            Debug.Log("Sync Complete");
             CmdMapSyncComplete();
         }
     }

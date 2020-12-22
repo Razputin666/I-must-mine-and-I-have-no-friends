@@ -30,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8978213078250018397}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -242.26572, y: 1049.9954, z: -439.6709}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -53,9 +53,9 @@ MonoBehaviour:
   tileChunk: {fileID: 4802906064719502046, guid: f1fc65f761491f74abdd69e1daf070b8,
     type: 3}
   tiles:
-  - {fileID: 11400000, guid: d2a454cdcf61587439cbe5ede10d0c9c, type: 2}
-  - {fileID: 11400000, guid: 2f70c4bc8f3b6204a8847947b95871dd, type: 2}
-  - {fileID: 11400000, guid: d2a454cdcf61587439cbe5ede10d0c9c, type: 2}
+  - {fileID: 11400000, guid: 959f9c500dd8cd24a8c10ea498c4c20e, type: 2}
+  - {fileID: 11400000, guid: f1688e60831d4b344b3c182eaf1c7d68, type: 2}
+  - {fileID: 11400000, guid: 959f9c500dd8cd24a8c10ea498c4c20e, type: 2}
   - {fileID: 11400000, guid: 6cff7ee5c94bf6a4b884d29da71caa3f, type: 2}
   - {fileID: 11400000, guid: f7aaaa40707a37a4bbcfc69e94f9bf45, type: 2}
   - {fileID: 11400000, guid: 239ebe86ddba1bb48ad336fe9d92de10, type: 2}
@@ -128,6 +128,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80649f7813e3e3049bb9f2c56b7d0885, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   chunks: []
   tileDatas:
   - {fileID: 11400000, guid: 1ea78bb27036e8645b0eaf68259b61e0, type: 2}

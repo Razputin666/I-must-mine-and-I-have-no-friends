@@ -239,12 +239,12 @@ public class LevelGeneratorLayered : NetworkBehaviour
 
 	private void SaveMap()
 	{
-		gameTiles.index = 0;
-		for(int i = 0; i < chunks.Count; i++)
-        {
-			gameTiles.GetWorldTiles(chunks[i], true);
-			gameTiles.index++;
-        }
+		//gameTiles.index = 0;
+		//for(int i = 0; i < chunks.Count; i++)
+  //      {
+		//	gameTiles.GetWorldTiles(chunks[i], true);
+		//	gameTiles.index++;
+  //      }
 	
 	}
 
@@ -446,10 +446,14 @@ public class LevelGeneratorLayered : NetworkBehaviour
 
 		if (playerSpawn.collider.gameObject.CompareTag("TileMap"))
 		{
-			GameObject start = GameObject.Find("StartPosition");
-			start.transform.position = playerSpawn.point;
-			NetworkManager.RegisterStartPosition(start.transform);
-
+			if (NetworkManager.startPositions.Count > 0)
+				NetworkManager.startPositions[0].position = playerSpawn.point;
+			else
+            {
+				GameObject start = GameObject.Find("StartPosition");
+				start.transform.position = playerSpawn.point;
+				NetworkManager.RegisterStartPosition(start.transform);
+			}
 			GameObject drill = Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
 
 			NetworkServer.Spawn(drill);
@@ -467,16 +471,18 @@ public class LevelGeneratorLayered : NetworkBehaviour
 
 			if(playerSpawn.collider.gameObject.CompareTag("TileMap"))
             {
-				GameObject start = GameObject.Find("StartPosition");
-				start.transform.position = playerSpawn.point;
-				NetworkManager.RegisterStartPosition(start.transform);
-
-				GameObject drill = Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
-
+				if (NetworkManager.startPositions.Count > 0)
+					NetworkManager.startPositions[0].position = playerSpawn.point + Vector2.up;
+				else
+				{
+					GameObject start = GameObject.Find("StartPosition");
+					start.transform.position = playerSpawn.point + Vector2.up;
+					NetworkManager.RegisterStartPosition(start.transform);
+				}
+				GameObject drill = Instantiate(drillLaser, playerSpawn.point + Vector2.up * 3, quaternion.identity);
+				drill.GetComponent<Rigidbody2D>().simulated = true;
 				NetworkServer.Spawn(drill);
 
-				//Instantiate(playerCharacter, playerSpawn.point, quaternion.identity);
-				//Instantiate(drillLaser, new Vector3(playerSpawn.point.x, playerSpawn.point.y + 10), quaternion.identity);
 				playerSpawned = true;
 			}
 		}

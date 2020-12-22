@@ -24,6 +24,7 @@ public class ItemCollision : NetworkBehaviour
         }
     }
 
+    [Client]
     public void OnTriggerEnter2D(Collider2D other)
     {
         if(other.transform.CompareTag("GroundItem"))
@@ -31,14 +32,23 @@ public class ItemCollision : NetworkBehaviour
             GroundItem groundItem = other.GetComponentInParent<GroundItem>();
             if (groundItem != null && groundItem.PickupTime <= 0f)
             {
-                
                 Item newItem = new Item(groundItem.Item);
                 if (inventory.AddItem(newItem, newItem.Amount))
                 {
                     if(player != null)
+                    {
                         player.RemoveItemFromGround(other.gameObject);
+                    } 
                 }
             }
         }
+    }
+
+    [TargetRpc]
+    private void RpcAddItemToPlayer(NetworkConnection conn, GameObject groundObject)
+    {
+        GroundItem groundItem = groundObject.GetComponentInParent<GroundItem>();
+        Item newItem = new Item(groundItem.Item);
+        inventory.AddItem(newItem, newItem.Amount);
     }
 }

@@ -1,11 +1,20 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using Mirror;
 
-public class GroundItem : MonoBehaviour, ISerializationCallbackReceiver
+public class GroundItem : NetworkBehaviour, ISerializationCallbackReceiver
 {
-    [SerializeField]
-    private ItemObject item;
+    [SerializeField] private ItemObject item;
     private float pickupCooldown = 2f;
+
+    struct ItemData
+    {
+        public int itemID;
+        public int itemAmount;
+    }
+
+    [SyncVar(hook = nameof(OnItemUpdate))]
+    private ItemData itemData;
 
     void Start()
     {
@@ -24,7 +33,27 @@ public class GroundItem : MonoBehaviour, ISerializationCallbackReceiver
         {
             pickupCooldown = cooldown;
             GetComponentInChildren<SpriteRenderer>().sprite = item.UIDisplaySprite;
+
+            itemData = new ItemData
+            {
+                itemID = item.Data.ID,
+                itemAmount = item.Data.Amount
+            };
         }
+    }
+    private void OnItemUpdate(ItemData _old, ItemData _new)
+    {
+        ItemDatabaseObject db = Resources.Load("ScriptableObjects/ItemDatabase") as ItemDatabaseObject;
+
+        ItemObject item = db.GetItemAt(_new.itemID);
+        item.Data.Amount = _new.itemAmount;
+
+        this.item = item;
+
+        Debug.Log("sprite update");
+        
+        GetComponentInChildren<SpriteRenderer>().sprite = item.UIDisplaySprite;
+
     }
 
     public ItemObject Item

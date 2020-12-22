@@ -22,7 +22,7 @@ public class SpawnManager : NetworkBehaviour
     {
         ItemDatabaseObject db = Resources.Load("ScriptableObjects/ItemDatabase") as ItemDatabaseObject;
 
-        ItemObject item = db.GetItemAt(itemID);
+        ItemObject item = Instantiate(db.GetItemAt(itemID));
         item.Data.Amount = itemAmount;
 
         spawnPos.z = 0;
@@ -30,13 +30,26 @@ public class SpawnManager : NetworkBehaviour
         GameObject groundItemPrefab = Resources.Load<GameObject>("SpawnablePrefabs/GroundItemObject") as GameObject;
         GameObject groundObject = Instantiate(groundItemPrefab, spawnPos + Vector3.up, Quaternion.identity, parentObject.transform);
 
+        //groundObject.GetComponent<Rigidbody2D>().simulated = true;
         GroundItem gItem = groundObject.GetComponent<GroundItem>();
         gItem.SetItemObject(item, 0f);
+
         NetworkServer.Spawn(groundObject);
+
+        //RpcChangeSprite(groundObject, itemID);
     }
 
-    public static void SpawnItem(Vector3 spawnPos, Sprite sprite)
-    {
+    //[ClientRpc]
+    //private void RpcChangeSprite(GameObject groundObject, int itemID)
+    //{
+    //    //groundObject.GetComponent<Rigidbody2D>().gravityScale = 0f;
 
-    }
+    //    ItemDatabaseObject db = Resources.Load("ScriptableObjects/ItemDatabase") as ItemDatabaseObject;
+
+    //    ItemObject item = Instantiate(db.GetItemAt(itemID));
+    //    item.Data.Amount = itemAmount;
+
+    //    GroundItem gItem = groundObject.GetComponent<GroundItem>();
+    //    gItem.SetItemObject(item, 0f);
+    //}
 }

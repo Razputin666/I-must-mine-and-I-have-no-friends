@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Mirror;
 
-public class PlayerStatesController : MonoBehaviour
+public class PlayerStatesController : NetworkBehaviour
 {
     private ItemHandler itemHandler;
     private PlayerController player;
@@ -15,18 +16,20 @@ public class PlayerStatesController : MonoBehaviour
 
     Vector3Int targetBlockIntPos;
     // Start is called before the first frame update
-    void Start()
+    public override void OnStartLocalPlayer()
     {
         player = GetComponent<PlayerController>();
         //tileMapChecker = GetComponentInChildren<TileMapChecker>();
         line = GetComponentInChildren<FaceMouse>().GetComponentInChildren<LineController>();
-        miningMode = GetComponentInChildren<FaceMouse>().GetComponentInChildren<MiningController>();
+        miningMode = GetComponent<MiningController>();
         itemHandler = GetComponent<ItemHandler>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!isLocalPlayer)
+            return;
         switch (player.playerStates)
         {
             case PlayerController.PlayerStates.Mining:
@@ -44,7 +47,7 @@ public class PlayerStatesController : MonoBehaviour
                 {
                     line.enabled = true;
 
-                    miningMode.Mine(targetBlockIntPos, player.MiningStrength);
+                    miningMode.CmdMineBlockAt(targetBlockIntPos, player.MiningStrength);
                 }
                 break;
             case PlayerController.PlayerStates.Normal:

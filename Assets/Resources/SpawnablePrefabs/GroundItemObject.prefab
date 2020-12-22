@@ -62,6 +62,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a0d3e64540b7e42ab28556ec4f8fb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   item: {fileID: 11400000, guid: 61d49c0aedc71804e9806a3f7176bfc5, type: 2}
 --- !u!50 &-28657454043541491
 Rigidbody2D:
@@ -78,7 +80,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 0.1
+  m_GravityScale: 6
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1

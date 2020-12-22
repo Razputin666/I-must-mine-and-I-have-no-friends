@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Mirror;
 
-public class TileMapManager : MonoBehaviour
+public class TileMapManager : NetworkBehaviour
 {
     [SerializeField] private List<Tilemap> chunks; //Only serialized for testing
 
@@ -13,14 +14,14 @@ public class TileMapManager : MonoBehaviour
 
     private Dictionary<TileBase, TileData> dataFromTiles;
 
-    private void Awake()
+    public override void OnStartServer()
     {
         StartCoroutine(TileChecker());
     }
 
     private IEnumerator TileChecker()
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return null;
         chunks = mapgGen.chunks;
         dataFromTiles = new Dictionary<TileBase, TileData>();
 

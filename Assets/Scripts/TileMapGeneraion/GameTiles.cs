@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.IO;
+using UnityEngine.Events;
 
 public class GameTiles : MonoBehaviour
 {
@@ -12,7 +13,8 @@ public class GameTiles : MonoBehaviour
 
     //public Vector3 tilemapWorldPos;
 
-    public int index;
+    public event UnityAction<string> OnWorldTilesSet;
+
     public List<WorldTile> GetWorldTiles(Tilemap tilemap, bool save)
     {
         //tilemapWorldPos = tilemap.transform.position;
@@ -40,13 +42,11 @@ public class GameTiles : MonoBehaviour
             };
 
             saveTiles.Add(_tile);
-            //else
-            //    tiles.Add(_tile.gridLocation.Vector3(), _tile);
         }
 
         if (save)
         {
-            TilemapDataSystem.Save(tilemap.name + index, "Map", saveTiles);
+            TilemapDataSystem.Save(tilemap.name, "Map", saveTiles);
         }
 
         return saveTiles;
@@ -60,7 +60,12 @@ public class GameTiles : MonoBehaviour
 
     public void SetWorldTiles(Tilemap tilemap, string folderName, List<WorldTile> saveTiles)
     {
-        //tiles = new Dictionary<Vector3, WorldTile>();
+        StartCoroutine(SetWorldTilesCoRoutine(tilemap, folderName, saveTiles));
+    }
+
+    private IEnumerator SetWorldTilesCoRoutine(Tilemap tilemap, string folderName, List<WorldTile> saveTiles)
+    {
+        int count = 0;
 
         string path = Path.Combine("Tilebase", folderName);
         bool startPosSet = false;
@@ -84,24 +89,24 @@ public class GameTiles : MonoBehaviour
                 }
             }
 
-            if(!startPosSet)
+            if (!startPosSet)
             {
                 tilemap.transform.position = tile.transFormPos.Vector3();
                 startPosSet = true;
             }
-                
-            WorldTile _tile = new WorldTile()
+
+            count++;
+
+            if(count >= 1000)
             {
-                localPlace = tile.localPlace,
-                gridLocation = tile.gridLocation,
-                tileBase = tile.tileBase,
-                isVisible = tile.isVisible,
-                isExplored = tile.isExplored,
-                transFormPos = tile.transFormPos,
-            };
+                count = 0;
+                yield return null;
+            }    
             //tiles.Add(_tile.gridLocation.Vector3(), _tile);
         }
-        
+
+        OnWorldTilesSet.Invoke(tilemap.name);
+
         tilemap.SetTiles(posArray, tileArray);
         Resources.UnloadUnusedAssets();
     }
