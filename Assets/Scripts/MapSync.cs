@@ -55,7 +55,7 @@ public class MapSync : NetworkBehaviour
     [Server]
     private IEnumerator SpawnPlayer(NetworkConnection conn)
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         gameObject.transform.position = NetworkManager.startPositions[0].position;
         
         GetComponent<PlayerController>().SetReady(true);
@@ -75,7 +75,6 @@ public class MapSync : NetworkBehaviour
         GameObject grid = GameObject.Find("Grid");
 
         Tilemap[] tilemaps = grid.GetComponentsInChildren<Tilemap>();
-        Debug.Log("tilemaps: " + tilemaps.Length);
         RpcSendMessageCount(tilemaps.Length);
 
         SendMapData(conn, tilemaps);
@@ -84,7 +83,7 @@ public class MapSync : NetworkBehaviour
     [Command]
     private void CmdMapSyncComplete()
     {
-        //GetComponent<PlayerController>().SetReady(true);
+        GetComponent<PlayerController>().SetReady(true);
         RpcSetReady();
         gameObject.transform.position = NetworkManager.startPositions[0].position;
     }
@@ -98,7 +97,6 @@ public class MapSync : NetworkBehaviour
     [Server]
     private void SendMapData(NetworkConnection conn, Tilemap[] tilemaps)
     {
-        Debug.Log(conn);
         for (int i = 0; i < tilemaps.Length; i++)
         {
             List<WorldTile> saveTiles = gameTiles.GetWorldTiles(tilemaps[i], false);
@@ -150,7 +148,6 @@ public class MapSync : NetworkBehaviour
         //float perc = (float)messagesRecieved / (float)totalMessages;
 
         //loadingScreenProgressText.text = "Loading: " + perc * 100;
-        Debug.Log("Transmission: " + transmissionID);
 
         GameObject grid = GameObject.Find("Grid");
         GameObject chunk = Instantiate(tilemapPrefab, grid.transform);
@@ -160,20 +157,8 @@ public class MapSync : NetworkBehaviour
         Tilemap tm = chunk.GetComponent<Tilemap>();
 
         List<WorldTile> saveData = DeserializeMap(data);
-        //gameTiles.saveTiles = saveData;
-        //stopWatch.Restart();
-        //stopWatch.Start();
+
         gameTiles.SetWorldTiles(tm, "", saveData);
-        //stopWatch.Stop();
-        //// Get the elapsed time as a TimeSpan value.
-        //System.TimeSpan ts = stopWatch.Elapsed;
-
-        //// Format and display the TimeSpan value.
-        //string elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-        //    ts.Hours, ts.Minutes, ts.Seconds,
-        //    ts.Milliseconds / 10);
-
-        //Debug.Log("setTile time: " + elapsedTime);
     }
 
     [Client]

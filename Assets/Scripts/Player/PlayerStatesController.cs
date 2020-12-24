@@ -6,13 +6,9 @@ using Mirror;
 
 public class PlayerStatesController : NetworkBehaviour
 {
-    private ItemHandler itemHandler;
     private PlayerController player;
     private LineController line;
-    private MiningController miningMode;
-    private TileMapChecker tileMapChecker;
-
-    private Tilemap targetedBlock;
+    private MiningController miningController;
 
     Vector3Int targetBlockIntPos;
     // Start is called before the first frame update
@@ -20,9 +16,8 @@ public class PlayerStatesController : NetworkBehaviour
     {
         player = GetComponent<PlayerController>();
         //tileMapChecker = GetComponentInChildren<TileMapChecker>();
-        line = GetComponentInChildren<FaceMouse>().GetComponentInChildren<LineController>();
-        miningMode = GetComponent<MiningController>();
-        itemHandler = GetComponent<ItemHandler>();
+        line = transform.Find("Gubb_arm").GetComponentInChildren<LineController>();
+        miningController = GetComponent<MiningController>();
     }
 
     // Update is called once per frame
@@ -33,7 +28,7 @@ public class PlayerStatesController : NetworkBehaviour
         switch (player.playerStates)
         {
             case PlayerController.PlayerStates.Mining:
-                targetBlockIntPos = Vector3Int.FloorToInt(player.worldPosition);
+                targetBlockIntPos = Vector3Int.FloorToInt(player.mousePosInWorld);
                 targetBlockIntPos.z = 0;
                 Vector3Int playerIntPos = Vector3Int.FloorToInt(transform.position);
                 Vector3Int distanceFromPlayer = targetBlockIntPos - playerIntPos;
@@ -47,7 +42,7 @@ public class PlayerStatesController : NetworkBehaviour
                 {
                     line.enabled = true;
 
-                    miningMode.CmdMineBlockAt(targetBlockIntPos, player.MiningStrength);
+                    miningController.CmdMineBlockAt(targetBlockIntPos, player.MiningStrength);
                 }
                 break;
             case PlayerController.PlayerStates.Normal:
@@ -58,19 +53,6 @@ public class PlayerStatesController : NetworkBehaviour
                 break;
             default:
                 break;
-        }
-    }
-    public Tilemap TargetedBlock
-    {
-        get
-        {
-            return targetedBlock;
-
-        }
-
-        set
-        {
-            targetedBlock = value;
         }
     }
 }

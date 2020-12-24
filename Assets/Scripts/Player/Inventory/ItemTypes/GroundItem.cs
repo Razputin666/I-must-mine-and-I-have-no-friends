@@ -50,10 +50,7 @@ public class GroundItem : NetworkBehaviour, ISerializationCallbackReceiver
 
         this.item = item;
 
-        Debug.Log("sprite update");
-        
         GetComponentInChildren<SpriteRenderer>().sprite = item.UIDisplaySprite;
-
     }
 
     public ItemObject Item

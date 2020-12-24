@@ -15,8 +15,8 @@ public class FaceMouse : MonoBehaviour
     public void RotateArm()
     {
         Vector2 direction = new Vector2(
-        player.worldPosition.x - transform.position.x,
-        player.worldPosition.y - transform.position.y);
+        player.mousePosInWorld.x - transform.position.x,
+        player.mousePosInWorld.y - transform.position.y);
 
         transform.up = direction;
     }

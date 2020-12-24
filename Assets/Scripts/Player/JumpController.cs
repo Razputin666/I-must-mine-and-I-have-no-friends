@@ -17,18 +17,20 @@ public class JumpController : NetworkBehaviour, HasCoolDownInterFace
     public int Id => id;
     public float CoolDownDuration => coolDownDuration;
 
-    public void Start()
+    public override void OnStartServer()
     {
         rb2d = GetComponent<Rigidbody2D>();
         capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
     }
-  
+
+    [Client]
     public bool IsGrounded()
     {
         RaycastHit2D raycastHit2D = Physics2D.CapsuleCast(capsuleCollider2d.bounds.center, capsuleCollider2d.bounds.size, CapsuleDirection2D.Vertical, 0f, Vector2.down, 0.5f);
       //  Physics2D.IgnoreCollision(, GetComponent<CapsuleCollider2D>());
         return raycastHit2D.collider != null;
     }
+
     [Client]
     public void Jump()
     {

@@ -30,7 +30,7 @@ public class SpawnManager : NetworkBehaviour
         GameObject groundItemPrefab = Resources.Load<GameObject>("SpawnablePrefabs/GroundItemObject") as GameObject;
         GameObject groundObject = Instantiate(groundItemPrefab, spawnPos + Vector3.up, Quaternion.identity, parentObject.transform);
 
-        //groundObject.GetComponent<Rigidbody2D>().simulated = true;
+        groundObject.GetComponent<Rigidbody2D>().simulated = true;
         GroundItem gItem = groundObject.GetComponent<GroundItem>();
         gItem.SetItemObject(item, 0f);
 

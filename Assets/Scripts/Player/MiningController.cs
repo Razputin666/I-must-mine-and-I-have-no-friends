@@ -40,7 +40,6 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
             Transform arm = gameObject.transform.Find("Gubb_arm");
             Transform heldItem = arm.Find("ItemHeldInHand");
             endOfGun = heldItem.Find("EndOfGun");
-            Debug.Log(endOfGun + " start");
         }
 
         tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();

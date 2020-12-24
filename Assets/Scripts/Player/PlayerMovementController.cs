@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 public class PlayerMovementController : NetworkBehaviour
 {
@@ -9,7 +10,7 @@ public class PlayerMovementController : NetworkBehaviour
     [SerializeField] Rigidbody2D rb2d;
     private JumpController jumpController;
     private FaceMouse faceMouse;
-
+    private Transform armTransform;
     private Vector2 previousInput;
 
     public float jumpVelocity;
@@ -21,53 +22,70 @@ public class PlayerMovementController : NetworkBehaviour
     private bool facingRight = true;
     private bool isJumping = false;
 
-    public void Start()
+    public override void OnStartServer()
     {
-        //if(!isLocalPlayer)
-        //{
-        //    GetComponent<Rigidbody2D>().simulated = false;
-        //}
+        rb2d = GetComponent<Rigidbody2D>();
+        jumpController = GetComponent<JumpController>();
+        faceMouse = GetComponentInChildren<FaceMouse>();
+        armTransform = transform.Find("Gubb_arm");
+        rb2d.simulated = true;
     }
 
     public override void OnStartLocalPlayer()
     {
-        enabled = true;
-
-        rb2d = GetComponent<Rigidbody2D>();
-        jumpController = GetComponent<JumpController>();
-        faceMouse = GetComponentInChildren<FaceMouse>();
-
         InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
         InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
 
-        InputManager.Controls.Player.Jump.performed += ctx => isJumping = true;
-        InputManager.Controls.Player.Jump.canceled += ctx => isJumping = false;
+        InputManager.Controls.Player.Jump.performed += ctx => IsJumping = true;
+        InputManager.Controls.Player.Jump.canceled += ctx => IsJumping = false;
+    }
+
+    private void Update()
+    {  
+        if(isServer && GetComponent<PlayerController>().IsReady)
+        {
+            RotateArm();
+        }   
     }
     
-    private void Update()
-    {
-        if (!isLocalPlayer)
-            return;
-
-        faceMouse.RotateArm();
-    }
-
-    [ClientCallback]
     private void FixedUpdate() => Move();
 
     [Client]
-    private void SetMovement(Vector2 movement) => previousInput = movement;
+    private void SetMovement(Vector2 movement)
+    {
+        previousInput = movement;
+        CmdInputChanged(previousInput);
+    }
     [Client]
-    private void ResetMovement() => previousInput = Vector2.zero;
+    private void ResetMovement() 
+    {
+        previousInput = Vector2.zero;
+        CmdInputChanged(previousInput);
+    }
 
+    [Command]
+    private void CmdInputChanged(Vector2 input)
+    {
+        previousInput = input;
+    }
+
+    [Command]
+    private void CmdJumpChanged(bool isJumping)
+    {
+        this.isJumping = isJumping;
+    }
+    
     private void Move()
     {
-        if (!isLocalPlayer)
+        if (!isServer)
+            return;
+
+        if (!GetComponent<PlayerController>().IsReady)
             return;
         
-        rb2d.velocity += previousInput * movementSpeed;
         Flip(previousInput.x);
-
+        rb2d.velocity += previousInput * movementSpeed;
+        
         if (rb2d.velocity.y < -25f)
         {
             heightTimer += Time.deltaTime;
@@ -112,6 +130,28 @@ public class PlayerMovementController : NetworkBehaviour
             Vector3 theScale = transform.localScale;
             theScale.x *= -1;
             transform.localScale = theScale;
+        }
+    }
+
+    public void RotateArm()
+    {
+        PlayerController player = GetComponent<PlayerController>();
+        Transform armTransform = transform.Find("Gubb_arm");
+        Vector2 direction = new Vector2(
+        player.mousePosInWorld.x - armTransform.position.x,
+        player.mousePosInWorld.y - armTransform.position.y);
+
+        armTransform.up = direction;
+    }
+
+    private bool IsJumping
+    {
+        get { return isJumping; }
+        set
+        {
+            isJumping = value;
+            if(isClient)
+                CmdJumpChanged(isJumping);
         }
     }
 }

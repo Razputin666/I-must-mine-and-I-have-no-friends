@@ -5,50 +5,49 @@ using Mirror;
 
 public class ItemCollision : NetworkBehaviour
 {
-    private PlayerController player;
-    private EnemyController enemy;
-    private InventoryObject inventory;
+    //private PlayerController player;
+    //private EnemyController enemy;
+    //private InventoryObject inventory;
 
-    // Start is called before the first frame update
-    public void Start()
-    {
-        if(GetComponentInParent<PlayerController>() == null)
-        {
-            enemy = GetComponentInParent<EnemyController>();
-            inventory = enemy.GetInventoryObject;
-        }
-        else
-        {
-            player = GetComponentInParent<PlayerController>();
-            inventory = player.GetInventoryObject;
-        }
-    }
+    //public override void OnStartServer()
+    //{
+    //    Debug.Log("Item");
+    //    if (GetComponentInParent<PlayerController>() == null)
+    //    {
+    //        enemy = GetComponentInParent<EnemyController>();
+    //        inventory = enemy.GetInventoryObject;
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("Item");
+    //        player = GetComponentInParent<PlayerController>();
+    //        inventory = player.GetInventoryObject;
+    //    }
+    //}
 
-    [Client]
-    public void OnTriggerEnter2D(Collider2D other)
-    {
-        if(other.transform.CompareTag("GroundItem"))
-        {
-            GroundItem groundItem = other.GetComponentInParent<GroundItem>();
-            if (groundItem != null && groundItem.PickupTime <= 0f)
-            {
-                Item newItem = new Item(groundItem.Item);
-                if (inventory.AddItem(newItem, newItem.Amount))
-                {
-                    if(player != null)
-                    {
-                        player.RemoveItemFromGround(other.gameObject);
-                    } 
-                }
-            }
-        }
-    }
-
-    [TargetRpc]
-    private void RpcAddItemToPlayer(NetworkConnection conn, GameObject groundObject)
-    {
-        GroundItem groundItem = groundObject.GetComponentInParent<GroundItem>();
-        Item newItem = new Item(groundItem.Item);
-        inventory.AddItem(newItem, newItem.Amount);
-    }
+    //[Server]
+    //public void OnTriggerEnter2D(Collider2D other)
+    //{
+    //    Debug.Log("collide");
+    //    if(other.transform.CompareTag("GroundItem"))
+    //    {
+    //        GroundItem groundItem = other.GetComponentInParent<GroundItem>();
+    //        if (groundItem != null && groundItem.PickupTime <= 0f)
+    //        {
+    //            if(TryGetComponent<PlayerController>(out PlayerController player))
+    //            {
+    //                Item newItem = new Item(groundItem.Item);
+    //                if (player.GetInventoryObject.AddItem(newItem, newItem.Amount))
+    //                {
+    //                    if (player != null)
+    //                    {
+    //                        player.RpcAddItemToPlayer(player.GetComponent<NetworkIdentity>().connectionToClient, other.gameObject);
+    //                        NetworkServer.Destroy(other.gameObject);
+    //                        //player.RemoveItemFromGround(other.gameObject);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 }

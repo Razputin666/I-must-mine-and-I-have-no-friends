@@ -15,7 +15,7 @@ MonoBehaviour:
   uiDisplaySprite: {fileID: 21300000, guid: 98056df016777c34dbe50b66d20c39ba, type: 3}
   stackable: 1
   itemType: 9
-  description: Dirt from another world
+  description: Dirt with some grass from another world
   data:
     name: Grass
     id: 21

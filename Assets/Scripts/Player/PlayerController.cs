@@ -21,7 +21,7 @@ public class PlayerController : NetworkBehaviour
     public int playerHP;
 
     public Rigidbody2D rb2d;        //Store a reference to the Rigidbody2D component required to use 2D Physics.
-    public Vector3 worldPosition;
+    public Vector3 mousePosInWorld;
     public Vector3 mousePos;
     private float distanceFromPlayerx;
     private float distanceFromPlayery;
@@ -30,7 +30,7 @@ public class PlayerController : NetworkBehaviour
     #endregion
 
     public Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
-    private ItemController itemController;
+
     private ItemHandler itemHandler;
     public Transform item;
     [SerializeField]
@@ -57,42 +57,57 @@ public class PlayerController : NetworkBehaviour
     Camera _secondCamera;
 
     private SceneScript sceneScript;
-    
-    private bool isReady = false;
+    [SerializeField]
+    private float itemPickupRange;
+    private float itemPickupCooldown;
+    private const float itemPickupCooldownDefault = 0.5f;
+    public bool IsReady { get; private set; } = false;
 
     private void Awake()
     {
         //allow all players to run this
         sceneScript = GameObject.FindObjectOfType<SceneScript>();
-        item = gameObject.GetComponentInChildren<FaceMouse>().gameObject.transform.Find("ItemHeldInHand");
+        item = gameObject.transform.Find("Gubb_arm").gameObject.transform.Find("ItemHeldInHand");
 
         itemHandler = GetComponent<ItemHandler>();
-        isReady = false;
+        IsReady = false;
+        
+        itemPickupCooldown = itemPickupCooldownDefault;
+
+        DontDestroyOnLoad(this.gameObject);
+    }
+
+    private void Update()
+    {
+        if (IsReady)
+        {
+            //if (!isLocalPlayer)
+            //{
+            //    //if(camera)
+            //    //    floatingInfo.transform.LookAt(camera.transform);
+            //    return;
+            //}
+
+            CheckQuickslotInput();
+
+            if(isServer)
+            {
+                itemPickupCooldown -= Time.deltaTime;
+
+                if (itemPickupCooldown <= 0f)
+                {
+                    itemPickupCooldown = itemPickupCooldownDefault;
+
+                    CheckItemCollision();
+                }
+            }
+        }
     }
 
     #region Network
-    private void OnNameChanged(string _Old, string _New)
-    {
-        playerNameText.text = playerName;
-    }
-    private void OnActiveItemChanged(int _Old, int _New)
-    {
-        ItemObject itemObj = itemHandler.ItemDatabase.GetItemAt(_New);
-        if (itemObj != null)
-        {
-            SetPlayerState(itemObj.ItemType);
-            item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
-        }
-        else
-        {
-            SetPlayerState(ITEM_TYPE.None);
-            item.GetComponent<SpriteRenderer>().sprite = null;
-        }
-    }
-
     public override void OnStartLocalPlayer()
     {
-        isReady = false;
+        IsReady = false;
 
         if (camera == null)
             camera = Instantiate(Camera.main);
@@ -164,65 +179,92 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    #endregion
-
-    //[ClientRpc]
-    //private void UpdatePlayerState(int itemID)
-    //{
-    //    ItemDatabaseObject idat = itemHandler.ItemDatabase;
-    //    ItemObject itemObj = idat.GetItemAt(itemID);
-    //    if (itemObj != null)
-    //    {
-    //        SetPlayerState(itemObj.ItemType);
-    //        item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
-    //    }
-    //    else
-    //    {
-    //        SetPlayerState(ITEM_TYPE.None);
-    //        item.GetComponent<SpriteRenderer>().sprite = null;
-    //    }
-    //}
-
-    #endregion
-
-    private IEnumerator FadeServerMessage()
+    [Command]
+    private void CmdSendMousPos(Vector3 mousePos)
     {
-        if(sceneScript)
-        {
-            yield return new WaitForSeconds(5f);
-
-            sceneScript.canvasStatusText.enabled = false;
-        }
+        mousePosInWorld = mousePos;
     }
 
-    #region Updates
-    [Client]
-    private void Update()
-    {
-        if(isReady)
-        {
-            if (!isLocalPlayer)
-            {
-                //if(camera)
-                //    floatingInfo.transform.LookAt(camera.transform);
-                return;
-            }
+    #endregion
 
-            CheckQuickslotInput();
-        }
+    #region Server
+    [Server]
+    private void CheckItemCollision()
+    {
+        Debug.Log("Checking collision");
+        Collider2D[] colliderArray = Physics2D.OverlapCircleAll(transform.position, itemPickupRange);
         
+        foreach (Collider2D collider2D in colliderArray)
+        {
+            Debug.Log(collider2D);
+            if (collider2D.TryGetComponent<GroundItem>(out GroundItem groundItem))
+            {
+                Debug.Log("Collision");
+                Item newItem = new Item(groundItem.Item);
+                //if (GetInventoryObject.AddItem(newItem, newItem.Amount))
+                //{
+                RpcAddItemToPlayer(GetComponent<NetworkIdentity>().connectionToClient, newItem.ID, newItem.Amount);
+                NetworkServer.Destroy(collider2D.gameObject);
+                //}
+            }
+        }
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(transform.position, itemPickupRange);
+    }
+
+    #endregion
+
+    #region Callbacks
+    private void OnNameChanged(string _Old, string _New)
+    {
+        playerNameText.text = playerName;
+    }
+    private void OnActiveItemChanged(int _Old, int _New)
+    {
+        ItemObject itemObj = itemHandler.ItemDatabase.GetItemAt(_New);
+        if (itemObj != null)
+        {
+            SetPlayerState(itemObj.ItemType);
+            item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
+        }
+        else
+        {
+            SetPlayerState(ITEM_TYPE.None);
+            item.GetComponent<SpriteRenderer>().sprite = null;
+        }
+    }
+    #endregion
+
+    #region Client
+
+    [TargetRpc]
+    public void RpcAddItemToPlayer(NetworkConnection conn, int itemID, int itemAmount)
+    {
+        Debug.Log("Adding item. ID: " + itemID + " amount: " + itemAmount);
+        ItemObject item = Instantiate(GetInventoryObject.ItemDatabase.GetItemAt(itemID));
+        item.Data.Amount = itemAmount;
+
+        Item newItem = new Item(item);
+        itemHandler.Inventory.AddItem(newItem, newItem.Amount);
+    }
+
     [Client]
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     void FixedUpdate()
     {
-        if(isReady)
+        if (IsReady)
         {
             if (!isLocalPlayer)
                 return;
 
             mousePos = Input.mousePosition;
-            worldPosition = camera.ScreenToWorldPoint(mousePos);
+            mousePosInWorld = camera.ScreenToWorldPoint(mousePos);
+
+            CmdSendMousPos(mousePosInWorld);
 
             if (playerHP <= 0)
             {
@@ -230,18 +272,19 @@ public class PlayerController : NetworkBehaviour
             }
         }
     }
-    #endregion
+    [Client]
     public void UpdateActiveItem(int itemID)
     {
         CmdActiveItemChanged(itemID);
     }
 
+    [Client]
     private void QuickslotActiveChanged(int index)
     {
         if (activeQuickslot != index)
         {
             ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[index].ItemObject;
-            
+
             int id = itemObj != null ? itemObj.Data.ID : -1;
             CmdActiveItemChanged(id);
             activeQuickslot = index;
@@ -317,28 +360,28 @@ public class PlayerController : NetworkBehaviour
     [Client]
     public void SetReady(bool ready)
     {
+        IsReady = ready;
+
         if (!isLocalPlayer)
             return;
 
-        isReady = ready;
-        if(isReady)
+        if (IsReady)
         {
             itemHandler.ShowGUI();
             GetComponent<MiningController>().UpdateTiles();
-            GetComponent<Rigidbody2D>().simulated = true;
         }
     }
-
+    [Client]
     public void RemoveItemFromGround(GameObject obj)
     {
-        if(isLocalPlayer)
+        if (isLocalPlayer)
             CmdRemoveGroundItem(obj);
     }
 
     [Client]
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(isReady)
+        if (IsReady)
         {
             if (collision.collider.CompareTag("EnemyWeapon"))
             {
@@ -358,7 +401,7 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    
+
 
     void Die()
     {
@@ -366,6 +409,24 @@ public class PlayerController : NetworkBehaviour
         gameObject.SetActive(false);
     }
 
+
+
+
+    #endregion
+
+    #endregion
+
+    private IEnumerator FadeServerMessage()
+    {
+        if(sceneScript)
+        {
+            yield return new WaitForSeconds(5f);
+
+            sceneScript.canvasStatusText.enabled = false;
+        }
+    }
+
+    
 
     IEnumerator CoroutineCoordinator()
     {
@@ -378,6 +439,7 @@ public class PlayerController : NetworkBehaviour
             yield return null;
         }
     }
+
     #region Getter
     public InventoryObject GetInventoryObject
     {
@@ -408,19 +470,7 @@ public class PlayerController : NetworkBehaviour
 
     public int MiningStrength
     {
-        get
-        {
-            return miningStrength;
-        }
+        get { return miningStrength; }
     }
-
-    public bool IsReady
-    {
-        get
-        {
-            return isReady;
-        }
-    }
-    
     #endregion
 }
