@@ -17,7 +17,7 @@ MonoBehaviour:
   itemType: 9
   description: Dirt with some grass from another world
   data:
-    name: Grass
+    name: Grass Block
     id: 21
     amount: 1
   maxStackSize: 0

@@ -196,6 +196,8 @@ public class LevelGeneratorLayered : NetworkBehaviour
 					startPosition.x += width - 1;
 					chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
 					chunk.name = "tilemap_" + i;
+
+					TilemapSyncManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
 				}
 				chunkHeightOffset = grassOverWorldChunk.GetChunkHeightOffset;
 				startPosition = new Vector2Int(0, 0);
@@ -219,6 +221,7 @@ public class LevelGeneratorLayered : NetworkBehaviour
 					startPosition.x += width - 1;
 					chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
 					chunk.name = "tilemap_" + i;
+					TilemapSyncManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
 				}
 				Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
 				Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
@@ -479,11 +482,18 @@ public class LevelGeneratorLayered : NetworkBehaviour
 					start.transform.position = playerSpawn.point + Vector2.up;
 					NetworkManager.RegisterStartPosition(start.transform);
 				}
-				GameObject drill = Instantiate(drillLaser, playerSpawn.point + Vector2.up * 3, quaternion.identity);
-				drill.GetComponent<Rigidbody2D>().simulated = true;
-				NetworkServer.Spawn(drill);
+				
+				GameObject player = GameObject.FindGameObjectWithTag("Player");
+				if(player != null)
+                {
+					GameObject drill = Instantiate(drillLaser, playerSpawn.point + Vector2.up * 3, quaternion.identity);
+					drill.GetComponent<Rigidbody2D>().simulated = true;
+					NetworkServer.Spawn(drill);
 
-				playerSpawned = true;
+					player.transform.position = NetworkManager.startPositions[0].position;
+
+					playerSpawned = true;
+				}
 			}
 		}
 	}

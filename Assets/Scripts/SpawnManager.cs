@@ -2,54 +2,64 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 public class SpawnManager : NetworkBehaviour
 {
-    //public static void SpawnItemAt(Vector3 spawnPos, ItemObject item)
-    //{
-    //    spawnPos.z = 0;
-    //    GameObject parentObject = GameObject.Find("ItemSpawner");
-    //    GameObject groundItemPrefab = Resources.Load<GameObject>("Prefabs/GroundItemObject") as GameObject;
-    //    GameObject groundObject = Instantiate(groundItemPrefab, spawnPos + Vector3.up, Quaternion.identity, parentObject.transform);
-
-    //    GroundItem gItem = groundObject.GetComponent<GroundItem>();
-    //    gItem.Item = item;
-    //    NetworkServer.Spawn(groundObject);
-    //}
-
     [Command(ignoreAuthority = true)]
-    public void CmdSpawnItemAt(Vector3 spawnPos, int itemID, int itemAmount)
+    public void CmdSpawnItemFromIDAt(Vector3 position, int itemID, int itemAmount)
     {
-        ItemDatabaseObject db = Resources.Load("ScriptableObjects/ItemDatabase") as ItemDatabaseObject;
+        SpawnItemAt(position, itemID, itemAmount);
+    }
+    [Command(ignoreAuthority = true)]
+    private void CmdSpawnItemFromNameAt(Vector3 position, string itemName)
+    {
+        SpawnItemAt(position, itemName);
+    }
+    public void SpawnItemAt(Vector3 position, string itemName)
+    {
+        if (!isServer)
+            CmdSpawnItemFromNameAt(position, itemName);
+        else
+        {
+            ItemDatabaseObject db = Resources.Load("ScriptableObjects/ItemDatabase") as ItemDatabaseObject;
 
-        ItemObject item = Instantiate(db.GetItemAt(itemID));
-        item.Data.Amount = itemAmount;
+            ItemObject item = Instantiate(db.GetItemOfName(itemName));
 
-        spawnPos.z = 0;
-        GameObject parentObject = GameObject.Find("ItemSpawner");
-        GameObject groundItemPrefab = Resources.Load<GameObject>("SpawnablePrefabs/GroundItemObject") as GameObject;
-        GameObject groundObject = Instantiate(groundItemPrefab, spawnPos + Vector3.up, Quaternion.identity, parentObject.transform);
+            position.z = 0;
+            GameObject parentObject = GameObject.Find("ItemSpawner");
+            GameObject groundItemPrefab = Resources.Load<GameObject>("SpawnablePrefabs/GroundItemObject") as GameObject;
+            GameObject groundObject = Instantiate(groundItemPrefab, position + Vector3.up, Quaternion.identity, parentObject.transform);
 
-        groundObject.GetComponent<Rigidbody2D>().simulated = true;
-        GroundItem gItem = groundObject.GetComponent<GroundItem>();
-        gItem.SetItemObject(item, 0f);
+            groundObject.GetComponent<Rigidbody2D>().simulated = true;
+            GroundItem gItem = groundObject.GetComponent<GroundItem>();
+            gItem.SetItemObject(item, 0f);
 
-        NetworkServer.Spawn(groundObject);
-
-        //RpcChangeSprite(groundObject, itemID);
+            NetworkServer.Spawn(groundObject);
+        }
     }
 
-    //[ClientRpc]
-    //private void RpcChangeSprite(GameObject groundObject, int itemID)
-    //{
-    //    //groundObject.GetComponent<Rigidbody2D>().gravityScale = 0f;
+    public void SpawnItemAt(Vector3 position, int itemID, int itemAmount)
+    {
+        if (!isServer)
+            CmdSpawnItemFromIDAt(position, itemID, itemAmount);
+        else
+        {
+            ItemDatabaseObject db = Resources.Load("ScriptableObjects/ItemDatabase") as ItemDatabaseObject;
 
-    //    ItemDatabaseObject db = Resources.Load("ScriptableObjects/ItemDatabase") as ItemDatabaseObject;
+            ItemObject item = Instantiate(db.GetItemAt(itemID));
+            item.Data.Amount = itemAmount;
 
-    //    ItemObject item = Instantiate(db.GetItemAt(itemID));
-    //    item.Data.Amount = itemAmount;
+            position.z = 0;
+            GameObject parentObject = GameObject.Find("ItemSpawner");
+            GameObject groundItemPrefab = Resources.Load<GameObject>("SpawnablePrefabs/GroundItemObject") as GameObject;
+            GameObject groundObject = Instantiate(groundItemPrefab, position + Vector3.up, Quaternion.identity, parentObject.transform);
 
-    //    GroundItem gItem = groundObject.GetComponent<GroundItem>();
-    //    gItem.SetItemObject(item, 0f);
-    //}
+            groundObject.GetComponent<Rigidbody2D>().simulated = true;
+            GroundItem gItem = groundObject.GetComponent<GroundItem>();
+            gItem.SetItemObject(item, 0f);
+
+            NetworkServer.Spawn(groundObject);
+        }
+    }
 }

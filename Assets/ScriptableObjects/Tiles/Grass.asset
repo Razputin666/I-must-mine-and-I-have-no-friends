@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tiles:
   - {fileID: 11400000, guid: 2a9692006a6ac174c97937bdfe0db83e, type: 2}
-  blockName: Grass
+  blockName: Grass Block
   blockStrength: 1
   blockType: Common

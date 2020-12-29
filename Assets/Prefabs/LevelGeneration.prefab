@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1792650185}
   - component: {fileID: 2085960718471711120}
   - component: {fileID: 8805108713136885511}
-  - component: {fileID: 7234395803593304995}
+  - component: {fileID: 1852934364}
   m_Layer: 0
   m_Name: LevelGeneration
   m_TagString: GameManager
@@ -176,7 +176,7 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
---- !u!114 &7234395803593304995
+--- !u!114 &1852934364
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -185,8 +185,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 8978213078250018397}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 433a72179347c3242ad1649f732f4cdc, type: 3}
+  m_Script: {fileID: 11500000, guid: 2bd89c59aec16cb4f9672879f5ca2f8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  localPlayer: {fileID: 0}
+  hasTilemaps: 0

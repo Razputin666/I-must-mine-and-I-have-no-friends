@@ -65,59 +65,96 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
         if(tileMapManager == null)
             tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
     }
-
-    public Tilemap GetChunk(Vector3Int targetedBlock)
+    [Server]
+    public Tilemap GetChunk(Vector3 targetedBlock)
     {
-        RaycastHit2D chunkCheck = Physics2D.Linecast(Vector2Int.FloorToInt(transform.position), new Vector2(targetedBlock.x, targetedBlock.y));
-        if (chunkCheck.collider != null && chunkCheck.collider.gameObject.CompareTag("TileMap"))
+        //RaycastHit2D chunkCheck = Physics2D.Linecast(Vector2Int.FloorToInt(transform.position), new Vector2(targetedBlock.x, targetedBlock.y));
+        //if (chunkCheck.collider != null && chunkCheck.collider.gameObject.CompareTag("TileMap"))
+        //{
+        //    return chunkCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
+        //}
+        //return null;
+
+        return GetTilemap(targetedBlock);
+    }
+
+    [Server]
+    private Tilemap GetTilemap(Vector2 worldPosition)
+    {
+        List<Tilemap> tilemaps = TilemapSyncManager.Instance.Tilemaps;
+        foreach (Tilemap tilemap in tilemaps)
         {
-            return chunkCheck.collider.attachedRigidbody.GetComponent<Tilemap>();
+            BoundsInt bounds = tilemap.cellBounds;
+            Vector3 tilemapPos = tilemap.transform.position;
+
+            if (Inside(tilemapPos, bounds.size, worldPosition))
+            {
+                return tilemap;
+            }
         }
+
         return null;
     }
 
     [Server]
-    public void Mine(Vector3Int blockToMine, float miningStr)
+    private bool Inside(Vector3 pos, Vector3Int size, Vector2 point)
     {
-        if(!coolDownSystem.IsOnCoolDown(id))
+        //Debug.Log("Tilemap Pos: " + pos);
+        //Debug.Log("tilemap Bounds pos: " + new Vector3(pos.x + size.x, pos.y + size.y));
+        //Debug.Log("MousePos: " + point);
+        if (pos.x <= point.x &&
+            point.x <= pos.x + size.x &&
+            pos.y <= point.y &&
+            point.y <= pos.y + size.y)
         {
-            chunk = GetChunk(blockToMine);
+            return true;
+        }
 
-            if (chunk == null)
-                return;
+        return false;
+    }
+    [Command]
+    private void CmdMineBlockAt(Vector3 blockToMine, float miningStr)
+    {
+        ServerMine(blockToMine, miningStr);
+    }
 
-            Vector3Int blockInCell = chunk.WorldToCell(blockToMine);
-            float blockStr;
-            string blockName = tileMapManager.BlockNameGet(new Vector3Int(blockInCell.x, blockInCell.y, 0), chunk);
+    [Server]
+    private void ServerMine(Vector3 blockToMine, float miningStr)
+    {
+        chunk = GetChunk(blockToMine);
 
-            if (!blockChecker.TryGetValue(blockInCell, out blockStr))
+        if (chunk == null)
+            return;
+        
+        Vector3Int blockInCell = chunk.WorldToCell(blockToMine);
+
+        if (chunk.GetTile(Vector3Int.FloorToInt(blockInCell)) == null)
+            return;
+
+        float blockStr;
+        string blockName = tileMapManager.GetBlockName(new Vector3Int(blockInCell.x, blockInCell.y, 0), chunk);
+
+        if (!blockChecker.TryGetValue(blockInCell, out blockStr))
+        {
+            blockStr = tileMapManager.GetBlockStrength(blockInCell, chunk);
+            if(blockStr >= 0)
             {
-                blockStr = tileMapManager.BlockStrengthGet(blockInCell, chunk);
-                if(blockStr >= 0)
-                {
-                    blockStr -= miningStr * Time.deltaTime;
-                    blockChecker.Add(blockInCell, blockStr);
-                }
+                blockStr -= miningStr * coolDownDuration;
+                blockChecker.Add(blockInCell, blockStr);
             }
-            else
-            {
-                blockStr = blockChecker[blockInCell];
-                blockStr -= miningStr * Time.deltaTime;
-                blockChecker[blockInCell] = blockStr;
-            }
-            if (blockStr <= 0)
-            {
-                //Debug.Log(blockInLocal + " position is " + blockType);
-                
-                DropItemFromBlock(blockInCell, blockName, chunk);
-                CheckBlockRules(blockInCell, blockName, chunk, blockToMine);
-                //chunk.SetTile(blockInLocal, null);
-                blockChecker.Remove(blockInCell);
-                coolDownSystem.PutOnCoolDown(this);
-
-                SendTilemapUpdate(blockInCell, chunk.name);
-            }
-
+        }
+        else
+        {
+            blockStr = blockChecker[blockInCell];
+            blockStr -= miningStr * coolDownDuration;
+            blockChecker[blockInCell] = blockStr;
+        }
+        if (blockStr <= 0)
+        {
+            DropItemFromBlock(blockInCell, blockName, chunk);
+            CheckBlockRules(blockInCell, blockName, chunk, blockToMine);
+            blockChecker.Remove(blockInCell);
+            TilemapSyncManager.Instance.UpdateTilemap(chunk.name, blockInCell, string.Empty);
         }
     }
 
@@ -139,13 +176,12 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
                 
                 if (currentChunk.HasTile(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0)))
                 {
-                    string upperBlockType = tileMapManager.BlockNameGet(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), currentChunk);
+                    string upperBlockType = tileMapManager.GetBlockName(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), currentChunk);
                     if(upperBlockType == "Plant")
                     {
                         Vector3Int cellBlockPos = new Vector3Int(blockPosition.x, blockPosition.y + 1, 0);
-                        currentChunk.SetTile(cellBlockPos, null);
 
-                        SendTilemapUpdate(cellBlockPos, currentChunk.name);
+                        TilemapSyncManager.Instance.UpdateTilemap(currentChunk.name, cellBlockPos, string.Empty);
 
                         //Drop block here
                     }
@@ -158,14 +194,14 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
                 
                 for (int y = 0; y < 50 && isTree; y++)
                 {
-                    upperBlocks.Add(tileMapManager.BlockNameGet(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), currentChunk));
+                    upperBlocks.Add(tileMapManager.GetBlockName(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), currentChunk));
                     if (upperBlocks[y] == "Tree")
                     {
                         Vector3Int cellBlockPos = new Vector3Int(blockPosition.x, blockPosition.y + y, 0);
-                        currentChunk.SetTile(cellBlockPos, null);
+
                         DropItemFromBlock(cellBlockPos, blockName, currentChunk);
 
-                        SendTilemapUpdate(cellBlockPos, currentChunk.name);
+                        TilemapSyncManager.Instance.UpdateTilemap(currentChunk.name, cellBlockPos, string.Empty);
                     }
                     else
                         isTree = false;
@@ -179,75 +215,24 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     private void DropItemFromBlock(Vector3Int blockPosition, string blockName, Tilemap tilemap)
     {
         ItemObject itemObj = itemDatabase.GetItemOfName(blockName);
+
         if (itemObj != null)
         {
-            spawnManager.CmdSpawnItemAt(tilemap.CellToWorld(blockPosition), itemObj.Data.ID, itemObj.Data.Amount);
+            spawnManager.SpawnItemAt(tilemap.CellToWorld(blockPosition), blockName);
         }
     }
 
-    [Command]
-    public void CmdMineBlockAt(Vector3Int blockPos, float miningStr)
+    public void Mine(Vector3 blockPos, float miningStr)
     {
-        Mine(blockPos, miningStr);
-        Debug.Log("Mining Server");
-    }
-
-    private void SendTilemapUpdate(Vector3Int blockPos, string tilemapName)
-    {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-
-        foreach (GameObject player in players)
+        if (!coolDownSystem.IsOnCoolDown(id))
         {
-            MiningController playerMine = player.GetComponent<MiningController>();
-            playerMine.RpcUpdateTilemap(player.GetComponent<NetworkIdentity>().connectionToClient, blockPos, tilemapName);
-        }
-    }
+            if (isClient)
+                CmdMineBlockAt(blockPos, miningStr);
+            else
+                ServerMine(blockPos, miningStr);
 
-    [TargetRpc]
-    public void RpcUpdateTilemap(NetworkConnection conn, Vector3Int blockPos, string tilemapName)
-    {
-        Debug.Log("Update Tilemap");
-        if (!GetComponent<PlayerController>().IsReady)
-        {
-            Debug.Log("Adding to list: " + tileUpdateData.Count);
-            tileUpdateData.Add(new TileUpdateData(blockPos, tilemapName));
-            return;
-        }
-
-        GameObject grid = GameObject.Find("Grid");
-
-        Tilemap[] tilemaps = grid.GetComponentsInChildren<Tilemap>();
-
-        for (int i = 0; i < tilemaps.Length; i++)
-        {
-            if (tilemaps[i].name == tilemapName)
-            {
-                Debug.Log("setting tiles");
-                tilemaps[i].SetTile(blockPos, null);
-                return;
-            }
-        }     
-    }
-
-    [Client]
-    public void UpdateTiles()
-    {
-        Debug.Log("Tiles: " + tileUpdateData.Count);
-        foreach (TileUpdateData data in tileUpdateData)
-        {
-            GameObject grid = GameObject.Find("Grid");
-
-            Tilemap[] tilemaps = grid.GetComponentsInChildren<Tilemap>();
-
-            for (int i = 0; i < tilemaps.Length; i++)
-            {
-                if (tilemaps[i].name == data.tilemapName)
-                {
-                    tilemaps[i].SetTile(data.blockCellPos, null);
-                }
-            }
-        }
-        tileUpdateData.Clear();
+            coolDownSystem.PutOnCoolDown(this);
+        }  
     }
     
     public int Id => id;

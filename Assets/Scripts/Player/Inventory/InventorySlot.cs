@@ -63,6 +63,17 @@ public class InventorySlot
     {
         UpdateSlot(item, this.item.Amount + value);
     }
+    public void RemoveAmount(int value)
+    {
+        if(item.Amount - value > 0)
+        {
+            UpdateSlot(Item, item.Amount - value);
+        }
+        else
+        {
+            RemoveItem();
+        }
+    }
     //Check if we can place the itemobject in this slot
     public bool CanPlaceInSlot(ItemObject itemObject)
     {

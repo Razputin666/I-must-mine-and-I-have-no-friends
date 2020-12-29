@@ -9,15 +9,17 @@ public class PlayerStatesController : NetworkBehaviour
     private PlayerController player;
     private LineController line;
     private MiningController miningController;
+    private BuildingController buildingController;
 
     Vector3Int targetBlockIntPos;
     // Start is called before the first frame update
     public override void OnStartLocalPlayer()
     {
         player = GetComponent<PlayerController>();
-        //tileMapChecker = GetComponentInChildren<TileMapChecker>();
+
         line = transform.Find("Gubb_arm").GetComponentInChildren<LineController>();
         miningController = GetComponent<MiningController>();
+        buildingController = GetComponent<BuildingController>();
     }
 
     // Update is called once per frame
@@ -25,29 +27,36 @@ public class PlayerStatesController : NetworkBehaviour
     {
         if (!isLocalPlayer)
             return;
+        Vector3 mousePosition = player.mousePosInWorld;
+        mousePosition.z = 0f;
+        Vector3 playerPosition = transform.position;
+
+        Vector3 distance = mousePosition - playerPosition;
+
         switch (player.playerStates)
         {
             case PlayerController.PlayerStates.Mining:
-                targetBlockIntPos = Vector3Int.FloorToInt(player.mousePosInWorld);
-                targetBlockIntPos.z = 0;
-                Vector3Int playerIntPos = Vector3Int.FloorToInt(transform.position);
-                Vector3Int distanceFromPlayer = targetBlockIntPos - playerIntPos;
-                //Debug.Log(targetBlockIntPos + " player mousepos");
-                //if(Input.GetMouseButtonDown(0))
-                //{
-                //    Debug.Log(player.worldPosition);
-                //}
 
-                if (Input.GetMouseButton(0) && distanceFromPlayer.x > -5 && distanceFromPlayer.x < 5 && distanceFromPlayer.y > -5 && distanceFromPlayer.y < 5)
+                if (Input.GetMouseButton(0) && distance.x > -5f && distance.x < 5f && distance.y > -5f && distance.y < 5f)
                 {
                     line.enabled = true;
 
-                    miningController.CmdMineBlockAt(targetBlockIntPos, player.MiningStrength);
+                    miningController.Mine(mousePosition, player.MiningStrength);
                 }
                 break;
             case PlayerController.PlayerStates.Normal:
                 break;
             case PlayerController.PlayerStates.Building:
+                if (Input.GetMouseButton(0) && distance.x > -5f && distance.x < 5f && distance.y > -5f && distance.y < 5f)
+                {
+                    ItemObject itemObj = player.GetActiveItem();
+                    if (itemObj != null)
+                    {
+                        buildingController.Build(mousePosition, itemObj.Data.Name);
+                    }
+                       
+                    
+                }
                 break;
             case PlayerController.PlayerStates.Idle:
                 break;

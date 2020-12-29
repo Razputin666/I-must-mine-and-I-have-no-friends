@@ -19,12 +19,11 @@ public class LoadingScreen : NetworkBehaviour
     
     private int messagesRecieved = 0;
     private int totalMessages = 0;
-
-    GameObject playerInstance;
+    private int tilemapsSynced = 0;
 
     //private System.Diagnostics.Stopwatch stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
-    public void Start()
+    public void Awake()
     {
         if (gameTiles == null)
             gameTiles = GetComponent<GameTiles>();
@@ -32,22 +31,17 @@ public class LoadingScreen : NetworkBehaviour
         if (networkTransmitter == null)
             networkTransmitter = GetComponent<NetworkTransmitter>();
     }
-    public override void OnStartClient()
+    public override void OnStartLocalPlayer()
     {
-        if (!isLocalPlayer)
-            return;
-
         if (!isClientOnly)
         {
             StartCoroutine(SpawnPlayer(connectionToClient));
             return;
         }
 
-        if (gameTiles == null)
-            gameTiles = GetComponent<GameTiles>();
+        TilemapSyncManager.Instance.HasTilemaps = false;
 
-        if (networkTransmitter == null)
-            networkTransmitter = GetComponent<NetworkTransmitter>();
+        gameTiles.OnWorldTilesSet += OnTilemapSet;
 
         networkTransmitter.OnDataCompletelyReceived += MyCompletlyRecievedHandler;
 
@@ -56,11 +50,11 @@ public class LoadingScreen : NetworkBehaviour
   
     private IEnumerator SpawnPlayer(NetworkConnection conn)
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
 
         //Spawn player
         GameObject playerInstance = Instantiate(playerPrefab, NetworkManager.startPositions[0].position, Quaternion.identity);
-
+        
         //Destroy gameobject
         GameObject go = conn.identity.gameObject;
 
@@ -81,10 +75,9 @@ public class LoadingScreen : NetworkBehaviour
     private void CmdRequestTerrainData()
     {
         NetworkConnection conn = connectionToClient;
-        GameObject grid = GameObject.Find("Grid");
+        //GameObject grid = GameObject.Find("Grid");
 
-        Tilemap[] tilemaps = grid.GetComponentsInChildren<Tilemap>();
-        Debug.Log("tilemaps: " + tilemaps.Length);
+        Tilemap[] tilemaps = TilemapSyncManager.Instance.Tilemaps.ToArray();
         RpcSendMessageCount(tilemaps.Length);
 
         SendMapData(conn, tilemaps);
@@ -94,7 +87,7 @@ public class LoadingScreen : NetworkBehaviour
     private void CmdMapSyncComplete()
     {
         //Spawn player
-        playerInstance = Instantiate(playerPrefab, NetworkManager.startPositions[0].position, Quaternion.identity);
+        GameObject playerInstance = Instantiate(playerPrefab, NetworkManager.startPositions[0].position, Quaternion.identity);
         
         //Destroy gameobject
         GameObject go = connectionToClient.identity.gameObject;
@@ -108,7 +101,6 @@ public class LoadingScreen : NetworkBehaviour
     [Server]
     private void SendMapData(NetworkConnection conn, Tilemap[] tilemaps)
     {
-        Debug.Log(conn);
         for (int i = 0; i < tilemaps.Length; i++)
         {
             List<WorldTile> saveTiles = gameTiles.GetWorldTiles(tilemaps[i], false);
@@ -160,34 +152,28 @@ public class LoadingScreen : NetworkBehaviour
         //float perc = (float)messagesRecieved / (float)totalMessages;
 
         //loadingScreenProgressText.text = "Loading: " + perc * 100;
-        Debug.Log("Transmission: " + transmissionID);
 
         GameObject grid = GameObject.Find("Grid");
         GameObject chunk = Instantiate(tilemapPrefab, grid.transform);
         chunk.name = "tilemap_" + transmissionID;
-        chunk.GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
 
         Tilemap tm = chunk.GetComponent<Tilemap>();
 
+        TilemapSyncManager.Instance.AddTileChunk(tm);
+
         List<WorldTile> saveData = DeserializeMap(data);
-        //gameTiles.saveTiles = saveData;
-        //stopWatch.Restart();
-        //stopWatch.Start();
+
         gameTiles.SetWorldTiles(tm, "", saveData);
-        //stopWatch.Stop();
-        //// Get the elapsed time as a TimeSpan value.
-        //System.TimeSpan ts = stopWatch.Elapsed;
+    }
 
-        //// Format and display the TimeSpan value.
-        //string elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-        //    ts.Hours, ts.Minutes, ts.Seconds,
-        //    ts.Milliseconds / 10);
+    [Client]
+    private void OnTilemapSet(string tilemap)
+    {
+        tilemapsSynced++;
 
-        //Debug.Log("setTile time: " + elapsedTime);
-        if (messagesRecieved == totalMessages)
+        if (tilemapsSynced == totalMessages)
         {
-            Debug.Log(messagesRecieved);
-            //GetComponentInChildren<Canvas>().enabled = false;
+            Debug.Log("Sync Complete");
             CmdMapSyncComplete();
         }
     }

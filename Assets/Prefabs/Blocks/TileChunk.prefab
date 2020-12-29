@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6611024963374839542}
   - component: {fileID: -7461722848896506654}
   - component: {fileID: 7663779823202159461}
+  - component: {fileID: -581366416466297786}
   m_Layer: 8
   m_Name: TileChunk
   m_TagString: TileMap
@@ -172,7 +173,7 @@ TilemapCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_MaximumTileChangeCount: 0
+  m_MaximumTileChangeCount: 100
   m_ExtrusionFactor: 1.2
 --- !u!50 &6611024963374839542
 Rigidbody2D:
@@ -229,6 +230,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f2308b3fc85de84aa32866f516cf78b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   tileChunk: {fileID: 0}
   tilesChunk:
   - {fileID: 11400000, guid: 2a9692006a6ac174c97937bdfe0db83e, type: 2}
@@ -236,3 +239,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5a0a7bdf6e67e0e41a91d2f211690cef, type: 2}
   - {fileID: 11400000, guid: 959f9c500dd8cd24a8c10ea498c4c20e, type: 2}
   SetJobs: 0
+--- !u!114 &-581366416466297786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4802906064719502046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0

@@ -34,26 +34,10 @@ public class TileMapManager : NetworkBehaviour
         }
     }
 
-    private void Update()
-    {
-
-        //if (Input.GetMouseButtonDown(0))
-        //{
-        //    Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //    Vector3Int gridPos = chunks[0].WorldToCell(mousePos);
-
-        //    TileBase clickedTile = chunks[0].GetTile(gridPos);
-
-        //    string blockType = dataFromTiles[clickedTile].blockType;
-
-          
-        //}
-    }
-
-    public float BlockStrengthGet(Vector3Int target, Tilemap chunk)
+    public float GetBlockStrength(Vector3Int target, Tilemap tilemap)
     {
         target = new Vector3Int(target.x, target.y, 0);
-        TileBase targetedBlock = chunk.GetTile(target);
+        TileBase targetedBlock = tilemap.GetTile(target);
         if(!targetedBlock)
         {
             return -1;
@@ -66,10 +50,10 @@ public class TileMapManager : NetworkBehaviour
         return -1;
     }
 
-    public string BlockNameGet(Vector3Int target, Tilemap chunk)
+    public string GetBlockName(Vector3Int target, Tilemap tilemap)
     {
         target = new Vector3Int(target.x, target.y, 0);
-        TileBase targetedBlock = chunk.GetTile(target);
+        TileBase targetedBlock = tilemap.GetTile(target);
         
         if (!targetedBlock)
         {
@@ -83,10 +67,10 @@ public class TileMapManager : NetworkBehaviour
         return "";
     }
 
-    public string BlockTypeGet(Vector3Int target, Tilemap chunk)
+    public string GetBlockType(Vector3Int target, Tilemap tilemap)
     {
         target = new Vector3Int(target.x, target.y, 0);
-        TileBase targetedBlock = chunk.GetTile(target);
+        TileBase targetedBlock = tilemap.GetTile(target);
 
         if (!targetedBlock)
         {

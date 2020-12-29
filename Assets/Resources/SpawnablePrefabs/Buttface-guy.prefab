@@ -551,9 +551,7 @@ GameObject:
   - component: {fileID: 1800691689235569727}
   - component: {fileID: 175909222}
   - component: {fileID: 3517234915460143306}
-  - component: {fileID: 4938367198306457046}
-  - component: {fileID: 850085812017958462}
-  - component: {fileID: -1698326407259608229}
+  - component: {fileID: -6603843561241074749}
   - component: {fileID: 1284842940383734445}
   - component: {fileID: -8734172430640283002}
   - component: {fileID: 3962188231169706446}
@@ -692,7 +690,6 @@ MonoBehaviour:
   playerHP: 10
   rb2d: {fileID: 8181247841218053084}
   mousePosInWorld: {x: 0, y: 0, z: 0}
-  mousePos: {x: 0, y: 0, z: 0}
   miningStrength: 5
   item: {fileID: 0}
   deathScreen: {fileID: 3454456197156547687, guid: 98da213e5f494ba4eb14daa0a3315696,
@@ -798,13 +795,13 @@ MonoBehaviour:
   syncInterval: 0.1
   itemDatabase: {fileID: 11400000, guid: 0479499c299ce264c916f647df531e9a, type: 2}
   id: 2
-  coolDownDuration: 0.5
+  coolDownDuration: 0.1
   coolDownSystem: {fileID: 658734927}
   points: []
   tileMapManager: {fileID: 0}
   chunk: {fileID: 0}
   endOfGun: {fileID: 0}
---- !u!114 &4938367198306457046
+--- !u!114 &-6603843561241074749
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -813,41 +810,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 8181247841218053072}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f22001f8c0f14248838239baa3c9cfe, type: 3}
+  m_Script: {fileID: 11500000, guid: 2557122024c061443a640fc672271d4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  loadingScreenProgressText: {fileID: 0}
-  loadingScreenProgressBar: {fileID: 0}
-  tilemapPrefab: {fileID: 4802906064719502046, guid: f1fc65f761491f74abdd69e1daf070b8,
-    type: 3}
---- !u!114 &850085812017958462
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8181247841218053072}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 433a72179347c3242ad1649f732f4cdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
---- !u!114 &-1698326407259608229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8181247841218053072}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c509c05e146bdb4d9d69ec48380e238, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  id: 3
+  coolDownDuration: 0.3
+  coolDownSystem: {fileID: 658734927}
 --- !u!114 &1284842940383734445
 MonoBehaviour:
   m_ObjectHideFlags: 0

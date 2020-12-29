@@ -7,8 +7,8 @@ using UnityEngine.Tilemaps;
 using Unity.Collections;
 using Unity.Burst;
 using System;
-
-public class ChunkSettings : MonoBehaviour
+using Mirror;
+public class ChunkSettings : NetworkBehaviour
 {
     float grassGrowthTimer;
     public Tilemap tileChunk;
@@ -18,16 +18,19 @@ public class ChunkSettings : MonoBehaviour
     private int width;
     private int height;
 
-    private void Start()
+    public void Start()
     {
-        mapGen = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
-        width = (int)gameObject.transform.position.x + mapGen.width;
-        height = (int)gameObject.transform.position.y + mapGen.height;
-        tileChunk = GetComponent<Tilemap>();
-        TreeGrowth();
+        if(isServer)
+        {
+            Debug.Log("started");
+            mapGen = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
+            width = (int)gameObject.transform.position.x + mapGen.width;
+            height = (int)gameObject.transform.position.y + mapGen.height;
+            tileChunk = GetComponent<Tilemap>();
+            TreeGrowth();
 
-        StartCoroutine(GrassGrowth());
-
+            StartCoroutine(GrassGrowth());
+        }
     }
 
     public IEnumerator GrassGrowth()
@@ -43,19 +46,21 @@ public class ChunkSettings : MonoBehaviour
                     int randomizer = UnityEngine.Random.Range(1, 10);
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0.01f, 0.2f));
                     if (randomizer > 5)
-                        tileChunk.SetTile(new Vector3Int(i, j, 0), tilesChunk[0]);
-
+                    {
+                        Debug.Log("grassBlock");
+                        TilemapSyncManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j, 0), tilesChunk[0].name);
+                    }
                 }
                 else if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i, j + 1, 0)) && tileChunk.GetTile(new Vector3Int(i, j, 0)) == tilesChunk[0])
                 {
                     int randomizer = UnityEngine.Random.Range(1, 10);
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0.01f, 0.2f));
                     if (randomizer > 5)
-                        tileChunk.SetTile(new Vector3Int(i, j + 1, 0), tilesChunk[2]);
+                    {
+                        Debug.Log("plants");
+                        TilemapSyncManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j + 1, 0), tilesChunk[2].name);
+                    }   
                 }
-                
-
-
             }
         }  
     }
@@ -73,12 +78,13 @@ public class ChunkSettings : MonoBehaviour
                     if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i, j + 1, 0)))
                     {
                         int randomValue = UnityEngine.Random.Range(1, 6);
-
+                        
                         for (int k = 1; k < randomValue; k++)
                         {
                             if (!tileChunk.HasTile(new Vector3Int(i, j + 1, 0)))
                             {
-                                tileChunk.SetTile(new Vector3Int(i, j + k, 0), tilesChunk[1]);
+                                Debug.Log("trees");
+                                TilemapSyncManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j + k, 0), tilesChunk[1].name);
                             }
                         }
                     }

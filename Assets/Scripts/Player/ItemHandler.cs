@@ -47,6 +47,7 @@ public class ItemHandler : NetworkBehaviour
             quickSlots.GetSlots[i].OnBeforeUpdate += OnBeforeSlotUpdate;
             quickSlots.GetSlots[i].OnAfterUpdate += OnAfterSlotUpdate;
         }
+        ShowGUI();
     }
 
     public void ShowGUI()
@@ -193,11 +194,13 @@ public class ItemHandler : NetworkBehaviour
         if(Input.GetKeyDown(KeyCode.P))
         {
             inventory.Save();
+            quickSlots.Save();
             equipment.Save();
         }
         else if (Input.GetKeyDown(KeyCode.L))
         {
             inventory.Load();
+            quickSlots.Load();
             equipment.Load();
         }
         else if (Input.GetKeyDown(KeyCode.I))
