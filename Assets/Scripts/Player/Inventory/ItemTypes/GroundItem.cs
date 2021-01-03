@@ -5,7 +5,8 @@ using Mirror;
 public class GroundItem : NetworkBehaviour, ISerializationCallbackReceiver
 {
     [SerializeField] private ItemObject item;
-    private float pickupCooldown = 2f;
+
+    public float PickupTime { get; private set; } = 2f;
 
     struct ItemData
     {
@@ -16,14 +17,10 @@ public class GroundItem : NetworkBehaviour, ISerializationCallbackReceiver
     [SyncVar(hook = nameof(OnItemUpdate))]
     private ItemData itemData;
 
-    void Start()
-    {
-    }
-
     private void Update()
     {
-        if (pickupCooldown >= 0f)
-            pickupCooldown -= Time.deltaTime;
+        if (PickupTime >= 0f)
+            PickupTime -= Time.deltaTime;
     }
 
     public void SetItemObject(ItemObject item, float cooldown = 2f)
@@ -31,7 +28,7 @@ public class GroundItem : NetworkBehaviour, ISerializationCallbackReceiver
         this.item = item;
         if (item != null)
         {
-            pickupCooldown = cooldown;
+            PickupTime = cooldown;
             GetComponentInChildren<SpriteRenderer>().sprite = item.UIDisplaySprite;
 
             itemData = new ItemData
@@ -43,6 +40,10 @@ public class GroundItem : NetworkBehaviour, ISerializationCallbackReceiver
     }
     private void OnItemUpdate(ItemData _old, ItemData _new)
     {
+        GameObject parentObject = GameObject.Find("ItemSpawner");
+
+        transform.parent = parentObject.transform;
+
         ItemDatabaseObject db = Resources.Load("ScriptableObjects/ItemDatabase") as ItemDatabaseObject;
 
         ItemObject item = db.GetItemAt(_new.itemID);
@@ -58,14 +59,6 @@ public class GroundItem : NetworkBehaviour, ISerializationCallbackReceiver
         get 
         {
             return this.item;
-        }
-    }
-
-    public float PickupTime
-    {
-        get
-        {
-            return this.pickupCooldown;
         }
     }
 

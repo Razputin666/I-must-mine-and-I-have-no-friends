@@ -30,8 +30,6 @@ public class PlayerController : NetworkBehaviour
     #endregion
 
     public Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
-
-    private ItemHandler itemHandler;
     public Transform item;
     [SerializeField]
     private DeathScreen deathScreen;
@@ -51,8 +49,6 @@ public class PlayerController : NetworkBehaviour
     public string playerName;
     [SyncVar(hook = nameof(OnActiveItemChanged))]
     private int activeItemID = -1;
-    private int activeQuickslot = -1;
-
     [SerializeField]
     Camera _secondCamera;
 
@@ -64,14 +60,15 @@ public class PlayerController : NetworkBehaviour
     [SyncVar]
     private bool isReady;
     public bool IsReady { get; private set; }
-
+    public ItemHandler ItemHandler { get; private set; }
+    public int ActiveQuickslot { get; private set; } = -1;
     private void Awake()
     {
         //allow all players to run this
         sceneScript = GameObject.FindObjectOfType<SceneScript>();
         item = gameObject.transform.Find("Gubb_arm").gameObject.transform.Find("ItemHeldInHand");
 
-        itemHandler = GetComponent<ItemHandler>();
+        ItemHandler = GetComponent<ItemHandler>();
         IsReady = false;
         
         itemPickupCooldown = itemPickupCooldownDefault;
@@ -89,8 +86,8 @@ public class PlayerController : NetworkBehaviour
             //    //    floatingInfo.transform.LookAt(camera.transform);
             //    return;
             //}
-
-            CheckQuickslotInput();
+            if(isLocalPlayer)
+                CheckQuickslotInput();
 
             if(isServer)
             {
@@ -145,7 +142,7 @@ public class PlayerController : NetworkBehaviour
     }
 
     [Command]
-    private void CmdSendMousPos(Vector3 mousePos)
+    private void CmdSendMousePos(Vector3 mousePos)
     {
         mousePosInWorld = mousePos;
     }
@@ -207,7 +204,6 @@ public class PlayerController : NetworkBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(transform.position, itemPickupRange);
     }
-
     #endregion
 
     #region Callbacks
@@ -217,7 +213,7 @@ public class PlayerController : NetworkBehaviour
     }
     private void OnActiveItemChanged(int _Old, int _New)
     {
-        ItemObject itemObj = itemHandler.ItemDatabase.GetItemAt(_New);
+        ItemObject itemObj = ItemHandler.ItemDatabase.GetItemAt(_New);
         if (itemObj != null)
         {
             SetPlayerState(itemObj.ItemType);
@@ -235,11 +231,11 @@ public class PlayerController : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         if (camera == null)
-            camera = Instantiate(Camera.main);
+            camera = Instantiate(Camera.main, transform);
 
         Camera.main.GetComponentInParent<AudioListener>().enabled = false;
         camera.GetComponent<AudioListener>().enabled = true;
-        camera.transform.SetParent(transform);
+        //camera.transform.SetParent(transform);
         camera.transform.localPosition = new Vector3(0, 0, -20);
 
         //_camera.transform.position = new Vector3(Mathf.Clamp(rb2d.transform.position.x, (0) + 26.7f, (mapSize.startPosition.x) - 26.7f), rb2d.transform.position.y, -1);
@@ -259,11 +255,9 @@ public class PlayerController : NetworkBehaviour
         playerStates = PlayerStates.Idle;
 
         jumpController = GetComponent<JumpController>();
-        itemHandler = GetComponent<ItemHandler>();
+        ItemHandler = GetComponent<ItemHandler>();
 
         //mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
-
-        TilemapSyncManager.Instance.HasTilemaps = true;
 
         StartCoroutine(CoroutineCoordinator());
     }
@@ -276,15 +270,17 @@ public class PlayerController : NetworkBehaviour
         item.Data.Amount = itemAmount;
 
         Item newItem = new Item(item);
-        itemHandler.Inventory.AddItem(newItem, newItem.Amount);
+        if(!ItemHandler.QuickSlots.AddItem(newItem, newItem.Amount))
+        {
+            if (!ItemHandler.Inventory.AddItem(newItem, newItem.Amount))
+                return; //spawn back item to the world
+        }
     }
 
     [TargetRpc]
     public void RpcRemoveItemFromQuickslot(NetworkConnection conn, int amount)
     {
-        itemHandler.QuickSlots.GetSlots[activeQuickslot].RemoveAmount(amount);
-
-        
+        ItemHandler.QuickSlots.GetSlots[ActiveQuickslot].RemoveAmount(amount);
     }
 
     [Client]
@@ -296,9 +292,9 @@ public class PlayerController : NetworkBehaviour
             if (!isLocalPlayer)
                 return;
 
-            mousePosInWorld = camera.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mousePosInWorld = camera.ScreenToWorldPoint(Input.mousePosition);
 
-            CmdSendMousPos(mousePosInWorld);
+            CmdSendMousePos(mousePosInWorld);
 
             if (playerHP <= 0)
             {
@@ -315,18 +311,18 @@ public class PlayerController : NetworkBehaviour
     [Client]
     private void QuickslotActiveChanged(int index)
     {
-        if (activeQuickslot != index)
+        if (ActiveQuickslot != index)
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[index].ItemObject;
+            ItemObject itemObj = ItemHandler.QuickSlots.Container.InventorySlot[index].ItemObject;
 
             int id = itemObj != null ? itemObj.Data.ID : -1;
             CmdActiveItemChanged(id);
-            activeQuickslot = index;
+            ActiveQuickslot = index;
         }
         else
         {
             CmdActiveItemChanged(-1);
-            activeQuickslot = -1;
+            ActiveQuickslot = -1;
         }
     }
 
@@ -447,15 +443,15 @@ public class PlayerController : NetworkBehaviour
 
     public ItemObject GetActiveItem()
     {
-        if (activeQuickslot == -1)
+        if (ActiveQuickslot == -1)
             return null;
 
-        return itemHandler.QuickSlots.GetSlots[activeQuickslot].ItemObject;
+        return ItemHandler.QuickSlots.GetSlots[ActiveQuickslot].ItemObject;
     }
 
     public InventoryObject GetInventoryObject
     {
-        get { return itemHandler.Inventory; }
+        get { return ItemHandler.Inventory; }
     }
 
     //public float DistanceFromPlayerX
@@ -471,11 +467,8 @@ public class PlayerController : NetworkBehaviour
 
     //    set { distanceFromPlayery = value; }
     //}
+
     
-    public int ActiveQuickslot
-    {
-        get { return activeQuickslot; }
-    }
     public int ActiveItemID
     { 
         get { return activeItemID; } 
@@ -484,11 +477,6 @@ public class PlayerController : NetworkBehaviour
     public int MiningStrength
     {
         get { return miningStrength; }
-    }
-
-    public ItemHandler ItemHandler
-    {
-        get { return itemHandler; }
     }
     #endregion
 }

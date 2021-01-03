@@ -12,7 +12,6 @@ public class LoadingScreen : NetworkBehaviour
 {
     [SerializeField] private TMP_Text loadingScreenProgressText = null;
     [SerializeField] private Image loadingScreenProgressBar = null;
-    [SerializeField] private GameObject tilemapPrefab = null;
     [SerializeField] private GameObject playerPrefab = null;
     private GameTiles gameTiles = null;
     private NetworkTransmitter networkTransmitter = null;
@@ -39,8 +38,6 @@ public class LoadingScreen : NetworkBehaviour
             return;
         }
 
-        TilemapSyncManager.Instance.HasTilemaps = false;
-
         gameTiles.OnWorldTilesSet += OnTilemapSet;
 
         networkTransmitter.OnDataCompletelyReceived += MyCompletlyRecievedHandler;
@@ -50,7 +47,9 @@ public class LoadingScreen : NetworkBehaviour
   
     private IEnumerator SpawnPlayer(NetworkConnection conn)
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return null;
+
+        yield return null;
 
         //Spawn player
         GameObject playerInstance = Instantiate(playerPrefab, NetworkManager.startPositions[0].position, Quaternion.identity);
@@ -64,31 +63,12 @@ public class LoadingScreen : NetworkBehaviour
         NetworkServer.Destroy(go);
     }
 
-    private IEnumerator RequestTerrainData()
-    {
-        yield return null;
-
-        CmdRequestTerrainData();
-    }
-    #region Server
-    [Command(ignoreAuthority = true)]
-    private void CmdRequestTerrainData()
-    {
-        NetworkConnection conn = connectionToClient;
-        //GameObject grid = GameObject.Find("Grid");
-
-        Tilemap[] tilemaps = TilemapSyncManager.Instance.Tilemaps.ToArray();
-        RpcSendMessageCount(tilemaps.Length);
-
-        SendMapData(conn, tilemaps);
-    }
-
     [Command]
     private void CmdMapSyncComplete()
     {
         //Spawn player
         GameObject playerInstance = Instantiate(playerPrefab, NetworkManager.startPositions[0].position, Quaternion.identity);
-        
+
         //Destroy gameobject
         GameObject go = connectionToClient.identity.gameObject;
 
@@ -96,6 +76,25 @@ public class LoadingScreen : NetworkBehaviour
         NetworkServer.Spawn(playerInstance, connectionToClient);
 
         NetworkServer.Destroy(go);
+    }
+
+    private IEnumerator RequestTerrainData()
+    {
+        yield return null;
+
+        TileMapManager.Instance.InitTilemaps();
+
+        CmdRequestTerrainData();
+    }
+
+    #region Server
+    [Command(ignoreAuthority = true)]
+    private void CmdRequestTerrainData()
+    {
+        Tilemap[] tilemaps = TileMapManager.Instance.Tilemaps.ToArray();
+        RpcSendMessageCount(tilemaps.Length);
+
+        SendMapData(connectionToClient, tilemaps);
     }
 
     [Server]
@@ -153,14 +152,13 @@ public class LoadingScreen : NetworkBehaviour
 
         //loadingScreenProgressText.text = "Loading: " + perc * 100;
 
-        GameObject grid = GameObject.Find("Grid");
-        GameObject chunk = Instantiate(tilemapPrefab, grid.transform);
-        chunk.name = "tilemap_" + transmissionID;
-
-        Tilemap tm = chunk.GetComponent<Tilemap>();
-
-        TilemapSyncManager.Instance.AddTileChunk(tm);
-
+        Tilemap tm = TileMapManager.Instance.GetTilemap("Tilemap_" + transmissionID);
+        if (!tm)
+        {
+            Debug.LogError("Error finding the correct tilemap");
+            return;
+        }
+            
         List<WorldTile> saveData = DeserializeMap(data);
 
         gameTiles.SetWorldTiles(tm, "", saveData);
@@ -174,6 +172,7 @@ public class LoadingScreen : NetworkBehaviour
         if (tilemapsSynced == totalMessages)
         {
             Debug.Log("Sync Complete");
+            TileMapManager.Instance.SyncComplete();
             CmdMapSyncComplete();
         }
     }

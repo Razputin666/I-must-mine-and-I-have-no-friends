@@ -1,161 +1,154 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Tilemaps;
+﻿//using System.Collections;
+//using System.Collections.Generic;
+//using UnityEngine;
+//using UnityEngine.Tilemaps;
+//using Mirror;
+//using Unity.Jobs;
+//using Unity.Mathematics;
+//using Unity.Collections;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+//#if UNITY_EDITOR
+//using UnityEditor;
+//#endif
 
-public class LevelGenerator : MonoBehaviour
-{
-	[Tooltip("The Tilemap to draw onto")]
-	[SerializeField]
-	private Tilemap tilemap;
-	[Tooltip("The Tile to draw (use a RuleTile for best results)")]
-	[SerializeField]
-	private TileBase[] tiles;
-
-	[Tooltip("Width of our map")]
-	[SerializeField]
-	private int width;
-	[Tooltip("Height of our map")]
-	[SerializeField]
-	private int height;
-
-	[Tooltip("The settings of our map")]
-	[SerializeField]
-	public MapSettings mapSetting;
-
-    private void Start()
-    {
-		ClearMap();
-		GenerateMap();
-	}
-
-    private void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.N))
-		{
-			ClearMap();
-			GenerateMap();
-		}
-	}
-
-	[ExecuteInEditMode]
-	public void GenerateMap()
-	{
-		ClearMap();
-		int[,] map = new int[width, height];
-		float seed;
-		if (mapSetting.randomSeed)
-		{
-			seed = Time.time;
-		}
-		else
-		{
-			seed = mapSetting.seed;
-		}
-
-		//Generate the map depending on mapSen the algorithm selected
-		switch (mapSetting.algorithm)
-		{
-			case Algorithm.Perlin:
-				//First generate our array
-				map = MapFunctions.GenerateArray(width, height, true);
-				//Next generate the perlin noise onto the array
-				map = MapFunctions.PerlinNoise(map, seed);
-				break;
-			case Algorithm.PerlinSmoothed:
-				//First generate our array
-				map = MapFunctions.GenerateArray(width, height, true);
-				//Next generate the perlin noise onto the array
-				map = MapFunctions.PerlinNoiseSmooth(map, seed, mapSetting.interval);
-				break;
-			case Algorithm.PerlinCave:
-				//First generate our array
-				map = MapFunctions.GenerateArray(width, height, true);
-				//Next generate the perlin noise onto the array
-				map = MapFunctions.PerlinNoiseCave(map, mapSetting.modifier, mapSetting.edgesAreWalls);
-				break;
-			case Algorithm.RandomWalkTop:
-				//First generate our array
-				map = MapFunctions.GenerateArray(width, height, true);
-				//Next generater the random top
-				map = MapFunctions.RandomWalkTop(map, seed);
-				break;
-			case Algorithm.RandomWalkTopSmoothed:
-				//First generate our array
-				map = MapFunctions.GenerateArray(width, height, true);
-				//Next generate the smoothed random top
-				map = MapFunctions.RandomWalkTopSmoothed(map, seed, mapSetting.interval, mapSetting.randomHeightStart);
-				break;
-			case Algorithm.RandomWalkCave:
-				//First generate our array
-				map = MapFunctions.GenerateArray(width, height, false);
-				//Next generate the random walk cave
-				map = MapFunctions.RandomWalkCave(map, seed, mapSetting.clearAmount);
-				break;
-			case Algorithm.RandomWalkCaveCustom:
-				//First generate our array
-				map = MapFunctions.GenerateArray(width, height, false);
-				//Next generate the custom random walk cave
-				map = MapFunctions.RandomWalkCaveCustom(map, seed, mapSetting.clearAmount, 100);
-				break;
-			case Algorithm.CellularAutomataVonNeuman:
-				//First generate the cellular automata array
-				map = MapFunctions.GenerateCellularAutomata(width, height, seed, mapSetting.fillAmount, mapSetting.edgesAreWalls);
-				//Next smooth out the array using the von neumann rules
-				map = MapFunctions.SmoothVNCellularAutomata(map, mapSetting.edgesAreWalls, mapSetting.smoothAmount);
-				break;
-			case Algorithm.CellularAutomataMoore:
-				//First generate the cellular automata array
-				map = MapFunctions.GenerateCellularAutomata(width, height, seed, mapSetting.fillAmount, mapSetting.edgesAreWalls);
-				//Next smooth out the array using the Moore rules
-				map = MapFunctions.SmoothMooreCellularAutomata(map, mapSetting.edgesAreWalls, mapSetting.smoothAmount);
-				break;
-			case Algorithm.DirectionalTunnel:
-				//First generate our array
-				map = MapFunctions.GenerateArray(width, height, false);
-				//Next generate the tunnel through the array
-				map = MapFunctions.DirectionalTunnel(map, mapSetting.minPathWidth, mapSetting.maxPathWidth, mapSetting.maxPathChange, mapSetting.roughness, mapSetting.windyness);
-				break;
-		}
-		//Render the result
-		MapFunctions.RenderMap(map, tilemap, tiles);
-	}
-
-	public void ClearMap()
-	{
-		tilemap.ClearAllTiles();
-	}
-}
-
-//[CustomEditor(typeof(LevelGenerator))]
-//public class LevelGeneratorEditor : Editor
+//public class LevelGenerator : NetworkBehaviour
 //{
-//	public override void OnInspectorGUI()
+//	[Tooltip("The Tilemap to draw onto")]
+//	[SerializeField] private GameObject tilemapPrefab;
+//	[Tooltip("The Tile to draw (use a RuleTile for best results)")]
+//	[SerializeField] private TileBase[] tiles;
+
+//	[Tooltip("Width of our map")]
+//	[SerializeField] private int tilemapChunkWidth;
+//	[Tooltip("Height of our map")]
+//	[SerializeField] private int tilemapChunkHeight;
+
+//	[Tooltip("Number of chunks on the x")]
+//	[SerializeField] private int numberOfChunksX;
+//	[Tooltip("Number of chunks on the y")]
+//	[SerializeField] private int numberOfChunksY;
+//	//[Tooltip("The settings of our map")]
+//	//[SerializeField]
+//	//public MapSettings mapSetting;
+
+//	[SyncVar]
+//	private int mapSeed = 0;
+
+//	public List<Tilemap> chunks = new List<Tilemap>();
+
+//	public override void OnStartServer()
 //	{
-//		base.OnInspectorGUI();
+//		mapSeed = UnityEngine.Random.Range(1, 100000);
 
-//		//Reference to our script
-//		LevelGenerator levelGen = (LevelGenerator)target;
+//		UnityEngine.Random.InitState(mapSeed);
 
-//		//Only show the mapsettings UI if we have a reference set up in the editor
-//		if (levelGen.mapSetting != null)
+//		InitialWorldGeneration();
+//	}
+
+//	private void InitialWorldGeneration()
+//	{
+//		InitChunks();
+		
+
+//		//Vector2 startPosition = new Vector2(startX, startY);
+
+
+		
+//	}
+
+//	private void InitChunks()
+//    {
+//		GameObject grid = GameObject.Find("Grid");
+
+//		float startX = -tilemapChunkWidth * (numberOfChunksX / 2);
+//		float startY = -tilemapChunkHeight;
+
+//		int tilemapIndex = 0;
+
+//		for (int y = 0; y < numberOfChunksY; y++)
 //		{
-//			Editor mapSettingEditor = CreateEditor(levelGen.mapSetting);
-//			mapSettingEditor.OnInspectorGUI();
-
-//			if (GUILayout.Button("Generate"))
+//			for (int x = 0; x < numberOfChunksX; x++)
 //			{
-//				levelGen.GenerateMap();
-//			}
+//				GameObject chunk = Instantiate(tilemapPrefab, grid.transform);
 
-//			if (GUILayout.Button("Clear"))
-//			{
-//				levelGen.ClearMap();
+//				Tilemap tilemap = chunk.GetComponent<Tilemap>();
+//				chunk.transform.position = new Vector2(
+//					startX + (tilemapChunkWidth * x) - 1,
+//					startY + (tilemapChunkHeight * y) - 1); ;
+
+//				chunk.name = "tilemap_" + tilemapIndex;
+
+//				InitMap(chunk.GetComponent<Tilemap>());
+//				chunk.GetComponent<ChunkSettings>().Init();
+
+//				TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
+//				chunks.Add(chunk.GetComponent<Tilemap>());
+
+//				tilemapIndex++;
 //			}
 //		}
 //	}
+
+//	private void InitMap(Tilemap tilemap)
+//    {
+//		int[,] map = new int[tilemapChunkWidth, tilemapChunkHeight];
+
+//		map = MapFunctions.GenerateArray(tilemapChunkWidth, tilemapChunkHeight, false);
+
+//		MapFunctions.RenderMap(map, tilemap, tiles[2]); //Render with Dirt
+//	}
+
+//	private void InitTopLayer()
+//    {
+//		int[,] map = new int[tilemapChunkWidth, tilemapChunkHeight];
+
+//		for (int x = 0; x < numberOfChunksX; x++)
+//		{
+//			Tilemap tilemap = chunks[x];
+
+//			float seed = UnityEngine.Random.Range(0f, 1f);
+//			int heighRandomize = UnityEngine.Random.Range(2, 7);
+
+//			//First generate our array
+//			map = MapFunctions.GenerateArray(tilemapChunkWidth, tilemapChunkHeight, true);
+//			//Next generate the smoothed random top
+//			map = MapFunctions.RandomWalkTopSmoothed(map, seed, 3, heighRandomize);
+
+//		}
+//		NativeArray<int> mapCoords = new NativeArray<int>(tilemapChunkWidth * tilemapChunkHeight, Allocator.TempJob);
+
+//		GenerateArrayJob generateArrayJob = new GenerateArrayJob
+//		{
+//			mapList = mapCoords,
+//			empty = true,
+//		};
+
+//		JobHandle jobHandle = generateArrayJob.Schedule(mapCoords.Length, 100);
+//		jobHandle.Complete();
+
+//        for (int x = 0; x < tilemapChunkWidth; x++)
+//        {
+//            for (int y = 0; y < tilemapChunkHeight; y++)
+//            {
+//				map[x, y] = mapCoords[x + tilemapChunkHeight * y];
+//            }
+//        }
+//	}
+
+//	public struct GenerateArrayJob : IJobParallelFor
+//    {
+//		public NativeArray<int> mapList;
+//		public bool empty;
+//        public void Execute(int index)
+//        {
+//			if (empty)
+//			{
+//				mapList[index] = 0;
+//			}
+//			else
+//			{
+//				mapList[index] = 1;
+//			}
+//		}
+//    }
 //}

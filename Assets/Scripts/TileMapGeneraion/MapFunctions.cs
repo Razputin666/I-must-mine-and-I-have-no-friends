@@ -52,7 +52,28 @@ public class MapFunctions
             }
         }
     }
- 
+
+    /// <summary>
+    /// Draws the map to the screen
+    /// </summary>
+    /// <param name="map">Map that we want to draw</param>
+    /// <param name="tilemap">Tilemap we will draw onto</param>
+    /// <param name="tile">Tile we will draw with</param>
+    public static void RenderMap(int[,] map, Tilemap tilemap, TileBase tile)
+    {
+        tilemap.ClearAllTiles(); //Clear the map (ensures we dont overlap)
+        for (int x = 0; x < map.GetUpperBound(0); x++) //Loop through the width of the map
+        {
+            for (int y = map.GetUpperBound(1); y >= 0; y--) //Loop through the height of the map
+            {
+                if (map[x, y] == 1) // 1 = tile, 0 = no tile
+                {
+                    tilemap.SetTile(new Vector3Int(x, y, 0), tile);
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// Renders a map using an offset provided, Useful for having multiple maps on one tilemap
     /// </summary>
@@ -133,7 +154,6 @@ public class MapFunctions
 
     public static void ChangeExistingBlocks(int[,] map, Tilemap tilemap, TileBase tile, Vector2Int offset)
     {
-
         for (int x = 0; x < map.GetUpperBound(0); x++)
         {
             for (int y = 0; y < map.GetUpperBound(1); y++)
@@ -449,7 +469,6 @@ public class MapFunctions
     /// <returns>The modified map with a smoothed random walk</returns>
     public static int[,] RandomWalkTopSmoothed(int[,] map, float seed, int minSectionWidth, int randomizedRange)
     {
-        
         //Seed our random
         System.Random rand = new System.Random(seed.GetHashCode());
 

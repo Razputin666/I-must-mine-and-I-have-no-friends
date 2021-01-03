@@ -40,17 +40,16 @@ public class BuildingController : NetworkBehaviour, HasCoolDownInterFace
         if (tilemap.HasTile(cellPosition))
             return;
 
-        if(TilemapSyncManager.Instance.UpdateTilemap(tilemap.name, cellPosition, tileBaseName))
+        if(TileMapManager.Instance.UpdateTilemap(tilemap.name, cellPosition, tileBaseName))
         {
             GetComponent<PlayerController>().RpcRemoveItemFromQuickslot(connectionToClient, 1);
         }
-        
     }
 
     [Server]
     private Tilemap GetTilemap(Vector2 worldPosition)
     {
-        List<Tilemap> tilemaps = TilemapSyncManager.Instance.Tilemaps;
+        List<Tilemap> tilemaps = TileMapManager.Instance.Tilemaps;
         foreach (Tilemap tilemap in tilemaps)
         {
             BoundsInt bounds = tilemap.cellBounds;
@@ -68,9 +67,6 @@ public class BuildingController : NetworkBehaviour, HasCoolDownInterFace
     [Server]
     private bool Inside(Vector3 pos, Vector3Int size, Vector2 point)
     {
-        //Debug.Log("Tilemap Pos: " + pos);
-        //Debug.Log("tilemap Bounds pos: " + new Vector3(pos.x + size.x, pos.y + size.y));
-        //Debug.Log("MousePos: " + point);
         if (pos.x <= point.x &&
             point.x <= pos.x + size.x &&
             pos.y <= point.y &&

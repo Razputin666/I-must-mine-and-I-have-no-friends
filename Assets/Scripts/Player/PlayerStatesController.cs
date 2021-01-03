@@ -54,8 +54,6 @@ public class PlayerStatesController : NetworkBehaviour
                     {
                         buildingController.Build(mousePosition, itemObj.Data.Name);
                     }
-                       
-                    
                 }
                 break;
             case PlayerController.PlayerStates.Idle:

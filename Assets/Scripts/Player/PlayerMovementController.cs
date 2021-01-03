@@ -136,7 +136,7 @@ public class PlayerMovementController : NetworkBehaviour
     public void RotateArm()
     {
         PlayerController player = GetComponent<PlayerController>();
-        Transform armTransform = transform.Find("Gubb_arm");
+        //Transform armTransform = transform.Find("Gubb_arm");
         Vector2 direction = new Vector2(
         player.mousePosInWorld.x - armTransform.position.x,
         player.mousePosInWorld.y - armTransform.position.y);

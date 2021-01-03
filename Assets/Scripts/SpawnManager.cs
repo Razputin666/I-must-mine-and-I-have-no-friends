@@ -11,11 +11,13 @@ public class SpawnManager : NetworkBehaviour
     {
         SpawnItemAt(position, itemID, itemAmount);
     }
+
     [Command(ignoreAuthority = true)]
     private void CmdSpawnItemFromNameAt(Vector3 position, string itemName)
     {
         SpawnItemAt(position, itemName);
     }
+
     public void SpawnItemAt(Vector3 position, string itemName)
     {
         if (!isServer)
@@ -57,7 +59,7 @@ public class SpawnManager : NetworkBehaviour
 
             groundObject.GetComponent<Rigidbody2D>().simulated = true;
             GroundItem gItem = groundObject.GetComponent<GroundItem>();
-            gItem.SetItemObject(item, 0f);
+            gItem.SetItemObject(item, 1f);
 
             NetworkServer.Spawn(groundObject);
         }

@@ -11,8 +11,7 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     [SerializeField] private int id = 2;
     [SerializeField] private float coolDownDuration;
     [SerializeField] private CoolDownSystem coolDownSystem;
-    [SerializeField] private Transform[] points;
-    [SerializeField] private TileMapManager tileMapManager;
+    //[SerializeField] private Transform[] points;
 
     [SerializeField] private Tilemap chunk;
     private SpawnManager spawnManager;
@@ -42,7 +41,6 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
             endOfGun = heldItem.Find("EndOfGun");
         }
 
-        tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
         spawnManager = GameObject.Find("ItemSpawner").GetComponent<SpawnManager>();
         //  player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
         //  tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
@@ -60,10 +58,6 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
             Transform heldItem = arm.Find("ItemHeldInHand");
             endOfGun = heldItem.Find("EndOfGun");
         }
-            
-
-        if(tileMapManager == null)
-            tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
     }
     [Server]
     public Tilemap GetChunk(Vector3 targetedBlock)
@@ -81,16 +75,14 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     [Server]
     private Tilemap GetTilemap(Vector2 worldPosition)
     {
-        List<Tilemap> tilemaps = TilemapSyncManager.Instance.Tilemaps;
+        List<Tilemap> tilemaps = TileMapManager.Instance.Tilemaps;
         foreach (Tilemap tilemap in tilemaps)
         {
             BoundsInt bounds = tilemap.cellBounds;
             Vector3 tilemapPos = tilemap.transform.position;
 
             if (Inside(tilemapPos, bounds.size, worldPosition))
-            {
                 return tilemap;
-            }
         }
 
         return null;
@@ -130,13 +122,13 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
 
         if (chunk.GetTile(Vector3Int.FloorToInt(blockInCell)) == null)
             return;
-
+        
         float blockStr;
-        string blockName = tileMapManager.GetBlockName(new Vector3Int(blockInCell.x, blockInCell.y, 0), chunk);
+        string blockName = TileMapManager.Instance.GetBlockName(new Vector3Int(blockInCell.x, blockInCell.y, 0), chunk);
 
         if (!blockChecker.TryGetValue(blockInCell, out blockStr))
         {
-            blockStr = tileMapManager.GetBlockStrength(blockInCell, chunk);
+            blockStr = TileMapManager.Instance.GetBlockStrength(blockInCell, chunk);
             if(blockStr >= 0)
             {
                 blockStr -= miningStr * coolDownDuration;
@@ -154,7 +146,7 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
             DropItemFromBlock(blockInCell, blockName, chunk);
             CheckBlockRules(blockInCell, blockName, chunk, blockToMine);
             blockChecker.Remove(blockInCell);
-            TilemapSyncManager.Instance.UpdateTilemap(chunk.name, blockInCell, string.Empty);
+            TileMapManager.Instance.UpdateTilemap(chunk.name, blockInCell, string.Empty);
         }
     }
 
@@ -176,12 +168,12 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
                 
                 if (currentChunk.HasTile(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0)))
                 {
-                    string upperBlockType = tileMapManager.GetBlockName(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), currentChunk);
+                    string upperBlockType = TileMapManager.Instance.GetBlockName(new Vector3Int(blockPosition.x, blockPosition.y + 1, 0), currentChunk);
                     if(upperBlockType == "Plant")
                     {
                         Vector3Int cellBlockPos = new Vector3Int(blockPosition.x, blockPosition.y + 1, 0);
 
-                        TilemapSyncManager.Instance.UpdateTilemap(currentChunk.name, cellBlockPos, string.Empty);
+                        TileMapManager.Instance.UpdateTilemap(currentChunk.name, cellBlockPos, string.Empty);
 
                         //Drop block here
                     }
@@ -194,14 +186,14 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
                 
                 for (int y = 0; y < 50 && isTree; y++)
                 {
-                    upperBlocks.Add(tileMapManager.GetBlockName(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), currentChunk));
+                    upperBlocks.Add(TileMapManager.Instance.GetBlockName(new Vector3Int(blockPosition.x, blockPosition.y + y, 0), currentChunk));
                     if (upperBlocks[y] == "Tree")
                     {
                         Vector3Int cellBlockPos = new Vector3Int(blockPosition.x, blockPosition.y + y, 0);
 
                         DropItemFromBlock(cellBlockPos, blockName, currentChunk);
 
-                        TilemapSyncManager.Instance.UpdateTilemap(currentChunk.name, cellBlockPos, string.Empty);
+                        TileMapManager.Instance.UpdateTilemap(currentChunk.name, cellBlockPos, string.Empty);
                     }
                     else
                         isTree = false;

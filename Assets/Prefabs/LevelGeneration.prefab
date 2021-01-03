@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 1792650185}
   - component: {fileID: 2085960718471711120}
   - component: {fileID: 8805108713136885511}
-  - component: {fileID: 1852934364}
   m_Layer: 0
   m_Name: LevelGeneration
   m_TagString: GameManager
@@ -130,7 +129,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  chunks: []
   tileDatas:
   - {fileID: 11400000, guid: 1ea78bb27036e8645b0eaf68259b61e0, type: 2}
   - {fileID: 11400000, guid: 743de9394c2689d4898f56ace2f5c190, type: 2}
@@ -141,7 +139,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 45cfb562a4c7b1849abb43aca8dbc877, type: 2}
   - {fileID: 11400000, guid: 773d82892f6c65e408bec71e4d8e0955, type: 2}
   - {fileID: 11400000, guid: 6aa9bbea0a3fee745915b42b71349669, type: 2}
-  mapgGen: {fileID: 8978213078250018398}
 --- !u!114 &2085960718471711120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,19 +173,3 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
---- !u!114 &1852934364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8978213078250018397}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2bd89c59aec16cb4f9672879f5ca2f8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  localPlayer: {fileID: 0}
-  hasTilemaps: 0

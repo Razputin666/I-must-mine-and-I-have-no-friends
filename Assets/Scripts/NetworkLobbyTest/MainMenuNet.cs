@@ -4,7 +4,7 @@ using Mirror;
 
 public class MainMenuNet : MonoBehaviour
 {
-    [SerializeField] private NetworkManager networkManager = null;
+    [SerializeField] private NetworkManager networkManager;
 
     [Header("UI")]
     [SerializeField] private GameObject landingPagePanel = null;

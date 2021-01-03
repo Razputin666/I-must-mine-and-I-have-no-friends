@@ -12,25 +12,32 @@ public class ChunkSettings : NetworkBehaviour
 {
     float grassGrowthTimer;
     public Tilemap tileChunk;
-    [SerializeField] public TileBase[] tilesChunk;
+    [SerializeField] public TileBase[] tilebases;
     [SerializeField] private bool SetJobs;
     private LevelGeneratorLayered mapGen;
     private int width;
     private int height;
-
-    public void Start()
+    private bool hasInitialized = false;
+    public override void OnStartServer()
     {
-        if(isServer)
-        {
-            Debug.Log("started");
-            mapGen = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
-            width = (int)gameObject.transform.position.x + mapGen.width;
-            height = (int)gameObject.transform.position.y + mapGen.height;
-            tileChunk = GetComponent<Tilemap>();
-            TreeGrowth();
+        Debug.Log("Server");
+        Init();
+    }
 
-            StartCoroutine(GrassGrowth());
-        }
+    public void Init()
+    {
+        if (hasInitialized)
+            return;
+
+        hasInitialized = true;
+
+        mapGen = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
+        width = (int)gameObject.transform.position.x + mapGen.width;
+        height = (int)gameObject.transform.position.y + mapGen.height;
+        tileChunk = GetComponent<Tilemap>();
+        TreeGrowth();
+
+        StartCoroutine(GrassGrowth());
     }
 
     public IEnumerator GrassGrowth()
@@ -41,24 +48,22 @@ public class ChunkSettings : NetworkBehaviour
             for (int j = height; j < height * 2; j++)
             {
                // yield return new WaitForSeconds(0.02f);
-                if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i,j + 1, 0)) && tileChunk.GetTile(new Vector3Int(i, j, 0)) == tilesChunk[3])
+                if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i,j + 1, 0)) && tileChunk.GetTile(new Vector3Int(i, j, 0)) == tilebases[3])
                 {
                     int randomizer = UnityEngine.Random.Range(1, 10);
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0.01f, 0.2f));
                     if (randomizer > 5)
                     {
-                        Debug.Log("grassBlock");
-                        TilemapSyncManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j, 0), tilesChunk[0].name);
+                        TileMapManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j, 0), tilebases[0].name);
                     }
                 }
-                else if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i, j + 1, 0)) && tileChunk.GetTile(new Vector3Int(i, j, 0)) == tilesChunk[0])
+                else if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i, j + 1, 0)) && tileChunk.GetTile(new Vector3Int(i, j, 0)) == tilebases[0])
                 {
                     int randomizer = UnityEngine.Random.Range(1, 10);
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0.01f, 0.2f));
                     if (randomizer > 5)
                     {
-                        Debug.Log("plants");
-                        TilemapSyncManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j + 1, 0), tilesChunk[2].name);
+                        TileMapManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j + 1, 0), tilebases[2].name);
                     }   
                 }
             }
@@ -83,8 +88,7 @@ public class ChunkSettings : NetworkBehaviour
                         {
                             if (!tileChunk.HasTile(new Vector3Int(i, j + 1, 0)))
                             {
-                                Debug.Log("trees");
-                                TilemapSyncManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j + k, 0), tilesChunk[1].name);
+                                TileMapManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j + k, 0), tilebases[1].name);
                             }
                         }
                     }
@@ -95,6 +99,9 @@ public class ChunkSettings : NetworkBehaviour
 
     private void Update()
     {
+        if (!isServer)
+            return;
+
         grassGrowthTimer += Time.deltaTime;
         
         if(grassGrowthTimer > 30)

@@ -68,8 +68,6 @@ public class LevelGeneratorLayered : NetworkBehaviour
 
 	private GameTiles gameTiles;
 
-	private NetworkTransmitter networkTransmitter;
-
 	[SyncVar]
 	private int mapSeed = 0;
 
@@ -195,9 +193,11 @@ public class LevelGeneratorLayered : NetworkBehaviour
 					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
 					startPosition.x += width - 1;
 					chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
-					chunk.name = "tilemap_" + i;
-
-					TilemapSyncManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
+					
+					NetworkServer.Spawn(chunk);
+					chunk.GetComponent<ChunkSettings>().Init();
+					chunk.GetComponent<TilemapSyncer>().SetName("Tilemap_" + i);
+					TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
 				}
 				chunkHeightOffset = grassOverWorldChunk.GetChunkHeightOffset;
 				startPosition = new Vector2Int(0, 0);
@@ -220,11 +220,19 @@ public class LevelGeneratorLayered : NetworkBehaviour
 					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y + startPosition.y);
 					startPosition.x += width - 1;
 					chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
-					chunk.name = "tilemap_" + i;
-					TilemapSyncManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
+					
+					NetworkServer.Spawn(chunk);
+					chunk.GetComponent<ChunkSettings>().Init();
+					chunk.GetComponent<TilemapSyncer>().SetName("Tilemap_" + i);
+
+					TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
 				}
-				Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
-				Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
+				GameObject t1 = Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
+				NetworkServer.Spawn(t1);
+
+				GameObject t2 = Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
+				NetworkServer.Spawn(t2);
+
 				//StartCoroutine(GenerateTrees());
 
 				//SetPlayerSpawnLocation();
