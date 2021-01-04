@@ -45,8 +45,10 @@ public class PlayerController : MonoBehaviour
     private ItemHandler itemHandler;
     public Transform item;
     private JumpController jumpController;
+   // private LegMovement legMovement;
    [SerializeField]private DeathScreen deathScreen;
     [SerializeField] private LevelGeneratorLayered mapSize;
+    [SerializeField] private LimbMovement legMovement;
 
 
     [SerializeField]
@@ -61,10 +63,9 @@ public class PlayerController : MonoBehaviour
         item.GetComponent<SpriteRenderer>().sprite = null;
         item.GetComponent<DefaultGun>().enabled = false;
         item.GetComponent<MiningController>().enabled = false;
-
-        //Get and store a reference to the Rigidbody2D component so that we can access it.
         
         facingRight = true;
+        // legMovement = GetComponent<LegMovement>();
         rb2d = GetComponent<Rigidbody2D>();
         boxCollider2d = transform.GetComponent<BoxCollider2D>();
         capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
@@ -87,8 +88,8 @@ public class PlayerController : MonoBehaviour
     {
         mousePos = Input.mousePosition;
         worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
-        _camera.transform.position = new Vector3(Mathf.Clamp(rb2d.transform.position.x, (0) + 26.7f, (mapSize.startPosition.x) - 26.7f), rb2d.transform.position.y, -1);
-
+        //  _camera.transform.position = new Vector3(Mathf.Clamp(rb2d.transform.position.x, (0) + 26.7f, (mapSize.startPosition.x) - 26.7f), rb2d.transform.position.y, -1);
+        _camera.transform.position = new Vector3(transform.position.x, transform.position.y, -1f);
 
 
         CalculateMovement();
@@ -109,15 +110,31 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.D))
         {
-            rb2d.velocity += Vector2.right * speed;
+            //rb2d.velocity += Vector2.right * speed;
+            legMovement.MoveFootTarget(Vector2.right);
             Flip(Vector2.right.x);
         }
 
         if (Input.GetKey(KeyCode.A))
         {
-            rb2d.velocity += Vector2.left * speed;
+           // rb2d.velocity += Vector2.left * speed;
+            //RaycastHit2D slopeCheck = Physics2D.Raycast(new Vector2(transform.position.x - 3f, transform.position.y), Vector2.down, transform.localScale.y * 4, LayerMask.GetMask("Blocks"));
+            //RaycastHit2D slopeCheck = Physics2D.BoxCast(new Vector2(transform.position.x, transform.position.y - transform.localScale.y), new Vector2(boxCollider2d.bounds.size.x, boxCollider2d.bounds.size.y), 0f, Vector2.left, 0.2f);
+            ////RaycastHit2D slopeCheck = Physics2D.Raycast(new Vector2(transform.position.x + 1f, transform.position.y), Vector2.down, transform.localScale.y * 4, LayerMask.GetMask("Blocks"));
+            //Debug.Log(slopeCheck.point.y);
+            //if (slopeCheck.collider != null && transform.position.y - slopeCheck.point.y < 3f && jumpController.IsGrounded())
+            //{
+
+            //    transform.position = Vector3.MoveTowards(transform.position, new Vector2(transform.position.x, slopeCheck.point.y + transform.localScale.y - 0.5f), speed);
+            //}
+            //for (int i = 0; i < legMovement.legs.Length; i++)
+            //{
+            //    legMovement.currentTargets[i].position = Vector2.MoveTowards(legMovement.currentTargets[i].position, legMovement.desiredTargets[i].position, speed * Time.deltaTime);
+            //}
+            legMovement.MoveFootTarget(Vector2.left);
             Flip(Vector2.left.x);
         }
+
         if (rb2d.velocity.y < -25f)
         {
             heightTimer += Time.deltaTime;
@@ -146,6 +163,7 @@ public class PlayerController : MonoBehaviour
             if (maxSpeed > 30f)
                 widthTimer = 1f;
         }
+
     }
 
     private void CheckQuickslotInput()
@@ -296,20 +314,19 @@ public class PlayerController : MonoBehaviour
     {
         if(collision.collider.CompareTag("EnemyWeapon"))
         {
-            EnemyController enemy = collision.collider.gameObject.GetComponentInParent<EnemyController>();
-            playerHP -= enemy.enemyStrength;
+            EnemyBehaviour enemy = collision.collider.gameObject.GetComponentInParent<EnemyBehaviour>();
+            playerHP -= enemy.GetStats.strength;
 
             if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x > 0f)
             {
-                rb2d.AddForceAtPosition(enemy.enemyKnockBack, transform.position);
+                rb2d.AddForceAtPosition(Vector2.right * 1000, transform.position);
             }
 
             else if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x < 0f)
             {
-                rb2d.AddForceAtPosition(-enemy.enemyKnockBack, transform.position);
+                rb2d.AddForceAtPosition(Vector2.left * 1000, transform.position);
             }
         }
-
 
     }
 

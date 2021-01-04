@@ -21,7 +21,7 @@ public class MiningController : MonoBehaviour, HasCoolDownInterFace
     // Start is called before the first frame update
     void Start()
     {
-        endOfGun = transform.Find("EndOfGun");
+      //  endOfGun = transform.Find("EndOfGun");
       //  player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
       //  tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
     }

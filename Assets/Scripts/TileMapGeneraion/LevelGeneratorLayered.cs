@@ -57,6 +57,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 	[SerializeField] private GameObject evilBeavis;
 	[SerializeField] private GameObject evilBeavisBase;
 	[SerializeField] private PathfindingSettings pathfindingSettings;
+	[SerializeField] private bool spawnPlayer;
 	public List<Tilemap> chunks = new List<Tilemap>();
 
 	public float grassGrowthTimeToReach;
@@ -117,8 +118,11 @@ public class LevelGeneratorLayered : MonoBehaviour
 				Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
 				//StartCoroutine(GenerateTrees());
 
-				//StartCoroutine(SpawnPlayer());
-				pathfindingSettings.prank();
+				if (spawnPlayer)
+                {
+					StartCoroutine(SpawnPlayer());
+				}
+				//pathfindingSettings.prank();
 				StartCoroutine(SpawnEnemyBase());
 
 				break;

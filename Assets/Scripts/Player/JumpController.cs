@@ -9,9 +9,9 @@ public class JumpController : MonoBehaviour, HasCoolDownInterFace
     //[SerializeField] private PlayerController player;
     [SerializeField] private float jumpVelocity;
     [SerializeField] private CoolDownSystem coolDownSystem = null;
+    [SerializeField] private Transform body;
     private Rigidbody2D rb2d;
-    private Transform unit;
-    private CapsuleCollider2D capsuleCollider2d;
+    private BoxCollider2D collider2d;
 
     public int Id => id;
     public float CoolDownDuration => coolDownDuration;
@@ -19,7 +19,8 @@ public class JumpController : MonoBehaviour, HasCoolDownInterFace
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-        capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
+        collider2d = GetComponent<BoxCollider2D>();
+        
     }
 
     // Update is called once per frame
@@ -43,8 +44,8 @@ public class JumpController : MonoBehaviour, HasCoolDownInterFace
 
     public bool IsGrounded()
     {
-        RaycastHit2D raycastHit2D = Physics2D.CapsuleCast(capsuleCollider2d.bounds.center, capsuleCollider2d.bounds.size, CapsuleDirection2D.Vertical, 0f, Vector2.down, 0.5f);
-      //  Physics2D.IgnoreCollision(, GetComponent<CapsuleCollider2D>());
+         RaycastHit2D raycastHit2D = Physics2D.BoxCast(body.position, collider2d.bounds.size, 0f, Vector2.down, 0.8f, LayerMask.GetMask("Blocks"));
+        //  Physics2D.IgnoreCollision(, GetComponent<CapsuleCollider2D>());
         return raycastHit2D.collider != null;
     }
 

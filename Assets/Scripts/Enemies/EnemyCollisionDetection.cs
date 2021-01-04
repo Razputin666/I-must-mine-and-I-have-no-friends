@@ -5,14 +5,9 @@ using UnityEngine;
 public class EnemyCollisionDetection : MonoBehaviour
 {
 
-    private EnemyController enemy;
+   [SerializeField] private EnemyBehaviour enemy;
     
 
-
-    private void Start()
-    {
-        enemy = GetComponent<EnemyController>();
-    }
 
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -21,7 +16,7 @@ public class EnemyCollisionDetection : MonoBehaviour
 
         if (collision.collider.CompareTag("Bullet"))
         {
-            enemy.enemyHP -= collision.collider.GetComponent<Bullet>().projectileStrength;
+            enemy.UpdateHealth(collision.collider.GetComponent<Bullet>().projectileStrength);
         }
         
 
@@ -41,10 +36,10 @@ public class EnemyCollisionDetection : MonoBehaviour
 
         }
 
-        else if (collision.collider.CompareTag("Player") && enemy.enemyStates != EnemyController.EnemyStates.FrogAggressive)
-        {
-            enemy.SetAggressiveMode();
-        }
+        //else if (collision.collider.CompareTag("Player") && enemy.enemyStates != EnemyController.EnemyStates.FrogAggressive)
+        //{
+        //    enemy.SetAggressiveMode();
+        //}
 
     }
    

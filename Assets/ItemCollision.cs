@@ -4,20 +4,18 @@ using UnityEngine;
 
 public class ItemCollision : MonoBehaviour
 {
-    private PlayerController player;
-    private EnemyController enemy;
+    [SerializeField] private PlayerController player;
+    [SerializeField] private EnemyBehaviour enemy;
     private InventoryObject inventory;
     // Start is called before the first frame update
     void Start()
     {
-        if(GetComponentInParent<PlayerController>() == null)
+        if (GetComponentInParent<PlayerController>() == null)
         {
-            enemy = GetComponentInParent<EnemyController>();
-            inventory = enemy.GetInventoryObject;
+            inventory = enemy.GetInventory;
         }
         else
         {
-            player = GetComponentInParent<PlayerController>();
             inventory = player.GetInventoryObject;
         }
     }
@@ -31,6 +29,7 @@ public class ItemCollision : MonoBehaviour
     {
         if(other.transform.CompareTag("GroundItem"))
         {
+
             GroundItem groundItem = other.GetComponentInParent<GroundItem>();
             if (groundItem != null && groundItem.PickupTime <= 0f)
             {

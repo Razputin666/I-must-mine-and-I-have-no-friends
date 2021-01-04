@@ -23,7 +23,7 @@ public class EvilBeavisBaseController : MonoBehaviour, HasCoolDownInterFace
 
     private int blockAmount;
     private int oreAmount;
-    private EnemyController targetedMinion;
+    private FrogBehaviour targetedMinion;
     private List<GameObject> minions = new List<GameObject>();
 
     public int Id => id;
@@ -123,12 +123,12 @@ public class EvilBeavisBaseController : MonoBehaviour, HasCoolDownInterFace
     private void MinionDropOff(GameObject minion)
     {
 
-        targetedMinion = minion.GetComponent<EnemyController>();
+        targetedMinion = minion.GetComponent<FrogBehaviour>();
         oreAmount += targetedMinion.OreAmount;
         blockAmount += targetedMinion.BlockAmount;
         targetedMinion.BlockAmount = 0;
         targetedMinion.OreAmount = 0;
-        targetedMinion.Inventory.RemoveAllItems();
+        targetedMinion.GetInventory.RemoveAllItems();
         TrySpawnMinion();
         coolDownSystem.PutOnCoolDown(this);
 
