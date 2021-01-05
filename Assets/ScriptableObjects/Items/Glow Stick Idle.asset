@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c24a72b71acf7341adb69095f866761, type: 3}
-  m_Name: Gow Stick Idle
+  m_Name: Glow Stick Idle
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300000, guid: 17b9fa2decede2c4db49261afb55838b, type: 3}
   stackable: 1
@@ -18,6 +18,6 @@ MonoBehaviour:
   description: 
   data:
     name: Glow Stick
-    id: 14
+    id: 16
     amount: 1
   maxStackSize: 0
