@@ -16,6 +16,6 @@ MonoBehaviour:
     itemObject: {fileID: 11400000, guid: a3407508bff0ea94eba79213d295bca5, type: 2}
     amount: 1
   materials:
-  - itemObject: {fileID: 11400000, guid: e9561ef4822cc3a47956e4c828c3c040, type: 2}
+  - itemObject: {fileID: 11400000, guid: bb4322effac08e542ab09e26473cd165, type: 2}
     amount: 2
-  iD: 1
+  iD: 2

@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 8390871902958351600}
   - component: {fileID: 8390871902958351615}
   - component: {fileID: 8390871902958351614}
-  m_Layer: 12
-  m_Name: WorldTeleporterRight
+  - component: {fileID: -979064130462191721}
+  m_Layer: 2
+  m_Name: WorldTeleporter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -70,4 +71,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e18ba9929c6acb48a4d50643e3b1852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sideCamera: {fileID: 0}
+--- !u!114 &-979064130462191721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8390871902958351613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0

@@ -39,7 +39,7 @@ public class PlayerMovementNoRigid : MonoBehaviour
 
 
     public Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
-    private ItemController itemController;
+    //private ItemController itemController;
     private Inventory inventory;
     public Transform item;
     private JumpController jumpController;

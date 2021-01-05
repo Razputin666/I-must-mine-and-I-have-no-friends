@@ -29,6 +29,19 @@ public class ItemDatabaseObject : ScriptableObject, ISerializationCallbackReceiv
 
     public ItemObject GetItemAt(int id)
     {
-       return this.itemObjects[id];
+        if(id >= 0 && id < itemObjects.Length)
+            return this.itemObjects[id];
+        return null;
+    }
+
+    public ItemObject GetItemOfName(string name)
+    {
+        for (int i = 0; i < itemObjects.Length; i++)
+        {
+            if (itemObjects[i].Data.Name == name)
+                return itemObjects[i];
+            
+        }
+        return null;
     }
 }

@@ -22,7 +22,6 @@ public class DynamicInterface : UserInterface
 
     public override void CreateSlots()
     {
-
         slotsOnInterface = new Dictionary<GameObject, InventorySlot>();
 
         for (int i = 0; i < inventory.GetSlots.Length; i++)

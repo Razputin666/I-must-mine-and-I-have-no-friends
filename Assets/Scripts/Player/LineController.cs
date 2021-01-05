@@ -15,8 +15,8 @@ public class LineController : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
-        miningLaser = gameObject.GetComponent<MiningController>();
+        player = transform.parent.GetComponentInParent<PlayerController>();
+        miningLaser = transform.parent.GetComponentInParent<MiningController>();
         lr = GetComponent<LineRenderer>();
     }
 
@@ -33,9 +33,8 @@ public class LineController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 watever = new Vector3(player.worldPosition.x, player.worldPosition.y, 0);
-        laserPoints = new Vector3[] { watever, miningLaser.endOfGun.position };
-
+        Vector3 laserEndPos = new Vector3(player.mousePosInWorld.x, player.mousePosInWorld.y, 0);
+        laserPoints = new Vector3[] { laserEndPos, miningLaser.endOfGun.position };
 
         // lr.SetPosition(0, miningLaser.endOfGun.position);
         lr.SetPositions(laserPoints);

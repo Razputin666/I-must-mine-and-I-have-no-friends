@@ -16,7 +16,7 @@ public class WorldTeleport : MonoBehaviour
         {
 
              RaycastHit2D unitMover = Physics2D.Raycast(new Vector2(1.5f, mapSize.height * 2), Vector2.down);    
-                
+             
              collision.transform.position = new Vector3(1.5f, unitMover.point.y + 2f, 0);
                 
             

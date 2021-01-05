@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c24a72b71acf7341adb69095f866761, type: 3}
   m_Name: IronBar
   m_EditorClassIdentifier: 
-  uiDisplaySprite: {fileID: 21300000, guid: 08a166b1ef13af746b18345c0303c0f3, type: 3}
+  uiDisplaySprite: {fileID: 21300000, guid: 31158a059d217494fba2788e7ae23d97, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 12
   description: 
   data:
     name: Iron Bar
-    id: -1
+    id: 15
     amount: 1
+  maxStackSize: 0

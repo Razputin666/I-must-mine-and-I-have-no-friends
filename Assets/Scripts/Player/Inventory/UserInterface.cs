@@ -15,18 +15,22 @@ public abstract class UserInterface : MonoBehaviour
     [SerializeField]
     private GameObject tooltipObject;
 
+    SpawnManager spawnManager;
+    
     //Start is called before the first frame update
-    void Start()
+    void OnEnable()
     {
         for (int i = 0; i < inventory.GetSlots.Length; i++)
         {
             inventory.GetSlots[i].parent = this;
             //inventory.GetSlots[i].OnAfterUpdate += OnSlotUpdate;
         }
-
+        
         CreateSlots();
         AddEvent(gameObject, EventTriggerType.PointerEnter, delegate { OnEnterInterface(gameObject); });
         AddEvent(gameObject, EventTriggerType.PointerExit, delegate { OnExitInterface(gameObject); });
+        
+        spawnManager = GameObject.Find("ItemSpawner").GetComponent<SpawnManager>();
     }
 
     protected void OnSlotUpdate(InventorySlot slot)
@@ -124,9 +128,12 @@ public abstract class UserInterface : MonoBehaviour
 
         if(MouseData.interfaceMouseIsOver == null)
         {
+            Camera cam = transform.parent.transform.parent.GetComponentInChildren<Camera>();
             ItemObject newItem = slotsOnInterface[obj].ItemObject;
             newItem.Data.Amount = slotsOnInterface[obj].Item.Amount;
-            SpawnManager.SpawnItemAt(Camera.main.ScreenToWorldPoint(Input.mousePosition), newItem);
+            //CmdSpawnItemAt(cam.ScreenToWorldPoint(Input.mousePosition), newItem.Data.ID, newItem.Data.Amount);
+            //SpawnManager.SpawnItemAt(cam.ScreenToWorldPoint(Input.mousePosition), newItem);
+            spawnManager.SpawnItemAt(cam.ScreenToWorldPoint(Input.mousePosition), newItem.Data.ID, newItem.Data.Amount);
             slotsOnInterface[obj].RemoveItem();
             return;
         }
@@ -148,6 +155,10 @@ public abstract class UserInterface : MonoBehaviour
         get
         {
             return this.inventory;
+        }
+        set
+        {
+            this.inventory = value;
         }
     }
 }

@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d65b42a5bf76d540bf7dd38f50e9469, type: 3}
   m_Name: StoneBlock
   m_EditorClassIdentifier: 
-  uiDisplaySprite: {fileID: 21300000, guid: 212046d11af4df847b97bf65df7204a9, type: 3}
+  uiDisplaySprite: {fileID: 21300006, guid: b00b9ff8e2a7f494c9679b0b59c599bb, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 9
   description: 
   data:
     name: Stone Block
-    id: 13
+    id: 20
     amount: 1
+  maxStackSize: 0

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum ITEM_TYPE
 {
+    None,
     HelmetMod,
     ChestMod,
     LegMod,
@@ -15,7 +16,8 @@ public enum ITEM_TYPE
     TileBlock,
     Weapon,
     MiningLaser,
-    Component
+    Component,
+    Ore
 }
 
 public abstract class ItemObject : ScriptableObject
@@ -31,6 +33,8 @@ public abstract class ItemObject : ScriptableObject
     protected string description;
     [SerializeField]
     protected Item data = new Item();
+    [SerializeField]
+    protected int maxStackSize;
 
     public Item CreateItem()
     {
@@ -73,5 +77,10 @@ public abstract class ItemObject : ScriptableObject
             return this.data;
         }
     }
+    public int MaxStackSize
+    {
+        get {return this.maxStackSize; }
+    }
+
     #endregion
 }

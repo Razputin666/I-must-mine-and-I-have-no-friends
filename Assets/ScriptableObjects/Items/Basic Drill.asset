@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300000, guid: 28b541e52ee5d4c47ac598c62d085263, type: 3}
   stackable: 0
-  itemType: 10
+  itemType: 11
   description: 
   data:
     name: Basic Drill
-    id: -1
+    id: 0
     amount: 1
+  maxStackSize: 0
