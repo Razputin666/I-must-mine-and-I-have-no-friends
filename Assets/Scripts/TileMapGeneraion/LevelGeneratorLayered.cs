@@ -177,7 +177,7 @@ public class LevelGeneratorLayered : NetworkBehaviour
 	{
 		Vector3 ll = Vector3.zero;
 
-		pathfinding = new Pathfinding(width * numberOfChunks, height * numberOfChunks, new Vector3(0, -height + 1));
+		//pathfinding = new Pathfinding(width * numberOfChunks, height * numberOfChunks, new Vector3(0, -height + 1));
 		//List<int[,]> mapList = new List<int[,]>();
 		//mapList = LoadMap();
 		switch (typeOfPlanet)

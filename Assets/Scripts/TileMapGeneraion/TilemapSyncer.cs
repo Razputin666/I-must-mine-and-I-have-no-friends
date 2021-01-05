@@ -72,10 +72,7 @@ public class TilemapSyncer : NetworkBehaviour
         if (tilebaseName == string.Empty)
         {
             if (isServer)
-            {
                 RpcUpdateTilemap(tilePositionCell, tilebaseName);
-
-            }
 
             SetTile(tilePositionCell, null);
 
@@ -87,9 +84,7 @@ public class TilemapSyncer : NetworkBehaviour
             {
                 if (tileAsset.name == tilebaseName)
                 {
-                    SetTile(tilePositionCell, tileAsset);
-
-                    return true;
+                    return UpdateTilemap(tilePositionCell, tileAsset);
                 }
             }
         }
@@ -110,12 +105,12 @@ public class TilemapSyncer : NetworkBehaviour
 
     private void SetTile(Vector3Int tilePositionCell, TileBase tilebase)
     {
-        if(isServer)
-        {
-            bool mineable = tilebase == null ? false : true;
-            Debug.Log(mineable);
-            Pathfinding.Instance.UpdateGridMineable(tilemap.CellToWorld(tilePositionCell), mineable);
-        }
+        //if(isServer)
+        //{
+        //    bool mineable = tilebase == null ? false : true;
+        //    Debug.Log(mineable);
+        //    Pathfinding.Instance.UpdateGridMineable(tilemap.CellToWorld(tilePositionCell), mineable);
+        //}
         tilemap.SetTile(tilePositionCell, tilebase);
     }
     #region Client
