@@ -175,8 +175,6 @@ public class LevelGeneratorLayered : NetworkBehaviour
 
     private void WorldGeneration()
 	{
-		Vector3 ll = Vector3.zero;
-
 		//pathfinding = new Pathfinding(width * numberOfChunks, height * numberOfChunks, new Vector3(0, -height + 1));
 		//List<int[,]> mapList = new List<int[,]>();
 		//mapList = LoadMap();
@@ -199,7 +197,6 @@ public class LevelGeneratorLayered : NetworkBehaviour
 					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
 					startPosition.x += width - 1;
 
-					
 					//chunk.GetComponent<ChunkSettings>().Init();
 					chunk.GetComponent<TilemapSyncer>().SetName("Tilemap_" + i);
 					TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
@@ -211,7 +208,6 @@ public class LevelGeneratorLayered : NetworkBehaviour
 				int offset;
 				for (int i = overWorldChunks; i < numberOfChunks + overWorldChunks; i++)
 				{
-					
 					//if (i - overWorldChunks != 0)
 					//{
 					//	offset = i - overWorldChunks - 1;
@@ -233,10 +229,6 @@ public class LevelGeneratorLayered : NetworkBehaviour
 					chunk.GetComponent<TilemapSyncer>().SetName("Tilemap_" + i);
 
 					TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
-					
-					//Testing for pathfinding
-					if (i == overWorldChunks)
-						ll = chunk.transform.position;
 				}
 				GameObject t1 = Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
 				NetworkServer.Spawn(t1);
@@ -256,9 +248,7 @@ public class LevelGeneratorLayered : NetworkBehaviour
 				break;
 			default:
 				break;
-		}
-		Debug.Log(ll);
-		
+		}		
 	}
 
 	private void SaveMap()
