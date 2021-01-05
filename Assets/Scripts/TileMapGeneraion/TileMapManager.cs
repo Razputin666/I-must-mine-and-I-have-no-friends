@@ -116,6 +116,11 @@ public class TileMapManager : NetworkBehaviour
         }
         return false;
     }
+    [Server]
+    public bool UpdateTilemap(Tilemap tilemap, Vector3Int tilePositionCell, TileBase tileBase)
+    {
+        return tilemap.GetComponent<TilemapSyncer>().UpdateTilemap(tilePositionCell, tileBase);
+    }
 
     [Client]
     public void InitTilemaps()

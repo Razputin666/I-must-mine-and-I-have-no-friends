@@ -9,7 +9,7 @@ public class PlayerMovementController : NetworkBehaviour
     [SerializeField] private float movementSpeed = 1f;
     [SerializeField] Rigidbody2D rb2d;
     private JumpController jumpController;
-    private FaceMouse faceMouse;
+    //private FaceMouse faceMouse;
     private Transform armTransform;
     private Vector2 previousInput;
 
@@ -18,15 +18,18 @@ public class PlayerMovementController : NetworkBehaviour
     private float maxSpeed;
     float heightTimer;
     float widthTimer;
-    float jumpTimer;
+    //float jumpTimer;
     private bool facingRight = true;
     private bool isJumping = false;
+
+    private int currentPathIndex;
+    private List<Vector3> pathVectorList;
 
     public override void OnStartServer()
     {
         rb2d = GetComponent<Rigidbody2D>();
         jumpController = GetComponent<JumpController>();
-        faceMouse = GetComponentInChildren<FaceMouse>();
+        //faceMouse = GetComponentInChildren<FaceMouse>();
         armTransform = transform.Find("Gubb_arm");
         rb2d.simulated = true;
     }
@@ -45,9 +48,150 @@ public class PlayerMovementController : NetworkBehaviour
         if(isServer && GetComponent<PlayerController>().IsReady)
         {
             RotateArm();
-        }   
+            //PathfindingTest();
+        }
+
+        //if(isClient)
+        //{
+        //    if(Input.GetMouseButtonDown(0))
+        //    {
+        //        PlayerController player = GetComponent<PlayerController>();
+
+        //        CmdSetTargetPath(player.mousePosInWorld);
+        //    }
+        //    if(Input.GetMouseButtonDown(1))
+        //    {
+        //        PlayerController player = GetComponent<PlayerController>();
+
+        //        Debug.Log(player.mousePosInWorld);
+        //    }
+        //}
+    }
+    [Command]
+    private void CmdSetTargetPath(Vector3 targetPositon)
+    {
+        currentPathIndex = 0;
+        //Debug.Log(targetPositon);
+        pathVectorList = Pathfinding.Instance.FindPath(transform.position + Vector3.down, targetPositon);
+        //Debug.Log(transform.position + Vector3.down);
+        //foreach (Vector3 pos in pathVectorList)
+        //{
+            
+        //    Debug.Log(pos);
+        //}
+
+        if (pathVectorList != null && pathVectorList.Count > 1)
+            pathVectorList.RemoveAt(0);
+    }
+
+    private void PathfindingTest()
+    {
+        if(pathVectorList != null)
+        {
+            Vector3 targetPosition = pathVectorList[currentPathIndex];
+            Vector3 adjustedTransform = transform.position + Vector3.down;
+
+            if (PathRequiresMining(targetPosition))
+            {
+                
+            }
+            else if(Vector3.Distance(adjustedTransform, targetPosition) > 1f)
+            {
+                //Debug.Log(targetPosition + " " + adjustedTransform);
+                Vector3 moveDir = (targetPosition - adjustedTransform).normalized;
+                //Debug.Log(moveDir);
+                //if (moveDir.y > 0.8)
+                //    IsJumping = true;
+                //else
+                //{
+                //    IsJumping = false;
+                //    
+                //}
+                previousInput = moveDir;
+                float distanceBefore = Vector3.Distance(transform.position, targetPosition);
+                //rb2d.velocity += new Vector2(moveDir.x, moveDir.y) * movementSpeed;
+                //transform.position += moveDir * 5f * Time.deltaTime;
+            }
+            else
+            {
+                currentPathIndex++;
+                if(currentPathIndex >= pathVectorList.Count)
+                {
+                    pathVectorList = null;
+                    previousInput = Vector2.zero;
+                }
+            }
+        }
     }
     
+    private bool PathRequiresMining(Vector3 targetPosition)
+    {
+        PathNode currentNode = Pathfinding.Instance.GetNode(targetPosition);
+        if (currentNode.isMineable)
+        {
+            Debug.Log("Mining 1 " + targetPosition);
+            GetComponent<MiningController>().Mine(targetPosition, GetComponent<PlayerController>().MiningStrength);
+
+            return true;
+        }
+        else
+        {
+            Debug.Log("Checking neighbours");
+            foreach (PathNode neigbourNode in currentNode.neighbourNodes)
+            {
+                Debug.Log(neigbourNode.ToString() + neigbourNode.isMineable);
+                if (neigbourNode.isMineable)
+                {
+                    Vector3 adjustedTransform = transform.position + Vector3.down;
+                    Vector3 moveDir = (targetPosition - adjustedTransform).normalized;
+
+                    if(Mathf.Abs(moveDir.x) > Mathf.Abs(moveDir.y))
+                    {
+                        Vector3 neighbourPosition = Pathfinding.Instance.GetWorldPosition(neigbourNode.x, neigbourNode.y);
+                        Debug.Log(neighbourPosition);
+                        Debug.Log("Up Dist: " + Vector3.Distance(targetPosition + Vector3.up, neighbourPosition));
+                        Debug.Log("Down Dist: " + Vector3.Distance(targetPosition + Vector3.down, neighbourPosition));
+                        if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.up, neighbourPosition) < 0.5f)
+                        {
+                            Debug.Log("Mining 2 " + targetPosition);
+                            GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
+                            return true;
+                        }
+                        else if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.down, neighbourPosition) < 0.5f)
+                        {
+                            Debug.Log("Mining 3 " + targetPosition);
+                            GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
+                            return true;
+                        }
+                        return false;
+                    }
+                    else
+                    {
+                        Vector3 neighbourPosition = Pathfinding.Instance.GetWorldPosition(neigbourNode.x, neigbourNode.y);
+                        Debug.Log(neighbourPosition);
+                        Debug.Log("Right Dist: " + Vector3.Distance(targetPosition + Vector3.right, neighbourPosition));
+                        Debug.Log("Left Dist: " + Vector3.Distance(targetPosition + Vector3.left, neighbourPosition));
+                        if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.right, neighbourPosition) < 0.5f)
+                        {
+                            Debug.Log("Mining 4 " + targetPosition);
+                            GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
+                            return true;
+                        }
+                        else if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.left, neighbourPosition) < 0.5f)
+                        {
+                            Debug.Log("Mining 5 " + targetPosition);
+                            GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void FixedUpdate() => Move();
 
     [Client]
@@ -115,7 +259,7 @@ public class PlayerMovementController : NetworkBehaviour
                 widthTimer = 1f;
         }
 
-        if (isJumping && jumpController.IsGrounded())
+        if (IsJumping && jumpController.IsGrounded())
         {
             jumpController.Jump();
         }

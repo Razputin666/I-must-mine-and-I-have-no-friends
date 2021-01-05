@@ -60,8 +60,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 239ebe86ddba1bb48ad336fe9d92de10, type: 2}
   - {fileID: 11400000, guid: 417e14d843f47dc45940df80ff579a44, type: 2}
   - {fileID: 11400000, guid: 6c7f547ab2fa0c64fbf5d04548be30f6, type: 2}
-  width: 250
-  height: 250
+  width: 50
+  height: 50
   mapSettingsLeft:
   - {fileID: 11400000, guid: 7e44f010d0d73e64fac75bfb3dc8ec92, type: 2}
   - {fileID: 11400000, guid: 9f16b9b68fd89124e9d85a234be1c3d7, type: 2}

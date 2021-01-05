@@ -199,11 +199,11 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(transform.position, itemPickupRange);
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.blue;
+    //    Gizmos.DrawSphere(transform.position, itemPickupRange);
+    //}
     #endregion
 
     #region Callbacks
@@ -293,7 +293,7 @@ public class PlayerController : NetworkBehaviour
                 return;
 
             Vector3 mousePosInWorld = camera.ScreenToWorldPoint(Input.mousePosition);
-
+            mousePosInWorld.z = 0;
             CmdSendMousePos(mousePosInWorld);
 
             if (playerHP <= 0)

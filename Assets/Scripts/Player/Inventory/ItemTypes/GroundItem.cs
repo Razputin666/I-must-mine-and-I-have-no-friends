@@ -42,7 +42,7 @@ public class GroundItem : NetworkBehaviour, ISerializationCallbackReceiver
     {
         GameObject parentObject = GameObject.Find("ItemSpawner");
 
-        transform.parent = parentObject.transform;
+        transform.SetParent(parentObject.transform, true);
 
         ItemDatabaseObject db = Resources.Load("ScriptableObjects/ItemDatabase") as ItemDatabaseObject;
 

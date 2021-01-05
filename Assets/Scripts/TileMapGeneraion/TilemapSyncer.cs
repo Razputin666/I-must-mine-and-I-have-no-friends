@@ -30,26 +30,7 @@ public class TilemapSyncer : NetworkBehaviour
 
     public bool hasTilemap;
 
-    public override void OnStartServer()
-    {
-        Init();
-    }
-
-    public override void OnStartClient()
-    {
-        if (isServer)
-            return;
-
-        hasTilemap = false;
-
-        Init();
-
-        tileUpdateData = new List<TileUpdateData>();
-
-        TileMapManager.Instance.AddTileChunk(GetComponent<Tilemap>());
-    }
-
-    private void Init()
+    private void Awake()
     {
         if (!gametiles)
             gametiles = GetComponent<GameTiles>();
@@ -61,6 +42,18 @@ public class TilemapSyncer : NetworkBehaviour
             tilemap = GetComponent<Tilemap>();
 
         tileAssets = Resources.LoadAll<TileBase>("Tilebase");
+    }
+
+    public override void OnStartClient()
+    {
+        if (isServer)
+            return;
+
+        hasTilemap = false;
+
+        tileUpdateData = new List<TileUpdateData>();
+
+        TileMapManager.Instance.AddTileChunk(GetComponent<Tilemap>());
     }
 
     private void OnNameChanged(string _Old, string _New)
@@ -79,9 +72,12 @@ public class TilemapSyncer : NetworkBehaviour
         if (tilebaseName == string.Empty)
         {
             if (isServer)
+            {
                 RpcUpdateTilemap(tilePositionCell, tilebaseName);
 
-            tilemap.SetTile(tilePositionCell, null);
+            }
+
+            SetTile(tilePositionCell, null);
 
             return true;
         }
@@ -91,16 +87,36 @@ public class TilemapSyncer : NetworkBehaviour
             {
                 if (tileAsset.name == tilebaseName)
                 {
-                    tilemap.SetTile(tilePositionCell, tileAsset);
-
-                    if (isServer)
-                        RpcUpdateTilemap(tilePositionCell, tilebaseName);
+                    SetTile(tilePositionCell, tileAsset);
 
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    public bool UpdateTilemap(Vector3Int tilePositionCell, TileBase tilebase)
+    {
+        if (isServer)
+        {
+            RpcUpdateTilemap(tilePositionCell, tilebase.name);
+        }
+
+        SetTile(tilePositionCell, tilebase);
+
+        return true;
+    }
+
+    private void SetTile(Vector3Int tilePositionCell, TileBase tilebase)
+    {
+        if(isServer)
+        {
+            bool mineable = tilebase == null ? false : true;
+            Debug.Log(mineable);
+            Pathfinding.Instance.UpdateGridMineable(tilemap.CellToWorld(tilePositionCell), mineable);
+        }
+        tilemap.SetTile(tilePositionCell, tilebase);
     }
     #region Client
     [Client]

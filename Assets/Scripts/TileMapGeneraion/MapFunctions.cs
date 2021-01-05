@@ -47,7 +47,8 @@ public class MapFunctions
             {
                 if (map[x, y] == 1) // 1 = tile, 0 = no tile
                 {
-                   tilemap.SetTile(new Vector3Int(x, y, 0), tiles[0]);
+                    TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x, y, 0), tiles[0]);
+                    //tilemap.SetTile(new Vector3Int(x, y, 0), tiles[0]);
                 }
             }
         }
@@ -81,7 +82,7 @@ public class MapFunctions
     /// <param name="tilemap">The tilemap to draw on</param>
     /// <param name="tile">The tile to draw with</param>
     /// <param name="offset">The offset to apply</param>
-    public static void RenderMapWithOffset(int[,] map, Tilemap tilemap, TileBase tiles, Vector2Int offset, bool addTiles)
+    public static void RenderMapWithOffset(int[,] map, Tilemap tilemap, TileBase tile, Vector2Int offset, bool addTiles)
     {
         for (int x = 0; x < map.GetUpperBound(0); x++)
         {
@@ -89,18 +90,21 @@ public class MapFunctions
             {
                 if (map[x, y] == 1 && addTiles)
                 {
-                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles);
+                    TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x + offset.x, y + offset.y, 0), tile);
+                    //tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles);
                 }
                 else if (map[x, y] == 0)
                 {
-                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                    TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                    //tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
                 }
 
                 if (x + 1 < map.GetUpperBound(0) && x - 1 >= 0 && y + 1 < map.GetUpperBound(1) && y - 1 >= 0)
                 {
                     if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
                     {
-                        tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                        TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                        //tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
                     }
                 }
             }
@@ -118,7 +122,8 @@ public class MapFunctions
                 {
                     if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
                     {
-                        tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                        TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                        //tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
                     }
                 }
             }
@@ -127,25 +132,27 @@ public class MapFunctions
 
     public static void RenderFeaturesWithOffset(int[,] map, Tilemap tilemap, TileBase[] tiles, Vector2Int offset, bool addTiles)
     {
-
         for (int x = 0; x < map.GetUpperBound(0); x++)
         {
             for (int y = 0; y < map.GetUpperBound(1); y++)
             {
                 if (map[x, y] == 1 && addTiles)
                 {
-                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                    TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x + offset.x, y + offset.y, 0), null);
+                    //tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), null);
                 }
                 else if (map[x, y] == 0)
                 {
-                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[0]);
+                    TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x + offset.x, y + offset.y, 0), tiles[0]);
+                    //tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[0]);
                 }
 
                 if (x + 1 < map.GetUpperBound(0) && x - 1 >= 0 && y + 1 < map.GetUpperBound(1) && y - 1 >= 0)
                 {
                     if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
                     {
-                        tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
+                        TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
+                        //tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
                     }
                 }
             }
@@ -162,7 +169,8 @@ public class MapFunctions
                 {
                     if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
                     {
-                        tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tile);
+                        TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x + offset.x, y + offset.y, 0), tile);
+                        //tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tile);
                     }
                 }
             }
@@ -210,14 +218,16 @@ public class MapFunctions
 
                 if (map[x, y] == 0)
                 {
-                    tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[0]);
+                    TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x + offset.x, y + offset.y, 0), tiles[0]);
+                    //tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[0]);
                 }
 
                 if (x + 1 < map.GetUpperBound(0) && x - 1 >= 0 && y + 1 < map.GetUpperBound(1) && y - 1 >= 0)
                 {
                     if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x, y + 1] != 1 && map[x, y - 1] != 1)
                     {
-                        tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
+                        TileMapManager.Instance.UpdateTilemap(tilemap, new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
+                        //tilemap.SetTile(new Vector3Int(x + offset.x, y + offset.y, 0), tiles[1]);
                     }
                 }
             }

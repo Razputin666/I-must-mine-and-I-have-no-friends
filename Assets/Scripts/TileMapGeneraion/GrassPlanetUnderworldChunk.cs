@@ -70,7 +70,6 @@ public class GrassPlanetUnderworldChunk : MonoBehaviour
             MapFunctions.ChangeExistingBlocks(mapCoords, tilemap, mapGen.tiles[1], new Vector2Int(spawnPositionX, spawnPositionY));
            // spawnPositionY += spawnHeightY - 2;
             seed = UnityEngine.Random.Range(0f, 1f);
-
         }
 
         //mapCoords = MapFunctions.GenerateArray(spawnWidthX, spawnHeightY, false);
@@ -100,31 +99,31 @@ public class GrassPlanetUnderworldChunk : MonoBehaviour
             int spawnWidthX = width / 2;
 
 
-            if (spawnPositionX > (width / 2 - 20))
-            {
-                spawnPositionX -= width / 100;
-                spawnWidthX = width / 100 - 1;
-            }
+            //if (spawnPositionX > (width / 2 - 20))
+            //{
+            //    spawnPositionX -= width / 100;
+            //    spawnWidthX = width / 100 - 1;
+            //}
 
-            if (spawnPositionY > (height / 2 - 20))
-            {
-                spawnPositionY -= (height / 100);
-                spawnHeightY = height / 100 - 1;
-            }
+            //if (spawnPositionY > (height / 2 - 20))
+            //{
+            //    spawnPositionY -= (height / 100);
+            //    spawnHeightY = height / 100 - 1;
+            //}
 
-            if (spawnPositionX + spawnWidthX >= width / 2)
-            {
-                int checker = (spawnPositionX + spawnWidthX - width / 2) - 1;
-                spawnWidthX += checker;
+            //if (spawnPositionX + spawnWidthX >= width / 2)
+            //{
+            //    int checker = (spawnPositionX + spawnWidthX - width / 2) - 1;
+            //    spawnWidthX += checker;
 
-            }
+            //}
 
-            if (spawnPositionY + spawnHeightY >= height / 2)
-            {
-                int checker = (spawnPositionY + spawnHeightY - height / 2) - 1;
-                spawnHeightY += checker;
+            //if (spawnPositionY + spawnHeightY >= height / 2)
+            //{
+            //    int checker = (spawnPositionY + spawnHeightY - height / 2) - 1;
+            //    spawnHeightY += checker;
 
-            }
+            //}
             int[,] mapCoords = new int[width, height];
             float seed = UnityEngine.Random.Range(0f, 1f);
             int removeAmount = chunkSettings[2].fillAmount;

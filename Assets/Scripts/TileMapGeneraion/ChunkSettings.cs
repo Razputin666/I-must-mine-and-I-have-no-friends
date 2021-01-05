@@ -17,25 +17,25 @@ public class ChunkSettings : NetworkBehaviour
     private LevelGeneratorLayered mapGen;
     private int width;
     private int height;
-    private bool hasInitialized = false;
+    //private bool hasInitialized = false;
+
     public override void OnStartServer()
     {
-        Debug.Log("Server");
         Init();
     }
 
     public void Init()
     {
-        if (hasInitialized)
-            return;
+        //if (hasInitialized)
+        //    return;
 
-        hasInitialized = true;
+        //hasInitialized = true;
 
         mapGen = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
         width = (int)gameObject.transform.position.x + mapGen.width;
         height = (int)gameObject.transform.position.y + mapGen.height;
         tileChunk = GetComponent<Tilemap>();
-        TreeGrowth();
+        //TreeGrowth();
 
         StartCoroutine(GrassGrowth());
     }
@@ -86,7 +86,7 @@ public class ChunkSettings : NetworkBehaviour
                         
                         for (int k = 1; k < randomValue; k++)
                         {
-                            if (!tileChunk.HasTile(new Vector3Int(i, j + 1, 0)))
+                            if (!tileChunk.HasTile(new Vector3Int(i, j + k, 0)))
                             {
                                 TileMapManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j + k, 0), tilebases[1].name);
                             }
