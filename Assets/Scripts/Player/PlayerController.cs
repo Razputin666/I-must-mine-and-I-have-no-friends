@@ -59,7 +59,6 @@ public class PlayerController : NetworkBehaviour
     private const float itemPickupCooldownDefault = 0.5f;
     [SyncVar]
     private bool isReady;
-    public bool IsReady { get; private set; }
     public ItemHandler ItemHandler { get; private set; }
     public int ActiveQuickslot { get; private set; } = -1;
     private void Awake()
@@ -87,8 +86,11 @@ public class PlayerController : NetworkBehaviour
             //    return;
             //}
             if(isLocalPlayer)
+            {
+                Debug.Log("local");
                 CheckQuickslotInput();
-
+            }
+                
             if(isServer)
             {
                 itemPickupCooldown -= Time.deltaTime;
@@ -290,6 +292,7 @@ public class PlayerController : NetworkBehaviour
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     void FixedUpdate()
     {
+        Debug.Log(IsReady);
         if (IsReady)
         {
             if (!isLocalPlayer)
@@ -323,6 +326,7 @@ public class PlayerController : NetworkBehaviour
     [Client]
     private void QuickslotActiveChanged(int index)
     {
+        Debug.Log("quickslot");
         if (ActiveQuickslot != index)
         {
             ItemObject itemObj = ItemHandler.QuickSlots.Container.InventorySlot[index].ItemObject;
@@ -466,6 +470,13 @@ public class PlayerController : NetworkBehaviour
         get { return ItemHandler.Inventory; }
     }
 
+    public bool IsReady
+    {
+        get { return isReady; }
+
+        private set { isReady = value; }
+    }
+
     //public float DistanceFromPlayerX
     //{
     //    get { return distanceFromPlayerx; }
@@ -480,7 +491,7 @@ public class PlayerController : NetworkBehaviour
     //    set { distanceFromPlayery = value; }
     //}
 
-    
+
     public int ActiveItemID
     { 
         get { return activeItemID; } 

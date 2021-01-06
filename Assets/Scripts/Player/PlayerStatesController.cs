@@ -39,7 +39,6 @@ public class PlayerStatesController : NetworkBehaviour
                 
                 if (Input.GetMouseButton(0) && distance.x > -5f && distance.x < 5f && distance.y > -5f && distance.y < 5f)
                 {
-                    Debug.Log(mousePosition);
                     line.enabled = true;
 
                     miningController.Mine(mousePosition, player.MiningStrength);

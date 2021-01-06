@@ -21,6 +21,21 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     // Start is called before the first frame update
     public override void OnStartServer()
     {
+        //if (endOfGun == null)
+        //{
+        //    Transform arm = gameObject.transform.Find("Gubb_arm");
+        //    Transform heldItem = arm.Find("ItemHeldInHand");
+        //    endOfGun = heldItem.Find("EndOfGun");
+        //}
+
+        //spawnManager = GameObject.Find("ItemSpawner").GetComponent<SpawnManager>();
+        //  player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
+        //  tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
+
+    }
+
+    private void Awake()
+    {
         if (endOfGun == null)
         {
             Transform arm = gameObject.transform.Find("Gubb_arm");
@@ -29,9 +44,6 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
         }
 
         spawnManager = GameObject.Find("ItemSpawner").GetComponent<SpawnManager>();
-        //  player = GetComponentInParent<FaceMouse>().GetComponentInParent<PlayerController>();
-        //  tileMapChecker = gameObject.GetComponentInParent<FaceMouse>().gameObject.GetComponentInParent<PlayerController>().gameObject.GetComponentInChildren<TileMapChecker>();
-
     }
 
     private void OnEnable()

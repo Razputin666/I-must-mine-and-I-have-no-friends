@@ -15,7 +15,6 @@ public class TileMapManager : NetworkBehaviour
 
     public List<Tilemap> Tilemaps { get; private set; }
 
-    public event UnityAction<int> OnTilemapsSynced;
     private void Awake()
     {
         if (Instance != null && Instance != this)
