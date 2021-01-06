@@ -105,12 +105,12 @@ public class TilemapSyncer : NetworkBehaviour
 
     private void SetTile(Vector3Int tilePositionCell, TileBase tilebase)
     {
-        if (isServer)
-        {
-            bool mineable = tilebase == null ? false : true;
+        //if (isServer)
+        //{
+        //    bool mineable = tilebase == null ? false : true;
             
-            Pathfinding.Instance.UpdateGridMineable(tilemap.CellToWorld(tilePositionCell), mineable);
-        }
+        //    Pathfinding.Instance.UpdateGridMineable(tilemap.CellToWorld(tilePositionCell), mineable);
+        //}
         tilemap.SetTile(tilePositionCell, tilebase);
     }
     #region Client

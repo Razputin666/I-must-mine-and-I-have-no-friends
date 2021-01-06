@@ -48,24 +48,24 @@ public class PlayerMovementController : NetworkBehaviour
         if(isServer && GetComponent<PlayerController>().IsReady)
         {
             RotateArm();
-            PathfindingTest();
+            //PathfindingTest();
         }
 
-        if (isClient)
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                PlayerController player = GetComponent<PlayerController>();
+        //if (isClient)
+        //{
+        //    if (Input.GetMouseButtonDown(0))
+        //    {
+        //        PlayerController player = GetComponent<PlayerController>();
 
-                CmdSetTargetPath(player.mousePosInWorld);
-            }
-            if (Input.GetMouseButtonDown(1))
-            {
-                PlayerController player = GetComponent<PlayerController>();
+        //        CmdSetTargetPath(player.mousePosInWorld);
+        //    }
+        //    if (Input.GetMouseButtonDown(1))
+        //    {
+        //        PlayerController player = GetComponent<PlayerController>();
 
-                Debug.Log(player.mousePosInWorld);
-            }
-        }
+        //        Debug.Log(player.mousePosInWorld);
+        //    }
+        //}
     }
     [Command]
     private void CmdSetTargetPath(Vector3 targetPositon)
