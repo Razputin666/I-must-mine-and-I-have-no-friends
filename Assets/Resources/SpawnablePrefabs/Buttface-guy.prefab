@@ -670,6 +670,8 @@ MonoBehaviour:
   rb2d: {fileID: 0}
   jumpVelocity: 1200
   maxFallSpeed: 0
+  mouseClick: {fileID: 4152571742085174859, guid: 672c873ec1561794783fbfdec54cf976,
+    type: 3}
 --- !u!114 &1398906487
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -175,7 +175,7 @@ public class LevelGeneratorLayered : NetworkBehaviour
 
     private void WorldGeneration()
 	{
-		//pathfinding = new Pathfinding(width * numberOfChunks, height * numberOfChunks, new Vector3(0, -height + 1));
+		pathfinding = new Pathfinding(width * numberOfChunks, height * numberOfChunks, new Vector3(0, -height + 1));
 		//List<int[,]> mapList = new List<int[,]>();
 		//mapList = LoadMap();
 		switch (typeOfPlanet)
@@ -190,16 +190,18 @@ public class LevelGeneratorLayered : NetworkBehaviour
 					GameObject chunk = Instantiate(tileChunk, grid.transform);
 					NetworkServer.Spawn(chunk);
 
-					chunks.Add(chunk.GetComponent<Tilemap>());
-					GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
-
 					//grassOverWorldChunk.GenerateGrassPlanetOverworldChunk(chunks[i]);
-					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y);
-					startPosition.x += width - 1;
+					chunk.transform.position = new Vector2(chunk.transform.position.x + startPosition.x, chunk.transform.position.y);
+					
 
 					//chunk.GetComponent<ChunkSettings>().Init();
 					chunk.GetComponent<TilemapSyncer>().SetName("Tilemap_" + i);
 					TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
+
+					chunks.Add(chunk.GetComponent<Tilemap>());
+					GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
+
+					startPosition.x += width - 1;
 				}
 				chunkHeightOffset = grassOverWorldChunk.GetChunkHeightOffset;
 				startPosition = new Vector2Int(0, 0);
@@ -217,18 +219,18 @@ public class LevelGeneratorLayered : NetworkBehaviour
 					GameObject chunk = Instantiate(tileChunk, grid.transform);
 					NetworkServer.Spawn(chunk);
 
-					chunks.Add(chunk.GetComponent<Tilemap>());
-					GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
-
 					//grassUnderWorldChunk.GenerateGrassPlanetUnderWorldChunk(chunks[i]);
-					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y + startPosition.y);
-					startPosition.x += width - 1;
-
+					chunk.transform.position = new Vector2(chunk.transform.position.x + startPosition.x, chunk.transform.position.y + startPosition.y);
 					
 					//chunk.GetComponent<ChunkSettings>().Init();
 					chunk.GetComponent<TilemapSyncer>().SetName("Tilemap_" + i);
 
+					chunks.Add(chunk.GetComponent<Tilemap>());
+					GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
+
 					TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
+
+					startPosition.x += width - 1;
 				}
 				GameObject t1 = Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
 				NetworkServer.Spawn(t1);

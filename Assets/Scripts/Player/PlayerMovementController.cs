@@ -48,35 +48,34 @@ public class PlayerMovementController : NetworkBehaviour
         if(isServer && GetComponent<PlayerController>().IsReady)
         {
             RotateArm();
-            //PathfindingTest();
+            PathfindingTest();
         }
 
-        //if(isClient)
-        //{
-        //    if(Input.GetMouseButtonDown(0))
-        //    {
-        //        PlayerController player = GetComponent<PlayerController>();
+        if (isClient)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                PlayerController player = GetComponent<PlayerController>();
 
-        //        CmdSetTargetPath(player.mousePosInWorld);
-        //    }
-        //    if(Input.GetMouseButtonDown(1))
-        //    {
-        //        PlayerController player = GetComponent<PlayerController>();
+                CmdSetTargetPath(player.mousePosInWorld);
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                PlayerController player = GetComponent<PlayerController>();
 
-        //        Debug.Log(player.mousePosInWorld);
-        //    }
-        //}
+                Debug.Log(player.mousePosInWorld);
+            }
+        }
     }
     [Command]
     private void CmdSetTargetPath(Vector3 targetPositon)
     {
         currentPathIndex = 0;
         //Debug.Log(targetPositon);
-        pathVectorList = Pathfinding.Instance.FindPath(transform.position + Vector3.down, targetPositon);
+        pathVectorList = Pathfinding.Instance.FindPath(transform.position, targetPositon);
         //Debug.Log(transform.position + Vector3.down);
         //foreach (Vector3 pos in pathVectorList)
         //{
-            
         //    Debug.Log(pos);
         //}
 
@@ -91,22 +90,20 @@ public class PlayerMovementController : NetworkBehaviour
             Vector3 targetPosition = pathVectorList[currentPathIndex];
             Vector3 adjustedTransform = transform.position + Vector3.down;
 
-            if (PathRequiresMining(targetPosition))
+            if(PathRequiresMining(targetPosition))
             {
-                
+
             }
-            else if(Vector3.Distance(adjustedTransform, targetPosition) > 1f)
+            else if(Vector3.Distance(adjustedTransform, targetPosition) > 1.0f && Vector3.Distance(transform.position + Vector3.up, targetPosition) > 1.0f)
             {
                 //Debug.Log(targetPosition + " " + adjustedTransform);
-                Vector3 moveDir = (targetPosition - adjustedTransform).normalized;
+                Vector3 moveDir = (targetPosition - transform.position).normalized;
                 //Debug.Log(moveDir);
-                //if (moveDir.y > 0.8)
-                //    IsJumping = true;
-                //else
-                //{
-                //    IsJumping = false;
-                //    
-                //}
+                if (moveDir.y > 0.8)
+                    IsJumping = true;
+                else
+                    IsJumping = false;
+
                 previousInput = moveDir;
                 float distanceBefore = Vector3.Distance(transform.position, targetPosition);
                 //rb2d.velocity += new Vector2(moveDir.x, moveDir.y) * movementSpeed;
@@ -136,59 +133,128 @@ public class PlayerMovementController : NetworkBehaviour
         }
         else
         {
-            Debug.Log("Checking neighbours");
-            foreach (PathNode neigbourNode in currentNode.neighbourNodes)
+            Vector3 adjustedTransform = transform.position;// + Vector3.down;
+            Debug.Log(targetPosition);
+            //Debug.Log(adjustedTransform);
+            Vector3 moveDir = (targetPosition - adjustedTransform).normalized;
+            //Debug.Log(moveDir);
+            if (Mathf.Abs(moveDir.x) > Mathf.Abs(moveDir.y))
             {
-                Debug.Log(neigbourNode.ToString() + neigbourNode.isMineable);
-                if (neigbourNode.isMineable)
+                PathNode upNeighbour = Pathfinding.Instance.GetNode(targetPosition + Vector3.up);
+                if (upNeighbour != null && upNeighbour.isMineable)
                 {
-                    Vector3 adjustedTransform = transform.position + Vector3.down;
-                    Vector3 moveDir = (targetPosition - adjustedTransform).normalized;
-
-                    if(Mathf.Abs(moveDir.x) > Mathf.Abs(moveDir.y))
-                    {
-                        Vector3 neighbourPosition = Pathfinding.Instance.GetWorldPosition(neigbourNode.x, neigbourNode.y);
-                        Debug.Log(neighbourPosition);
-                        Debug.Log("Up Dist: " + Vector3.Distance(targetPosition + Vector3.up, neighbourPosition));
-                        Debug.Log("Down Dist: " + Vector3.Distance(targetPosition + Vector3.down, neighbourPosition));
-                        if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.up, neighbourPosition) < 0.5f)
-                        {
-                            Debug.Log("Mining 2 " + targetPosition);
-                            GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
-                            return true;
-                        }
-                        else if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.down, neighbourPosition) < 0.5f)
-                        {
-                            Debug.Log("Mining 3 " + targetPosition);
-                            GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
-                            return true;
-                        }
-                        return false;
-                    }
-                    else
-                    {
-                        Vector3 neighbourPosition = Pathfinding.Instance.GetWorldPosition(neigbourNode.x, neigbourNode.y);
-                        Debug.Log(neighbourPosition);
-                        Debug.Log("Right Dist: " + Vector3.Distance(targetPosition + Vector3.right, neighbourPosition));
-                        Debug.Log("Left Dist: " + Vector3.Distance(targetPosition + Vector3.left, neighbourPosition));
-                        if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.right, neighbourPosition) < 0.5f)
-                        {
-                            Debug.Log("Mining 4 " + targetPosition);
-                            GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
-                            return true;
-                        }
-                        else if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.left, neighbourPosition) < 0.5f)
-                        {
-                            Debug.Log("Mining 5 " + targetPosition);
-                            GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
-                            return true;
-                        }
-                        return false;
-                    }
+                    Debug.Log("Mining 1 " + targetPosition + Vector3.up);
+                    GetComponent<MiningController>().Mine(targetPosition + Vector3.up, GetComponent<PlayerController>().MiningStrength);
+                    return true;
+                }
+                PathNode downNeighbour = Pathfinding.Instance.GetNode(targetPosition + Vector3.down);
+                if (downNeighbour != null && downNeighbour.isMineable)
+                {
+                    Debug.Log("Mining 2 " + targetPosition + Vector3.down);
+                    GetComponent<MiningController>().Mine(targetPosition + Vector3.down, GetComponent<PlayerController>().MiningStrength);
+                    return true;
                 }
             }
-        }
+            else
+            {
+                PathNode rightNeighbour = Pathfinding.Instance.GetNode(targetPosition + Vector3.right);
+                if (rightNeighbour != null && rightNeighbour.isMineable)
+                {
+                    Debug.Log("Mining 3 " + targetPosition + Vector3.right);
+                    GetComponent<MiningController>().Mine(targetPosition + Vector3.right, GetComponent<PlayerController>().MiningStrength);
+                    return true;
+                }
+                PathNode leftNeighbour = Pathfinding.Instance.GetNode(targetPosition + Vector3.left);
+                if (leftNeighbour != null && leftNeighbour.isMineable)
+                {
+                    Debug.Log("Mining 4 " + targetPosition + Vector3.left);
+                    GetComponent<MiningController>().Mine(targetPosition + Vector3.left, GetComponent<PlayerController>().MiningStrength);
+                    return true;
+                }
+                return false;
+            }
+            //Debug.Log("Checking neighbours");
+            //foreach (PathNode neigbourNode in currentNode.neighbourNodes)
+            //{
+            //    //Debug.Log(neigbourNode.ToString() + neigbourNode.isMineable);
+            //    if (neigbourNode.isMineable)
+            //    {
+            //        Vector3 adjustedTransform = transform.position;// + Vector3.down;
+            //        Vector3 moveDir = (targetPosition - adjustedTransform).normalized;
 
+            //        if(Mathf.Abs(moveDir.x) > Mathf.Abs(moveDir.y))
+            //        {
+            //            //Vector3 neighbourPosition = Pathfinding.Instance.GetWorldPosition(neigbourNode.x, neigbourNode.y);
+            //            //Debug.Log(targetPosition);
+            //            //Debug.Log(neighbourPosition);
+            //            //Debug.Log("Up Dist: " + Vector3.Distance(targetPosition + Vector3.up, neighbourPosition));
+            //            //Debug.Log("Down Dist: " + Vector3.Distance(targetPosition + Vector3.down, neighbourPosition));
+            //            //if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.up, neighbourPosition) < 1.5f)
+            //            //{
+            //            //    Debug.Log("Mining 2 " + targetPosition);
+            //            //    GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
+            //            //    return true;
+            //            //}
+            //            //else if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.down, neighbourPosition) < 1.5f)
+            //            //{
+            //            //    Debug.Log("Mining 3 " + targetPosition);
+            //            //    GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
+            //            //    return true;
+            //            //}
+            //            PathNode upNeighbour = Pathfinding.Instance.GetNode(targetPosition + Vector3.up);
+            //            if (upNeighbour.isMineable)
+            //            {
+            //                Debug.Log("Mining 4 " + targetPosition);
+            //                GetComponent<MiningController>().Mine(Pathfinding.Instance.GetWorldPosition(upNeighbour.x, upNeighbour.y), GetComponent<PlayerController>().MiningStrength);
+            //                return true;
+            //            }
+            //            PathNode downNeighbour = Pathfinding.Instance.GetNode(targetPosition + Vector3.down);
+            //            if (downNeighbour.isMineable)
+            //            {
+            //                Debug.Log("Mining 4 " + targetPosition);
+            //                GetComponent<MiningController>().Mine(Pathfinding.Instance.GetWorldPosition(downNeighbour.x, downNeighbour.y), GetComponent<PlayerController>().MiningStrength);
+            //                return true;
+            //            }
+            //            continue;
+            //        }
+            //        else
+            //        {
+            //            //Vector3 neighbourPosition = Pathfinding.Instance.GetWorldPosition(neigbourNode.x, neigbourNode.y);
+
+            //            //Debug.Log(targetPosition);
+            //            //Debug.Log(neighbourPosition);
+            //            //Debug.Log("Right Dist: " + Vector3.Distance(targetPosition + Vector3.right, neighbourPosition));
+            //            //Debug.Log("Left Dist: " + Vector3.Distance(targetPosition + Vector3.left, neighbourPosition));
+            //            //if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.right, neighbourPosition) < 1.5f)
+            //            //{
+            //            //    Debug.Log("Mining 4 " + targetPosition);
+            //            //    GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
+            //            //    return true;
+            //            //}
+            //            //else if (Pathfinding.Instance.GetNode(neighbourPosition).isMineable && Vector3.Distance(targetPosition + Vector3.left, neighbourPosition) < 1.5f)
+            //            //{
+            //            //    Debug.Log("Mining 5 " + targetPosition);
+            //            //    GetComponent<MiningController>().Mine(neighbourPosition, GetComponent<PlayerController>().MiningStrength);
+            //            //    return true;
+            //            //}
+            //            PathNode rightNeighbour = Pathfinding.Instance.GetNode(targetPosition + Vector3.right);
+            //            if(rightNeighbour.isMineable)
+            //            {
+            //                Debug.Log("Mining 4 " + targetPosition);
+            //                GetComponent<MiningController>().Mine(Pathfinding.Instance.GetWorldPosition(rightNeighbour.x, rightNeighbour.y), GetComponent<PlayerController>().MiningStrength);
+            //                return true;
+            //            }
+            //            PathNode leftNeighbour = Pathfinding.Instance.GetNode(targetPosition + Vector3.left);
+            //            if (leftNeighbour.isMineable)
+            //            {
+            //                Debug.Log("Mining 4 " + targetPosition);
+            //                GetComponent<MiningController>().Mine(Pathfinding.Instance.GetWorldPosition(leftNeighbour.x, leftNeighbour.y), GetComponent<PlayerController>().MiningStrength);
+            //                return true;
+            //            }
+            //            continue;
+            //        }
+            //    }
+        }
         return false;
     }
 

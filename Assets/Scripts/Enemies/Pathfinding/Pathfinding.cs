@@ -42,6 +42,11 @@ public class Pathfinding
         grid.GetXY(startWorldPosition, out int startX, out int startY);
         grid.GetXY(endWorldPosition, out int endX, out int endY);
 
+        if (endX > 100 || endY > 100)
+        {
+            Debug.Log(endX + "," + endY);
+            Debug.Log(endWorldPosition);
+        }
         List<PathNode> path = FindPath(startX, startY, endX, endY);
 
         if (path == null)
@@ -66,7 +71,11 @@ public class Pathfinding
         PathNode endNode = grid.GetGridObject(endX, endY);
 
         if (endNode == null)
+        {
             Debug.LogError("EndNode is null at: " + endX + "," + endY);
+            return null;
+        }
+            
 
         openList = new List<PathNode>() { startNode };
         closedList = new List<PathNode>();

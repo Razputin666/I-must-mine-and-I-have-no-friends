@@ -698,6 +698,16 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3288425832788631314, guid: 67987fa2af623f547a95031ed4997d12,
+        type: 3}
+      propertyPath: m_OcclusionCulling
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3288425832788631316, guid: 67987fa2af623f547a95031ed4997d12,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5918767642926632651, guid: 67987fa2af623f547a95031ed4997d12,
         type: 3}
       propertyPath: m_Name

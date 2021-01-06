@@ -214,14 +214,14 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
         }
     }
 
-    public void Mine(Vector3 blockPos, float miningStr)
+    public void Mine(Vector3 blockWorldPosition, float miningStr)
     {
         if (!coolDownSystem.IsOnCoolDown(id))
         {
             if (isClient)
-                CmdMineBlockAt(blockPos, miningStr);
+                CmdMineBlockAt(blockWorldPosition, miningStr);
             else
-                ServerMine(blockPos, miningStr);
+                ServerMine(blockWorldPosition, miningStr);
 
             coolDownSystem.PutOnCoolDown(this);
         }  

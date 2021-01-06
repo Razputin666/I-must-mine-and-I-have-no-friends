@@ -145,6 +145,7 @@ public class PlayerController : NetworkBehaviour
     private void CmdSendMousePos(Vector3 mousePos)
     {
         mousePosInWorld = mousePos;
+        Debug.Log("command");
     }
 
     #endregion
@@ -232,11 +233,13 @@ public class PlayerController : NetworkBehaviour
     {
         if (camera == null)
             camera = Instantiate(Camera.main, transform);
-
+        
         Camera.main.GetComponentInParent<AudioListener>().enabled = false;
         camera.GetComponent<AudioListener>().enabled = true;
-        //camera.transform.SetParent(transform);
+
         camera.transform.localPosition = new Vector3(0, 0, -20);
+
+        Camera.main.gameObject.SetActive(false);
 
         //_camera.transform.position = new Vector3(Mathf.Clamp(rb2d.transform.position.x, (0) + 26.7f, (mapSize.startPosition.x) - 26.7f), rb2d.transform.position.y, -1);
 
@@ -292,9 +295,18 @@ public class PlayerController : NetworkBehaviour
             if (!isLocalPlayer)
                 return;
 
-            Vector3 mousePosInWorld = camera.ScreenToWorldPoint(Input.mousePosition);
-            mousePosInWorld.z = 0;
-            CmdSendMousePos(mousePosInWorld);
+            Vector3 mousePos = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y));
+            mousePos.z = 0;
+
+            //if(mousePos.y > 60)
+            //{
+            //    Debug.Log(mousePos);
+            //    Debug.Log(Input.mousePosition);
+            //}
+            if (isServer)
+                mousePosInWorld = mousePos;
+            else
+                CmdSendMousePos(mousePos);
 
             if (playerHP <= 0)
             {
