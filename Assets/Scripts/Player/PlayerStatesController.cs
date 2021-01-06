@@ -28,7 +28,7 @@ public class PlayerStatesController : NetworkBehaviour
         if (!isLocalPlayer)
             return;
         Vector3 mousePosition = player.mousePosInWorld;
-        mousePosition.z = 0f;
+        
         Vector3 playerPosition = transform.position;
 
         Vector3 distance = mousePosition - playerPosition;
@@ -36,9 +36,10 @@ public class PlayerStatesController : NetworkBehaviour
         switch (player.playerStates)
         {
             case PlayerController.PlayerStates.Mining:
-
+                
                 if (Input.GetMouseButton(0) && distance.x > -5f && distance.x < 5f && distance.y > -5f && distance.y < 5f)
                 {
+                    Debug.Log(mousePosition);
                     line.enabled = true;
 
                     miningController.Mine(mousePosition, player.MiningStrength);

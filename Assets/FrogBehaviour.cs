@@ -9,7 +9,7 @@ public class FrogBehaviour : EnemyBehaviour
     
     [SerializeField] private MiningController miningMode;
     [SerializeField] private Transform arm;
-    [SerializeField] private PathfindingCustom pathfinding;
+    //[SerializeField] private PathfindingCustom pathfinding;
     [SerializeField] private Transform item;
 
     private float findTargetTimer;

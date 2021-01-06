@@ -252,7 +252,7 @@ public class PlayerController : NetworkBehaviour
         //CmdSetupPlayer(name);
 
         item.GetComponent<SpriteRenderer>().sprite = null;
-        item.GetComponent<DefaultGun>().enabled = false;
+        //item.GetComponent<DefaultGun>().enabled = false;
         //GetComponent<MiningController>().enabled = false;
 
         playerStates = PlayerStates.Idle;
@@ -298,15 +298,14 @@ public class PlayerController : NetworkBehaviour
             Vector3 mousePos = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y));
             mousePos.z = 0;
 
-            //if(mousePos.y > 60)
-            //{
-            //    Debug.Log(mousePos);
-            //    Debug.Log(Input.mousePosition);
-            //}
             if (isServer)
                 mousePosInWorld = mousePos;
             else
+            {
                 CmdSendMousePos(mousePos);
+                mousePosInWorld = mousePos;
+            }
+                
 
             if (playerHP <= 0)
             {
