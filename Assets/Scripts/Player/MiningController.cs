@@ -18,19 +18,6 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     public Transform endOfGun;
     private Dictionary<Vector3Int, float> blockChecker = new Dictionary<Vector3Int, float>();
 
-    private struct TileUpdateData
-    {
-        public TileUpdateData(Vector3Int blockPos, string newTilemapName)
-        {
-            blockCellPos = blockPos;
-            tilemapName = newTilemapName;
-        }
-        public Vector3Int blockCellPos;
-        public string tilemapName;
-    }
-
-    private List<TileUpdateData> tileUpdateData = new List<TileUpdateData>();
-
     // Start is called before the first frame update
     public override void OnStartServer()
     {

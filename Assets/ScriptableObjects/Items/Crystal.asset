@@ -20,3 +20,5 @@ MonoBehaviour:
     name: Crystal
     id: -1
     amount: 1
+    type: Ore
+  maxStackSize: 0

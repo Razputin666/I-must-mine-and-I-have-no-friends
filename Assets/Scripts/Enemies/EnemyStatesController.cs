@@ -31,9 +31,9 @@ public class EnemyStatesController : MonoBehaviour
         {
             case EnemyController.EnemyStates.FrogMining:
 
-                
 
-                Vector3 distanceToTarget = enemy.player.transform.position - transform.position;
+
+                Vector3 distanceToTarget = enemy.target;
 
 
                 if (distanceToTarget.x > 0)
@@ -89,7 +89,7 @@ public class EnemyStatesController : MonoBehaviour
                }
                else
                {
-                    for (int j = 1; j <= 2 && foundBlock == false; j++)
+                    for (int j = 0; j <= 2 && foundBlock == false; j++)
                     {
                         Vector3Int[] newBlockPos = GetNextBlocks(distanceToTarget, j);
                         for (int i = 0; i < newBlockPos.Length; i++)
@@ -109,12 +109,17 @@ public class EnemyStatesController : MonoBehaviour
 
                 if(!foundBlock)
                 {
+
                     return;
                 }
-
+              //  if (enemy.DistanceGained >= transform.position.magnitude)
+               // {
+                   // DestroySurroundingBlocks();
+               // }
                 if (distanceFromEnemy.x > -10 && distanceFromEnemy.x < 10 && distanceFromEnemy.y > -10 && distanceFromEnemy.y < 10)
                 {
                     miningMode.Mine(targetBlockIntPos, enemy.miningStrength);
+                 
                 }
 
                 break;
@@ -124,6 +129,8 @@ public class EnemyStatesController : MonoBehaviour
                 break;
         }
     }
+
+  
 
     public Tilemap TargetedChunk
     {

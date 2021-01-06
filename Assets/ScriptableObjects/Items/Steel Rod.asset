@@ -20,3 +20,5 @@ MonoBehaviour:
     name: Steel Rod
     id: -1
     amount: 1
+    type: Ore
+  maxStackSize: 0

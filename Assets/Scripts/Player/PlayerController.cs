@@ -313,6 +313,7 @@ public class PlayerController : NetworkBehaviour
                 Die();
             }
         }
+
     }
     [Client]
     public void UpdateActiveItem(int itemID)

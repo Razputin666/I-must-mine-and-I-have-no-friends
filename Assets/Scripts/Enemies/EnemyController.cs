@@ -2,33 +2,38 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, HasCoolDownInterFace
 {
 
     public enum EnemyStates
     {
-        FrogMining, FrogAggressive
+        FrogMining, FrogAggressive, FrogReturn
     }
 
     public EnemyStates enemyStates { get; private set; }
 
-    [SerializeField] private float whenToStop;
-    [SerializeField] private float whenToBack;
-    [SerializeField] private float whenToMove;
+    //private float whenToStop;
+    //private float whenToBack;
+    //private float whenToMove;
     [SerializeField] private float speed;
     [SerializeField] public int enemyHP;
-    [SerializeField] private float enterDigModeTimer;
     [SerializeField] private InventoryObject inventory;
+    [SerializeField] private int id = 4;
+    [SerializeField] private float coolDownDuration;
+    [SerializeField] private CoolDownSystem coolDownSystem;
     
 
 
-    
+
+
     #region EnemyValues
-
+    private float enterDigModeTimer = 0;
     private float distanceToPlayer;
     private float distanceGained;
     public PlayerController player;
     private JumpController jumpController;
+    private EvilBeavisBaseController baseController;
+    private List<Vector3Int> targetedOre;
     public Transform item;
     
     public Rigidbody2D rb2d;
@@ -42,6 +47,12 @@ public class EnemyController : MonoBehaviour
     public int enemyStrength;
     public Vector2 enemyKnockBack;
     public float miningStrength;
+    public Vector3 target;
+    private Vector3 pathfindingTarget;
+    private float distanceToTarget;
+    private int blockAmount;
+    private int oreAmount;
+
 
 
 
@@ -55,77 +66,67 @@ public class EnemyController : MonoBehaviour
         jumpController = GetComponent<JumpController>();
         item = gameObject.GetComponentInChildren<FacePlayer>().gameObject.transform.Find("ItemHeldInHand");
         item.GetComponent<MiningController>().enabled = false;
+        baseController = GameObject.FindWithTag("EnemyBase").GetComponent<EvilBeavisBaseController>();
+        targetedOre = baseController.targetedOre;
         enemyStates = EnemyStates.FrogAggressive;
         inventory = Instantiate(inventory);
+        
        
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
+
+
+        
         enterDigModeTimer += Time.deltaTime;
 
         if (enterDigModeTimer >= 3f)
         {
-           
-            // Debug.Log(transform.position.magnitude + " Position " + DistanceGained + " Distance gained");
-           
-            if(DistanceGained >= transform.position.magnitude)
-            {
-                SetMiningMode();
-            }
+            StateChange();
+            GetTarget();
 
-            //else if((DistanceGained * 1.5f) < transform.position.magnitude && enemyStates != EnemyStates.FrogAggressive)
-            //{
-            //    SetAggressiveMode();
-            //}
+        }
+        pathfindingTarget = GetComponent<PathfindingScript>().PathfindingTarget;
+        Debug.Log(pathfindingTarget + " pathfinding target");
 
-            if (Vector3.Distance(transform.position, player.transform.position) <= 10f)
-            {
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, player.transform.position - transform.position, 9f);
-                if (hit.transform && hit.transform.CompareTag("Test"))
-                {
-                    SetAggressiveMode();
-                }
-            }
+        if (pathfindingTarget.x - transform.position.x >= 1)
+        {
+            transform.position += Vector3.right * (speed * Time.deltaTime);
+            Flip(Vector2.right.x);
 
-            DistanceGained = transform.position.magnitude;
-            enterDigModeTimer = 0f;
         }
 
-
-
-
-
-        Vector3 temp = player.transform.position - transform.position;
-
-        // Debug.Log(item.position +" Pickaxe position " + (player.worldPosition - player.transform.position) + " Mouse position");
-        if (rb2d.velocity.x == 0f && enemyStates != EnemyStates.FrogMining || temp.y > 0)
+        else if (pathfindingTarget.x - transform.position.x <= -1)
+        {
+            transform.position += Vector3.left * (speed * Time.deltaTime);
+            Flip(Vector2.left.x);
+        }
+        if (rb2d.velocity.x == 0f && enemyStates != EnemyStates.FrogMining || pathfindingTarget.y - transform.position.y > 0)
         {
             jumpController.Jump();
         }
 
-        if (temp.x >= 0)
-        {
-            // rb2d.velocity += Vector2.right * (speed * Time.deltaTime);
-              transform.position += Vector3.right * (speed * Time.deltaTime);
-            //  rb2d.MovePosition(transform.position + (Vector3.right * speed * Time.deltaTime));
-           // rb2d.AddForce(Vector3.right * speed * Time.deltaTime);
-            Flip(Vector2.left.x);
-          
-            
-        }
+        //if (rb2d.velocity.x == 0f && enemyStates != EnemyStates.FrogMining || target.y > 0)
+        //{
+        //    jumpController.Jump();
+        //}
 
-        else
-        {
-           //  rb2d.velocity += Vector2.left * (speed * Time.deltaTime);
-             transform.position += Vector3.left * (speed * Time.deltaTime);
-            // rb2d.MovePosition(player.transform.position * (speed * Time.deltaTime));
-          //  rb2d.MovePosition(transform.position + (Vector3.left * speed * Time.deltaTime));
-          // rb2d.AddForce(Vector3.left * speed * Time.deltaTime);
-            Flip(Vector2.right.x);
-        }
+
+        //if (target.x >= 1)
+        //{
+        //      transform.position += Vector3.right * (speed * Time.deltaTime);
+        //    Flip(Vector2.right.x);
+
+        //}
+
+        //else if(target.x <= -1)
+        //{
+        //     transform.position += Vector3.left * (speed * Time.deltaTime);
+        //    Flip(Vector2.left.x);
+        //}
+
 
         if (rb2d.velocity.y < -25f)
         {
@@ -161,7 +162,67 @@ public class EnemyController : MonoBehaviour
             Die();
         }
 
-        // rb2d.velocity = temp * speed;
+    }
+
+    void MoveEnemy()
+    {
+
+
+    }
+
+    void GetTarget()
+    {
+
+        if (player != null)
+        {
+            distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
+
+            if (distanceToPlayer > 30f || Vector3.Distance(player.transform.position, baseController.gameObject.transform.position) > 30f && player != null)
+            {
+                target = player.transform.position - transform.position;
+            }
+        }
+        else if (baseController.targetedOre.Count > 0)
+        {
+            blockAmount = GetBlockAmount();
+            oreAmount = GetOreAmount();
+            if (blockAmount >= 50 || oreAmount >= 10)
+            {
+                 target = baseController.transform.position - transform.position;
+                // target = new Vector3(Mathf.Clamp(target.x, target.x - 20f, target.x + 20f), Mathf.Clamp(target.y, target.y - 20f, target.y + 20f));
+                //  target = new Vector3(Mathf.Clamp(baseController.transform.position.x - transform.position.x, -20f, 20f), Mathf.Clamp(baseController.transform.position.y - transform.position.y, -20f, 20f));
+              //  target = baseController.transform.position;
+            }
+            else
+            {
+                  target = baseController.targetedOre[baseController.targetedOre.Count - 1] - transform.position;
+                // target = new Vector3(Mathf.Clamp(target.x, target.x - 20f, target.x + 20f), Mathf.Clamp(target.y, target.y - 20f, target.y + 20f));
+              //  target = baseController.targetedOre[baseController.targetedOre.Count - 1];
+                distanceToTarget = Vector3.Distance(baseController.targetedOre[baseController.targetedOre.Count - 1], transform.position);
+            }
+        }
+    }
+
+    void StateChange()
+    {
+
+
+        if (DistanceGained >= transform.position.magnitude)
+        {
+            SetMiningMode();
+        }
+
+        if (player != null && Vector3.Distance(transform.position, player.transform.position) <= 10f)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, player.transform.position - transform.position, 9f);
+            if (hit.transform && hit.transform.CompareTag("Player"))
+            {
+                SetAggressiveMode();
+            }
+        }
+
+        DistanceGained = transform.position.magnitude;
+        enterDigModeTimer = 0f;
     }
 
     void Die()
@@ -178,36 +239,10 @@ public class EnemyController : MonoBehaviour
             Vector3 theScale = transform.localScale;
             theScale.x *= -1;
             transform.localScale = theScale;
+            //coolDownSystem.PutOnCoolDown(this);
+
         }
     }
-
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //   if(collision.collider.CompareTag("Bullet"))
-    //   {
-    //        enemyHP -= collision.collider.GetComponent<Bullet>().projectileStrength;
-    //   }
-    //    if (collision.collider.CompareTag("Enemy"))
-    //    {
-    //        EnemyController ally = collision.collider.gameObject.GetComponentInParent<EnemyController>();
-
-    //        if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x > 0f)
-    //        {
-    //            rb2d.AddForceAtPosition(ally.enemyKnockBack, transform.position);
-    //        }
-
-    //        else if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x < 0f)
-    //        {
-    //            rb2d.AddForceAtPosition(-ally.enemyKnockBack, transform.position);
-    //        }
-
-    //    }
-
-    //    else if (collision.collider.CompareTag("Player") && enemyStates != EnemyStates.FrogAggressive)
-    //    {
-    //        SetAggressiveMode();
-    //    }
-    //}
     public float DistanceGained
     {
         get { return distanceGained; }
@@ -236,4 +271,80 @@ public class EnemyController : MonoBehaviour
     {
         get { return inventory; }
     }
+
+    private int GetBlockAmount()
+    {
+        int items = 0;
+        List<int> listOfItems = new List<int>();
+
+        //if(inventory.FindItemInInventory("Dirt") != null)
+        //junk = inventory.FindItemInInventory("Dirt").Amount;
+        //if (inventory.FindItemInInventory("Stone") != null)
+        //    junk += inventory.FindItemInInventory("Stone").Amount;
+        //if (inventory.FindItemInInventory("Grass") != null)
+        //    junk += inventory.FindItemInInventory("Grass").Amount;
+        
+        if (inventory.FindItemsInInventory("Common") != null)
+        {
+            for (int i = 0; i < inventory.FindItemsInInventory("Common").Count; i++)
+            {
+                listOfItems.Add(inventory.FindItemsInInventory("Common")[i].Amount);
+            }
+            for (int j = 0; j < listOfItems.Count; j++)
+            {
+                items += listOfItems[j];
+            }
+        }
+        
+        return items;
+    }
+    private int GetOreAmount()
+    {
+        int items = 0;
+        List<int> listOfItems = new List<int>();
+        if (inventory.FindItemsInInventory("Ore") != null)
+        {
+            for (int i = 0; i < inventory.FindItemsInInventory("Ore").Count; i++)
+            {
+                listOfItems.Add(inventory.FindItemsInInventory("Ore")[i].Amount);
+            }
+            for (int j = 0; j < listOfItems.Count; j++)
+            {
+                items += listOfItems[j];
+            }
+        }
+
+        return items;
+    }
+
+    public int OreAmount
+    {
+        get { return oreAmount; }
+
+        set { oreAmount = value; }
+    }
+
+    public int BlockAmount
+    {
+        get { return blockAmount; }
+
+        set { blockAmount = value; }
+    }
+
+    public InventoryObject Inventory
+    {
+        get
+        { 
+            return inventory;
+        }
+
+        set
+        {
+            inventory = value;
+        }
+    }
+
+    public int Id => id;
+
+    public float CoolDownDuration => coolDownDuration;
 }

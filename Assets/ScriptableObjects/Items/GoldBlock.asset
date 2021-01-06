@@ -20,4 +20,5 @@ MonoBehaviour:
     name: Gold Block
     id: 12
     amount: 1
+    type: Ore
   maxStackSize: 0

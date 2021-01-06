@@ -12,7 +12,7 @@ public class WorldTeleport : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.transform.position.x > 1)
+        if (collision.transform.position.x > 1 && collision.transform.CompareTag("Enemy") || collision.transform.CompareTag("Player"))
         {
 
              RaycastHit2D unitMover = Physics2D.Raycast(new Vector2(1.5f, mapSize.height * 2), Vector2.down);    
@@ -21,7 +21,7 @@ public class WorldTeleport : MonoBehaviour
                 
             
         }
-        else
+        else if (collision.transform.CompareTag("Enemy") || collision.transform.CompareTag("Player"))
         {
 
              RaycastHit2D unitMover = Physics2D.Raycast(new Vector2(mapSize.startPosition.x, mapSize.height * 2), Vector2.down);

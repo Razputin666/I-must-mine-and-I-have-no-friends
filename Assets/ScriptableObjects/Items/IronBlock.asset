@@ -20,4 +20,5 @@ MonoBehaviour:
     name: Iron Block
     id: 16
     amount: 1
+    type: Ore
   maxStackSize: 0

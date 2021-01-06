@@ -20,4 +20,5 @@ MonoBehaviour:
     name: Tree
     id: 22
     amount: 1
+    type: Common
   maxStackSize: 0
