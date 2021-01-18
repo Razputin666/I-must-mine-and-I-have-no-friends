@@ -33,7 +33,7 @@ public class PlayerController : NetworkBehaviour
     public Transform item;
     [SerializeField]
     private DeathScreen deathScreen;
-    private Camera camera;
+    private Camera _Camera;
 
     private JumpController jumpController;
     [SerializeField] 
@@ -87,7 +87,6 @@ public class PlayerController : NetworkBehaviour
             //}
             if(isLocalPlayer)
             {
-                Debug.Log("local");
                 CheckQuickslotInput();
             }
                 
@@ -147,7 +146,6 @@ public class PlayerController : NetworkBehaviour
     private void CmdSendMousePos(Vector3 mousePos)
     {
         mousePosInWorld = mousePos;
-        Debug.Log("command");
     }
 
     #endregion
@@ -163,14 +161,12 @@ public class PlayerController : NetworkBehaviour
     [Server]
     private void CheckItemCollision()
     {
-        Debug.Log("Checking collision");
         Collider2D[] colliderArray = Physics2D.OverlapCircleAll(transform.position, itemPickupRange);
         
         foreach (Collider2D collider2D in colliderArray)
         {
             if (collider2D.TryGetComponent<GroundItem>(out GroundItem groundItem))
             {
-                Debug.Log("Collision");
                 Item newItem = new Item(groundItem.Item);
 
                 RpcAddItemToPlayer(GetComponent<NetworkIdentity>().connectionToClient, newItem.ID, newItem.Amount);
@@ -186,17 +182,17 @@ public class PlayerController : NetworkBehaviour
         {
             if (collision.collider.CompareTag("EnemyWeapon"))
             {
-                EnemyController enemy = collision.collider.gameObject.GetComponentInParent<EnemyController>();
-                playerHP -= enemy.enemyStrength;
+                EnemyBehaviour enemy = collision.collider.gameObject.GetComponentInParent<EnemyBehaviour>();
+                playerHP -= enemy.GetStats.strength;
 
                 if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x > 0f)
                 {
-                    rb2d.AddForceAtPosition(enemy.enemyKnockBack, transform.position);
+                    rb2d.AddForceAtPosition(Vector2.right * 1000, transform.position);
                 }
 
                 else if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x < 0f)
                 {
-                    rb2d.AddForceAtPosition(-enemy.enemyKnockBack, transform.position);
+                    rb2d.AddForceAtPosition(Vector2.left * 1000, transform.position);
                 }
             }
         }
@@ -233,13 +229,13 @@ public class PlayerController : NetworkBehaviour
     #region Client
     public override void OnStartLocalPlayer()
     {
-        if (camera == null)
-            camera = Instantiate(Camera.main, transform);
+        if (_Camera == null)
+            _Camera = Instantiate(Camera.main, transform);
         
         Camera.main.GetComponentInParent<AudioListener>().enabled = false;
-        camera.GetComponent<AudioListener>().enabled = true;
+        _Camera.GetComponent<AudioListener>().enabled = true;
 
-        camera.transform.localPosition = new Vector3(0, 0, -20);
+        _Camera.transform.localPosition = new Vector3(0, 0, -20);
 
         Camera.main.gameObject.SetActive(false);
 
@@ -292,13 +288,12 @@ public class PlayerController : NetworkBehaviour
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     void FixedUpdate()
     {
-        Debug.Log(IsReady);
         if (IsReady)
         {
             if (!isLocalPlayer)
                 return;
 
-            Vector3 mousePos = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y));
+            Vector3 mousePos = _Camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y));
             mousePos.z = 0;
 
             if (isServer)

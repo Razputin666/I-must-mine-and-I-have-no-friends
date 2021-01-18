@@ -11,12 +11,13 @@ public class PathNode
     public int gCost;
     public int hCost;
     public int fCost;
-    
+
+    public int amountFromBelow;
     public PathNode cameFromNode;
     public List<PathNode> neighbourNodes;
 
     public bool isWalkable;
-    public bool isMineable;
+    public bool hasBlock;
 
     public PathNode(GridGen<PathNode> grid, int x, int y)
     {
@@ -24,7 +25,8 @@ public class PathNode
         this.x = x;
         this.y = y;
         this.isWalkable = true;
-        this.isMineable = false;
+        this.hasBlock = false;
+        this.amountFromBelow = 0;
     }
 
     public void CalculateFCost()

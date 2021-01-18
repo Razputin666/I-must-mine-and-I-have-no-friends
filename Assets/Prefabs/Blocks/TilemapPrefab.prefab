@@ -236,11 +236,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   tileChunk: {fileID: 0}
-  tilesChunk:
-  - {fileID: 11400000, guid: 2a9692006a6ac174c97937bdfe0db83e, type: 2}
-  - {fileID: 11400000, guid: 6b1704343ab4d8d4dbee84c26c052bd8, type: 2}
-  - {fileID: 11400000, guid: 5a0a7bdf6e67e0e41a91d2f211690cef, type: 2}
-  - {fileID: 11400000, guid: 959f9c500dd8cd24a8c10ea498c4c20e, type: 2}
+  tilebases: []
   SetJobs: 0
 --- !u!114 &4780777864239414574
 MonoBehaviour:
@@ -256,6 +252,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  hasTilemap: 0
 --- !u!114 &875870659772456768
 MonoBehaviour:
   m_ObjectHideFlags: 0

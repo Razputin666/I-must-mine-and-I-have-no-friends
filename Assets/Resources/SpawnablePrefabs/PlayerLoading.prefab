@@ -475,7 +475,7 @@ GameObject:
   - component: {fileID: 2429210586901609883}
   - component: {fileID: 1462100602}
   m_Layer: 0
-  m_Name: Empty
+  m_Name: PlayerLoading
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -528,8 +528,6 @@ MonoBehaviour:
   syncInterval: 0.1
   loadingScreenProgressText: {fileID: 2047718987}
   loadingScreenProgressBar: {fileID: 1068908631}
-  tilemapPrefab: {fileID: 4802906064719502046, guid: f1fc65f761491f74abdd69e1daf070b8,
-    type: 3}
   playerPrefab: {fileID: 8181247841218053072, guid: 8892c9d624d2feb46b4740620f1e0891,
     type: 3}
 --- !u!114 &2429210586901609883
@@ -558,4 +556,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c509c05e146bdb4d9d69ec48380e238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  index: 0

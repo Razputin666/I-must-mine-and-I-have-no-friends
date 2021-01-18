@@ -49,12 +49,9 @@ public class LimbMovement : MonoBehaviour
         // Cast a ray
         for (int i = 0; i < legs.Length; i++)
         {
-
-
-
-            RaycastHit2D hit = Physics2D.Raycast(new
-       Vector2(legDesiredTargets[i].position.x, transform.position.y),
-       -Vector2.up, transform.localScale.y * 4, LayerMask.GetMask("Blocks"));
+            RaycastHit2D hit = Physics2D.Raycast(
+                new Vector2(legDesiredTargets[i].position.x, transform.position.y),
+                -Vector2.up, transform.localScale.y * 4, LayerMask.GetMask("Blocks"));
 
             if (hit.collider != null)
             {

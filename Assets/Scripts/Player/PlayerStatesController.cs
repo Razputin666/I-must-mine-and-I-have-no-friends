@@ -36,7 +36,6 @@ public class PlayerStatesController : NetworkBehaviour
         switch (player.playerStates)
         {
             case PlayerController.PlayerStates.Mining:
-                
                 if (Input.GetMouseButton(0) && distance.x > -5f && distance.x < 5f && distance.y > -5f && distance.y < 5f)
                 {
                     line.enabled = true;

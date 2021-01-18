@@ -6,6 +6,7 @@ public class Pathfinding
 {
     private const int MOVE_STRAIGHT_COST = 10;
     private const int MOVE_DIAGONAL_COST = 14;
+    private const int MINING_COST_PER_STR = 15;
 
     private GridGen<PathNode> grid;
     private List<PathNode> openList;
@@ -76,7 +77,6 @@ public class Pathfinding
             return null;
         }
             
-
         openList = new List<PathNode>() { startNode };
         closedList = new List<PathNode>();
 
@@ -89,6 +89,7 @@ public class Pathfinding
                 pathNode.gCost = int.MaxValue;
                 pathNode.CalculateFCost();
                 pathNode.cameFromNode = null;
+                pathNode.amountFromBelow = 0;
             }
         }
 
@@ -108,6 +109,8 @@ public class Pathfinding
             openList.Remove(currentNode);
             closedList.Add(currentNode);
 
+            //bool movingUp = false;
+            
             foreach (PathNode neighbourNode in currentNode.neighbourNodes)
             {
                 if (closedList.Contains(neighbourNode))
@@ -119,8 +122,73 @@ public class Pathfinding
                     continue;
                 }
 
+                if (neighbourNode.y - 1 >= 0)
+                {
+                    //Check if the node below can be walked on
+                    PathNode node = GetNode(neighbourNode.x, neighbourNode.y - 1);
+                    if (!node.hasBlock)
+                    {
+                        closedList.Add(neighbourNode);
+                        continue;
+                    }
+                }
+
+                int nodesNeededToMine = 0;
+
+                //if (currentNode.y + 1 == neighbourNode.y)
+                //    movingUp = true;
+                //else
+                //    movingUp = false;
                 //Check if we have a faster path from current node to the neighbour node than we had previously
                 int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNode, neighbourNode);
+
+                if (currentNode.y == neighbourNode.y)
+                {
+                    //Check if the node to the left or right is the neighbour node
+                    if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x)
+                    {
+                        //Check if nodes above and below needs mining
+                        if (neighbourNode.y + 1 < grid.GetHeight() && GetNode(neighbourNode.x, neighbourNode.y + 1).hasBlock)
+                            nodesNeededToMine++;
+
+                        if (neighbourNode.y - 1 >= 0 && GetNode(neighbourNode.x, neighbourNode.y - 1).hasBlock)
+                            nodesNeededToMine++;
+                    }
+                }
+                else if (currentNode.y + 1 == neighbourNode.y)//Check if we are going up
+                {
+                    if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x)
+                    {
+                        for (int i = 0; i < 3; i++) //Check nodes 3 tiles up if they need to be mined in order to be able to move
+                        {
+                            if (neighbourNode.y + i < grid.GetHeight() && GetNode(neighbourNode.x, neighbourNode.y + i).hasBlock)
+                                nodesNeededToMine++;
+                        }
+                    }
+                }
+                else if (currentNode.y - 1 == neighbourNode.y) // Check if the neighbourNode is below us
+                {
+                    if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x)
+                    {
+                        for (int i = 0; i < 3; i++) //Check nodes 3 tiles up if the need to be mined in order to be able to move
+                        {
+                            if (neighbourNode.y + i < grid.GetHeight() && GetNode(neighbourNode.x, neighbourNode.y + i).hasBlock)
+                                nodesNeededToMine++;
+                        }
+                    }
+                    else
+                    {
+                        //Check if the node to the left and right below us needs mining
+                        if (neighbourNode.x - 1 >= 0 && GetNode(neighbourNode.x - 1, neighbourNode.y).hasBlock)
+                            nodesNeededToMine++;
+
+                        if (neighbourNode.x + 1 >= 0 && GetNode(neighbourNode.x + 1, neighbourNode.y).hasBlock)
+                            nodesNeededToMine++;
+                    }
+                    
+                }
+
+                tentativeGCost += nodesNeededToMine * MINING_COST_PER_STR;
 
                 if (tentativeGCost < neighbourNode.gCost)
                 {
@@ -142,37 +210,38 @@ public class Pathfinding
     private List<PathNode> GetNeighbourList(PathNode currentNode)
     {
         List<PathNode> neighbourList = new List<PathNode>();
+        //Up
+        //if (currentNode.y + 1 < grid.GetHeight())
+        //    neighbourList.Add(GetNode(currentNode.x, currentNode.y + 1));
 
-        if(currentNode.x - 1 >= 0)
+        if (currentNode.x - 1 >= 0)
         {
             //Left
             neighbourList.Add(GetNode(currentNode.x - 1, currentNode.y));
             //Left Down
-            //if (currentNode.y - 1 >= 0)
-            //    neighbourList.Add(GetNode(currentNode.x - 1, currentNode.y - 1));
+            if (currentNode.y - 1 >= 0)
+                neighbourList.Add(GetNode(currentNode.x - 1, currentNode.y - 1));
             //Left Up
-            //if (currentNode.y + 1 < grid.GetHeight())
-            //    neighbourList.Add(GetNode(currentNode.x - 1, currentNode.y + 1));
+            if (currentNode.y + 1 < grid.GetHeight())
+                neighbourList.Add(GetNode(currentNode.x - 1, currentNode.y + 1));
         }
+        
 
-        if(currentNode.x + 1  < grid.GetWidth())
+        if (currentNode.x + 1  < grid.GetWidth())
         {
             //Right
             neighbourList.Add(GetNode(currentNode.x + 1, currentNode.y));
             //Right Down
-            //if (currentNode.y - 1 >= 0)
-            //    neighbourList.Add(GetNode(currentNode.x + 1, currentNode.y - 1));
+            if (currentNode.y - 1 >= 0)
+               neighbourList.Add(GetNode(currentNode.x + 1, currentNode.y - 1));
             //Right Up
-            //if (currentNode.y + 1 < grid.GetHeight())
-            //    neighbourList.Add(GetNode(currentNode.x + 1, currentNode.y + 1));
+            if (currentNode.y + 1 < grid.GetHeight())
+                neighbourList.Add(GetNode(currentNode.x + 1, currentNode.y + 1));
         }
 
         //Down
-        if(currentNode.y - 1 >= 0)
+        if (currentNode.y - 1 >= 0)
             neighbourList.Add(GetNode(currentNode.x, currentNode.y - 1));
-        //Up
-        if (currentNode.y + 1 < grid.GetHeight())
-            neighbourList.Add(GetNode(currentNode.x, currentNode.y + 1));
 
         return neighbourList;
     }
@@ -259,6 +328,6 @@ public class Pathfinding
     {
         PathNode pathNode = grid.GetGridObject(worldPosition);
         
-        pathNode.isMineable = isMineable;
+        pathNode.hasBlock = isMineable;
     }
 }

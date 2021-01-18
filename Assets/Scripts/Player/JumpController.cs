@@ -30,7 +30,7 @@ public class JumpController : NetworkBehaviour, HasCoolDownInterFace
     {
         RaycastHit2D raycastHit2D = Physics2D.CapsuleCast(capsuleCollider2d.bounds.center, capsuleCollider2d.bounds.size, CapsuleDirection2D.Vertical, 0f, Vector2.down, 0.5f);
         //RaycastHit2D raycastHit2D = Physics2D.BoxCast(body.position, collider2d.bounds.size, 0f, Vector2.down, 0.8f, LayerMask.GetMask("Blocks"));
-        //  Physics2D.IgnoreCollision(, GetComponent<CapsuleCollider2D>());
+        //Physics2D.IgnoreCollision(, GetComponent<CapsuleCollider2D>());
         return raycastHit2D.collider != null;
     }
 

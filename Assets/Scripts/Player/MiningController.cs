@@ -178,7 +178,6 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
                     }
                 }
                 break;
-
             case "Tree":
                 List<String> upperBlocks = new List<string>();
                 bool isTree = true;

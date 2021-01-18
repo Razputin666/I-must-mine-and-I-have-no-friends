@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Mirror;
 using UnityEngine.Events;
+using System.Linq;
 
 public class TileMapManager : NetworkBehaviour
 {
@@ -13,8 +14,11 @@ public class TileMapManager : NetworkBehaviour
 
     public static TileMapManager Instance { get; private set; }
 
-    public List<Tilemap> Tilemaps { get; private set; }
-
+    public List<Tilemap> Tilemaps 
+    { 
+        get { return tilemapss.Values.ToList(); }
+    }
+    private Dictionary<string, Tilemap> tilemapss;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -26,7 +30,7 @@ public class TileMapManager : NetworkBehaviour
         Instance = this;
         //DontDestroyOnLoad(this.gameObject);
 
-        Tilemaps = new List<Tilemap>();
+        tilemapss = new Dictionary<string, Tilemap>();
     }
 
     public override void OnStartServer()
@@ -99,22 +103,37 @@ public class TileMapManager : NetworkBehaviour
         return "";
     }
 
+    [Client]
+    public Tilemap GetTilemap(string tilemapName)
+    {
+        if (tilemapss.TryGetValue(tilemapName, out Tilemap tilemap))
+            return tilemap;
+        
+        return null;
+
+        //foreach (Tilemap tilemap in Tilemaps)
+        //{
+        //    if (tilemapName == tilemap.name)
+        //        return tilemap;
+        //}
+        //return null;
+    }
+
     public void AddTileChunk(Tilemap tilemap)
     {
-        Tilemaps.Add(tilemap);
+        tilemapss.Add(tilemap.name, tilemap);
+        //Tilemaps.Add(tilemap);
     }
 
     public bool UpdateTilemap(string tilemapName, Vector3Int tilePositionCell, string tileBaseName)
     {
-        foreach (Tilemap tilemapChunk in Tilemaps)
-        {
-            if (tilemapChunk.name == tilemapName)
-            {
-                return tilemapChunk.GetComponent<TilemapSyncer>().UpdateTilemap(tilePositionCell, tileBaseName);
-            }
-        }
+        Tilemap tilemap = GetTilemap(tilemapName);
+        if(tilemap != null)
+            return tilemap.GetComponent<TilemapSyncer>().UpdateTilemap(tilePositionCell, tileBaseName);
+
         return false;
     }
+
     [Server]
     public bool UpdateTilemap(Tilemap tilemap, Vector3Int tilePositionCell, TileBase tileBase)
     {
@@ -130,21 +149,8 @@ public class TileMapManager : NetworkBehaviour
 
         for (int i = 0; i < tilemapObjects.Length; i++)
         {
-            tilemapObjects[i].transform.parent = grid.transform;
-            //Debug.Log(tilemapObjects[i]);
-            //AddTileChunk(tilemapObjects[i].GetComponent<Tilemap>());
+            tilemapObjects[i].transform.SetParent(grid.transform, true);
         }
-    }
-
-    [Client]
-    public Tilemap GetTilemap(string tilemapName)
-    {
-        foreach (Tilemap tilemap in Tilemaps)
-        {
-            if (tilemapName == tilemap.name)
-                return tilemap;
-        }
-        return null;
     }
 
     [Client]
