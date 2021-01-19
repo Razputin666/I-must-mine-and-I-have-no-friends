@@ -110,27 +110,13 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.D))
         {
-            //rb2d.velocity += Vector2.right * speed;
             legMovement.MoveFootTarget(Vector2.right);
             Flip(Vector2.right.x);
         }
 
         if (Input.GetKey(KeyCode.A))
         {
-           // rb2d.velocity += Vector2.left * speed;
-            //RaycastHit2D slopeCheck = Physics2D.Raycast(new Vector2(transform.position.x - 3f, transform.position.y), Vector2.down, transform.localScale.y * 4, LayerMask.GetMask("Blocks"));
-            //RaycastHit2D slopeCheck = Physics2D.BoxCast(new Vector2(transform.position.x, transform.position.y - transform.localScale.y), new Vector2(boxCollider2d.bounds.size.x, boxCollider2d.bounds.size.y), 0f, Vector2.left, 0.2f);
-            ////RaycastHit2D slopeCheck = Physics2D.Raycast(new Vector2(transform.position.x + 1f, transform.position.y), Vector2.down, transform.localScale.y * 4, LayerMask.GetMask("Blocks"));
-            //Debug.Log(slopeCheck.point.y);
-            //if (slopeCheck.collider != null && transform.position.y - slopeCheck.point.y < 3f && jumpController.IsGrounded())
-            //{
 
-            //    transform.position = Vector3.MoveTowards(transform.position, new Vector2(transform.position.x, slopeCheck.point.y + transform.localScale.y - 0.5f), speed);
-            //}
-            //for (int i = 0; i < legMovement.legs.Length; i++)
-            //{
-            //    legMovement.currentTargets[i].position = Vector2.MoveTowards(legMovement.currentTargets[i].position, legMovement.desiredTargets[i].position, speed * Time.deltaTime);
-            //}
             legMovement.MoveFootTarget(Vector2.left);
             Flip(Vector2.left.x);
         }

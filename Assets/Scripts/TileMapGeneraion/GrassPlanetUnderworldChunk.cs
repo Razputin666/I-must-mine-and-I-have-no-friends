@@ -129,7 +129,8 @@ public class GrassPlanetUnderworldChunk : MonoBehaviour
             float seed = UnityEngine.Random.Range(0f, 1f);
             int removeAmount = chunkSettings[2].fillAmount;
             // mapGen.GenerateMainMap(chunkSettings[2], new Vector2Int(spawnPositionX, spawnPositionY), spawnWidthX, spawnHeightY, false, tilemap);
-            mapCoords = MapFunctions.GenerateArray(spawnWidthX, spawnHeightY, false);
+            mapCoords = MapFunctions.GenerateArray(Mathf.Clamp(spawnWidthX, 1, width / 2), Mathf.Clamp(spawnHeightY, 1, height / 2), false);
+          //  Debug.Log(mapCoords.GetLength(0) + " width in chunk " + mapCoords.GetLength(1) + " height in chunk");
             mapCoords = MapFunctions.RandomWalkCaveCustom(mapCoords, seed, removeAmount, numberOfLoops);
             MapFunctions.RemoveExistingBlocks(mapCoords, tilemap, new Vector2Int(spawnPositionX, spawnPositionY));
 

@@ -10,7 +10,7 @@ using UnityEditor;
 
 public enum TypeOfPlanet
 {
-	Earthlike, meme
+	Earthlike, meme, Default
 }
 
 public class LevelGeneratorLayered : MonoBehaviour
@@ -66,7 +66,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 	private List<int> chunkHeightOffset;
 	private void Start()
 	{
-		typeOfPlanet = TypeOfPlanet.Earthlike;
+		typeOfPlanet = TypeOfPlanet.Default;
 		WorldGeneration();
 
 	}
@@ -83,6 +83,7 @@ public class LevelGeneratorLayered : MonoBehaviour
 
                 for (int i = 0; i < numberOfChunks; i++)
                 {
+					Debug.Log(i + " i " + numberOfChunks + " numberofchunks");
                     GameObject chunk = Instantiate(tileChunk, grid.transform);
                     chunks.Add(chunk.GetComponent<Tilemap>());
                     GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
@@ -96,40 +97,63 @@ public class LevelGeneratorLayered : MonoBehaviour
 				startPosition = new Vector2Int(0, 0);
 				startPosition.y = -height + 1;
 				int overWorldChunks = chunks.Count;
-				int offset;
-				for (int i = overWorldChunks; i < numberOfChunks + overWorldChunks; i++)
-				{
-					if (i - overWorldChunks != 0)
-					{
-						offset = i - overWorldChunks - 1;
-						startPosition.y = startPosition.y + chunkHeightOffset[offset];
-					}
-					GameObject chunk = Instantiate(tileChunk, grid.transform);
-					chunks.Add(chunk.GetComponent<Tilemap>());
-					GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
-					grassUnderWorldChunk.GenerateGrassPlanetUnderWorldChunk(chunks[i]);
-					chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y + startPosition.y);
-					startPosition.x += width - 1;
-					chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
-
-				}
-
-				Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
-				Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
-				//StartCoroutine(GenerateTrees());
-
-				if (spawnPlayer)
+				int offset = 0;
+				//Debug.Log(overWorldChunks + " overworldchunks " + chunks.Count + " chunks count");
+                for (int i = overWorldChunks; i < numberOfChunks + overWorldChunks; i++)
                 {
-					StartCoroutine(SpawnPlayer());
-				}
-				//pathfindingSettings.prank();
-				StartCoroutine(SpawnEnemyBase());
 
-				break;
+					// Den här delen tar hand om höjdoffset så att chunks under inte overlappar med dem övre
+
+      //              if (i - overWorldChunks != 0)
+      //              {	
+						//offset = i - overWorldChunks - 1;
+						//Debug.Log(startPosition.y + " startpositiony " + offset + " chunkoffset " + chunkHeightOffset.Count + " chunkheightoffset counts");
+						//startPosition.y = startPosition.y + chunkHeightOffset[offset];
+      //              }
+                    
+                    GameObject chunk = Instantiate(tileChunk, grid.transform);
+                    chunks.Add(chunk.GetComponent<Tilemap>());
+                    GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
+                    grassUnderWorldChunk.GenerateGrassPlanetUnderWorldChunk(chunks[i]);
+                    chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y + startPosition.y);
+                    startPosition.x += width - 1;
+                    chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
+
+                }
+                //for (int i = 0; i < numberOfChunks; i++)
+                //{
+                //	if (i - overWorldChunks != 0)
+                //	{
+                //		offset = i - overWorldChunks - 1;
+                //		startPosition.y = startPosition.y + chunkHeightOffset[offset];
+                //	}
+                //	Debug.Log(overWorldChunks + " overworldchjunks " + numberOfChunks + " number of chunks");
+                //	GameObject chunk = Instantiate(tileChunk, grid.transform);
+                //	chunks.Add(chunk.GetComponent<Tilemap>());
+                //	GenerateMainMap(mainMap, startPosition, width, height, true, chunks[i]);
+                //	grassUnderWorldChunk.GenerateGrassPlanetUnderWorldChunk(chunks[i]);
+                //	chunks[i].transform.position = new Vector2(chunks[i].transform.position.x + startPosition.x, chunks[i].transform.position.y + startPosition.y);
+                //	startPosition.x += width - 1;
+                //	chunks[i].GetComponent<TilemapCollider2D>().maximumTileChangeCount = 100;
+
+                //}
+
+                //Instantiate(worldWrappingTeleport, new Vector3(startPosition.x, height), quaternion.identity);
+                //Instantiate(worldWrappingTeleport, new Vector3(-1, height), quaternion.identity);
+                ////StartCoroutine(GenerateTrees());
+
+                //if (spawnPlayer)
+                //            {
+                //	StartCoroutine(SpawnPlayer());
+                //}
+                ////pathfindingSettings.prank();
+                //StartCoroutine(SpawnEnemyBase());
+
+                break;
             case TypeOfPlanet.meme:
                 break;
-            default:
-                break;
+			case TypeOfPlanet.Default:
+				break;
         }
 
         

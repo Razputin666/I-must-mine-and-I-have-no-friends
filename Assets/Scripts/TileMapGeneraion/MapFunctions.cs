@@ -14,6 +14,7 @@ public class MapFunctions
     /// 
     public static int[,] GenerateArray(int width, int height, bool empty)
     {
+       
         int[,] map = new int[width, height];
         for (int x = 0; x < map.GetUpperBound(0); x++)
         {
@@ -638,7 +639,7 @@ public class MapFunctions
         int reqFloorAmount = ((map.GetUpperBound(1) * map.GetUpperBound(0)) * requiredFloorPercent) / 100;
         //Used for our while loop, when this reaches our reqFloorAmount we will stop tunneling
         int floorCount = 0;
-
+       // Debug.Log(map.GetLength(0) + " width " + map.GetLength(1) + " height");
         //Set our start position to not be a tile (0 = no tile, 1 = tile)
         map[floorX, floorY] = 0;
         //Increase our floor count
