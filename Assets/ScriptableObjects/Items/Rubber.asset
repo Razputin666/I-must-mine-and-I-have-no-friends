@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300000, guid: 1cea04a806cd28f4f8de1d0d77975e6d, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 12
   description: 
   data:
     name: Rubber
-    id: -1
+    id: 19
     amount: 1
+  maxStackSize: 0

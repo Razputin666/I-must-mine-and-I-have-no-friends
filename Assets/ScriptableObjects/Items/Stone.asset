@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300006, guid: b00b9ff8e2a7f494c9679b0b59c599bb, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 9
   description: 
   data:
-    name: Stone
+    name: Stone Block
     id: 20
     amount: 1
     type: Common

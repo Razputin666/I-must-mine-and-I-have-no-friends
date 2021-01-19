@@ -36,7 +36,7 @@ public class DefaultGun : MonoBehaviour, HasCoolDownInterFace
         }
 
         Transform bulletTransform = Instantiate(bullet,endOfGun.position , Quaternion.identity);
-        Vector3 directionOfShot = (player.worldPosition - endOfGun.position).normalized;
+        Vector3 directionOfShot = (player.mousePosInWorld - endOfGun.position).normalized;
 
         bulletTransform.GetComponent<Bullet>().Setup(directionOfShot);
         coolDownSystem.PutOnCoolDown(this);

@@ -48,7 +48,7 @@ public class EnemyController : MonoBehaviour, HasCoolDownInterFace
     public Vector2 enemyKnockBack;
     public float miningStrength;
     public Vector3 target;
-    private Vector3 pathfindingTarget;
+    //private Vector3 pathfindingTarget;
     private float distanceToTarget;
     private int blockAmount;
     private int oreAmount;
@@ -88,25 +88,25 @@ public class EnemyController : MonoBehaviour, HasCoolDownInterFace
             GetTarget();
 
         }
-        pathfindingTarget = GetComponent<PathfindingScript>().PathfindingTarget;
-        Debug.Log(pathfindingTarget + " pathfinding target");
+        //pathfindingTarget = GetComponent<PathfindingScript>().PathfindingTarget;
+        //Debug.Log(pathfindingTarget + " pathfinding target");
 
-        if (pathfindingTarget.x - transform.position.x >= 1)
-        {
-            transform.position += Vector3.right * (speed * Time.deltaTime);
-            Flip(Vector2.right.x);
+        //if (pathfindingTarget.x - transform.position.x >= 1)
+        //{
+        //    transform.position += Vector3.right * (speed * Time.deltaTime);
+        //    Flip(Vector2.right.x);
 
-        }
+        //}
 
-        else if (pathfindingTarget.x - transform.position.x <= -1)
-        {
-            transform.position += Vector3.left * (speed * Time.deltaTime);
-            Flip(Vector2.left.x);
-        }
-        if (rb2d.velocity.x == 0f && enemyStates != EnemyStates.FrogMining || pathfindingTarget.y - transform.position.y > 0)
-        {
-            jumpController.Jump();
-        }
+        //else if (pathfindingTarget.x - transform.position.x <= -1)
+        //{
+        //    transform.position += Vector3.left * (speed * Time.deltaTime);
+        //    Flip(Vector2.left.x);
+        //}
+        //if (rb2d.velocity.x == 0f && enemyStates != EnemyStates.FrogMining || pathfindingTarget.y - transform.position.y > 0)
+        //{
+        //    jumpController.Jump();
+        //}
 
         //if (rb2d.velocity.x == 0f && enemyStates != EnemyStates.FrogMining || target.y > 0)
         //{

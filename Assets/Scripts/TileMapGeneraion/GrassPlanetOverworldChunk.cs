@@ -42,8 +42,8 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
         CreateCoal(tilemap);
         chunkList = mapGen.chunks;
         RemoveLoneBlocks(tilemap);
-        if(chunkList.Count >= 2)
-        ChunkHeightNormalizer(tilemap);
+        //if(chunkList.Count >= 2)
+        //ChunkHeightNormalizer(tilemap);
 
     }
 
@@ -67,11 +67,12 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
         //Next generate the smoothed random top
         mapCoords = MapFunctions.RandomWalkTopSmoothed(mapCoords, seed, 3, heighRandomize);
            
-        MapFunctions.RenderMapWithOffset(mapCoords, tilemap, mapGen.tiles[2], startPosition, true);
+        MapFunctions.RenderMapWithOffset(mapCoords, tilemap, mapGen.tiles[0], startPosition, true);
     }
 
     void CreateFeatures(Tilemap tilemap)
     {
+        
         int spawnPositionX = 0;
         int spawnPositionY = 0;
         int spawnWidthX = width;
@@ -81,7 +82,7 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
         int amountToLeave = chunkSettings[0].fillAmount;
         int[,] mapCoords = new int[width, height];
         float seed = UnityEngine.Random.Range(0f, 1f);
-
+        
         // mapGen.GenerateMapFeatures(chunkSettings[0], new Vector2Int(spawnPositionX, spawnPositionY), spawnWidthX, spawnHeightY, false, amountToFill, 0, tilemap);
 
         for (int i = 0; i < numberOfLoops - 1; i++)
@@ -126,32 +127,32 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
             int spawnPositionX = UnityEngine.Random.Range(0, width / 2);
             int spawnWidthX = width / 2;
 
+            //if (spawnPositionX > (width / 2 - 20))
+            //{
+            //    spawnPositionX -= width / 100;
+            //    spawnWidthX = width / 100 - 1;
+            //}
 
-            if (spawnPositionX > (width / 2))
-            {
-                spawnPositionX -= width / 100;
-                spawnWidthX = width / 100 - 1;
-            }
+            //if (spawnPositionY > (height / 2 - 20))
+            //{
+            //    spawnPositionY -= (height / 100);
+            //    spawnHeightY = height / 100 - 1;
+            //}
 
-            if (spawnPositionY > (height / 2))
-            {
-                spawnPositionY -= (height / 100);
-                spawnHeightY = height / 100 - 1;
-            }
+            //if (spawnPositionX + spawnWidthX >= width / 2)
+            //{
+            //    int checker = (spawnPositionX + spawnWidthX - width / 2) - 1;
+            //    spawnWidthX += checker;
 
-            if (spawnPositionX + spawnWidthX >= width / 2)
-            {
-                int checker = (spawnPositionX + spawnWidthX - width / 2) - 1;
-                spawnWidthX += checker;
+            //}
 
-            }
+            //if (spawnPositionY + spawnHeightY >= height / 2)
+            //{
+            //    int checker = (spawnPositionY + spawnHeightY - height / 2) - 1;
+            //    spawnHeightY += checker;
 
-            if (spawnPositionY + spawnHeightY >= height / 2)
-            {
-                int checker = (spawnPositionY + spawnHeightY - height / 2) - 1;
-                spawnHeightY += checker;
-
-            }
+            //}
+            Debug.Log(spawnWidthX + "," + spawnHeightY);
             int[,] mapCoords = new int[width, height];
             float seed = UnityEngine.Random.Range(0f, 1f);
             int removeAmount = chunkSettings[2].fillAmount / 2;

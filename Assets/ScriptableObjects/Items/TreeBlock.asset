@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300000, guid: 9a24dfc21c315a14786e932f86148da3, type: 3}
   stackable: 1
-  itemType: 8
-  description: Dirt from another world
+  itemType: 9
+  description: 
   data:
     name: Tree
     id: 22

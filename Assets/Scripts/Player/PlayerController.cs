@@ -3,333 +3,447 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Tilemaps;
+using Mirror;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     [SerializeField]
     LayerMask blockLayerMask;
 
     public enum PlayerStates
     {
-        Mining, Normal, Building, Idle
+        Idle, Mining, Normal, Building
     }
 
     public PlayerStates playerStates { get; private set; }
 
-    #region PlayerValues
-    private Tilemap targetedBlock;
-    
+    #region PlayerValues    
     public int playerHP;
-    public float speed;                //Floating point variable to store the player's movement speed.
-    public float jumpVelocity;
-    public float miningStrength;
 
-    public float maxFallSpeed;
-    private float maxSpeed;
-    float heightTimer;
-    float widthTimer;
-    float jumpTimer;
     public Rigidbody2D rb2d;        //Store a reference to the Rigidbody2D component required to use 2D Physics.
-    private BoxCollider2D boxCollider2d;
-    private CapsuleCollider2D capsuleCollider2d;
-    private bool facingRight;
-    public Vector3 worldPosition;
-    public Vector3 mousePos;
-    private float distanceFromPlayerx;
-    private float distanceFromPlayery;
+    public Vector3 mousePosInWorld;
+    //public Vector3 mousePos;
+    //private float distanceFromPlayerx;
+    //private float distanceFromPlayery;
+    [SerializeField]
+    private int miningStrength;
     #endregion
 
-
     public Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
-    private ItemController itemController;
-    private ItemHandler itemHandler;
     public Transform item;
-    private JumpController jumpController;
-   // private LegMovement legMovement;
-   [SerializeField]private DeathScreen deathScreen;
-    [SerializeField] private LevelGeneratorLayered mapSize;
-    [SerializeField] private LimbMovement legMovement;
-
-
     [SerializeField]
-    Camera _camera;
+    private DeathScreen deathScreen;
+    private Camera camera;
+
+    private JumpController jumpController;
+    [SerializeField] 
+    private LevelGeneratorLayered mapSize;
+
+    //Network
+    [SerializeField]
+    private TextMesh playerNameText;
+    [SerializeField]
+    private GameObject floatingInfo;
+
+    [SyncVar(hook = nameof(OnNameChanged))]
+    public string playerName;
+    [SyncVar(hook = nameof(OnActiveItemChanged))]
+    private int activeItemID = -1;
     [SerializeField]
     Camera _secondCamera;
 
-    void Start()
+    private SceneScript sceneScript;
+    [SerializeField]
+    private float itemPickupRange;
+    private float itemPickupCooldown;
+    private const float itemPickupCooldownDefault = 0.5f;
+    [SyncVar]
+    private bool isReady;
+    public ItemHandler ItemHandler { get; private set; }
+    public int ActiveQuickslot { get; private set; } = -1;
+    private void Awake()
     {
-        //inventory = GetComponentInChildren<Inventory>();
-        item = gameObject.GetComponentInChildren<FaceMouse>().gameObject.transform.Find("ItemHeldInHand");
-        item.GetComponent<SpriteRenderer>().sprite = null;
-        item.GetComponent<DefaultGun>().enabled = false;
-        item.GetComponent<MiningController>().enabled = false;
+        //allow all players to run this
+        sceneScript = GameObject.FindObjectOfType<SceneScript>();
+        item = gameObject.transform.Find("Gubb_arm").gameObject.transform.Find("ItemHeldInHand");
+
+        ItemHandler = GetComponent<ItemHandler>();
+        IsReady = false;
         
-        facingRight = true;
-        // legMovement = GetComponent<LegMovement>();
-        rb2d = GetComponent<Rigidbody2D>();
-        boxCollider2d = transform.GetComponent<BoxCollider2D>();
-        capsuleCollider2d = transform.GetComponent<CapsuleCollider2D>();
-        jumpController = GetComponent<JumpController>();
-        itemHandler = GetComponent<ItemHandler>();
-        playerStates = PlayerStates.Idle;
-        mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
-        _camera = GameObject.Find("Main Camera").GetComponent<Camera>();
-       // itemController.SetMiningMode(); // Vi har inte combat än så den e på mining default
-        StartCoroutine(CoroutineCoordinator());
+        itemPickupCooldown = itemPickupCooldownDefault;
+
+        DontDestroyOnLoad(this.gameObject);
     }
 
     private void Update()
     {
-        CheckQuickslotInput();
+        if (IsReady)
+        {
+            //if (!isLocalPlayer)
+            //{
+            //    //if(camera)
+            //    //    floatingInfo.transform.LookAt(camera.transform);
+            //    return;
+            //}
+            if(isLocalPlayer)
+            {
+                Debug.Log("local");
+                CheckQuickslotInput();
+            }
+                
+            if(isServer)
+            {
+                itemPickupCooldown -= Time.deltaTime;
+
+                if (itemPickupCooldown <= 0f)
+                {
+                    itemPickupCooldown = itemPickupCooldownDefault;
+
+                    CheckItemCollision();
+                }
+            }
+        }
     }
 
+    #region Network
+
+    #region Commands
+    [Command]
+    public void CmdActiveItemChanged(int itemID)
+    {
+        activeItemID = itemID;
+    }
+
+    [Command]
+    public void CmdSetupPlayer(string name)
+    {
+
+        //player info sent to server, then server updates sync vars which handles it on all clients
+        playerName = name;
+        //sceneScript.statusText = $"{playerName} joined.";
+        //sceneScript.canvasStatusText.enabled = true;
+        StartCoroutine(FadeServerMessage());
+    }
+
+    [Command(ignoreAuthority = true)]
+    private void CmdRemoveGroundItem(GameObject obj)
+    {
+        NetworkServer.Destroy(obj);
+    }
+
+    [Command]
+    public void CmdSendPlayerMessage()
+    {
+        if(sceneScript)
+        {
+            sceneScript.canvasStatusText.enabled = true;
+            sceneScript.statusText = $"{playerName} says hello {Random.Range(10, 99)}";
+
+            StartCoroutine(FadeServerMessage());
+        }
+    }
+
+    [Command]
+    private void CmdSendMousePos(Vector3 mousePos)
+    {
+        mousePosInWorld = mousePos;
+        Debug.Log("command");
+    }
+
+    #endregion
+
+    #region Server
+
+    public override void OnStartServer()
+    {
+        IsReady = true;
+
+        rb2d = GetComponent<Rigidbody2D>();
+    }
+    [Server]
+    private void CheckItemCollision()
+    {
+        Debug.Log("Checking collision");
+        Collider2D[] colliderArray = Physics2D.OverlapCircleAll(transform.position, itemPickupRange);
+        
+        foreach (Collider2D collider2D in colliderArray)
+        {
+            if (collider2D.TryGetComponent<GroundItem>(out GroundItem groundItem))
+            {
+                Debug.Log("Collision");
+                Item newItem = new Item(groundItem.Item);
+
+                RpcAddItemToPlayer(GetComponent<NetworkIdentity>().connectionToClient, newItem.ID, newItem.Amount);
+                NetworkServer.Destroy(collider2D.gameObject);
+            }
+        }
+    }
+
+    [Server]
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (IsReady)
+        {
+            if (collision.collider.CompareTag("EnemyWeapon"))
+            {
+                EnemyController enemy = collision.collider.gameObject.GetComponentInParent<EnemyController>();
+                playerHP -= enemy.enemyStrength;
+
+                if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x > 0f)
+                {
+                    rb2d.AddForceAtPosition(enemy.enemyKnockBack, transform.position);
+                }
+
+                else if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x < 0f)
+                {
+                    rb2d.AddForceAtPosition(-enemy.enemyKnockBack, transform.position);
+                }
+            }
+        }
+    }
+
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.blue;
+    //    Gizmos.DrawSphere(transform.position, itemPickupRange);
+    //}
+    #endregion
+
+    #region Callbacks
+    private void OnNameChanged(string _Old, string _New)
+    {
+        playerNameText.text = playerName;
+    }
+    private void OnActiveItemChanged(int _Old, int _New)
+    {
+        ItemObject itemObj = ItemHandler.ItemDatabase.GetItemAt(_New);
+        if (itemObj != null)
+        {
+            SetPlayerState(itemObj.ItemType);
+            item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
+        }
+        else
+        {
+            SetPlayerState(ITEM_TYPE.None);
+            item.GetComponent<SpriteRenderer>().sprite = null;
+        }
+    }
+    #endregion
+
+    #region Client
+    public override void OnStartLocalPlayer()
+    {
+        if (camera == null)
+            camera = Instantiate(Camera.main, transform);
+        
+        Camera.main.GetComponentInParent<AudioListener>().enabled = false;
+        camera.GetComponent<AudioListener>().enabled = true;
+
+        camera.transform.localPosition = new Vector3(0, 0, -20);
+
+        Camera.main.gameObject.SetActive(false);
+
+        //_camera.transform.position = new Vector3(Mathf.Clamp(rb2d.transform.position.x, (0) + 26.7f, (mapSize.startPosition.x) - 26.7f), rb2d.transform.position.y, -1);
+
+        //Camera.main.CopyFrom(camera);
+        //floatingInfo.transform.localPosition = new Vector3(0.1f, 1f, 0f);
+        //floatingInfo.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+
+        string name = "Player" + Random.Range(100, 999);
+
+        //CmdSetupPlayer(name);
+
+        item.GetComponent<SpriteRenderer>().sprite = null;
+        //item.GetComponent<DefaultGun>().enabled = false;
+        //GetComponent<MiningController>().enabled = false;
+
+        playerStates = PlayerStates.Idle;
+
+        jumpController = GetComponent<JumpController>();
+        ItemHandler = GetComponent<ItemHandler>();
+
+        //mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
+
+        StartCoroutine(CoroutineCoordinator());
+    }
+
+    [TargetRpc]
+    public void RpcAddItemToPlayer(NetworkConnection conn, int itemID, int itemAmount)
+    {
+        Debug.Log("Adding item. ID: " + itemID + " amount: " + itemAmount);
+        ItemObject item = Instantiate(GetInventoryObject.ItemDatabase.GetItemAt(itemID));
+        item.Data.Amount = itemAmount;
+
+        Item newItem = new Item(item);
+        if(!ItemHandler.QuickSlots.AddItem(newItem, newItem.Amount))
+        {
+            if (!ItemHandler.Inventory.AddItem(newItem, newItem.Amount))
+                return; //spawn back item to the world
+        }
+    }
+
+    [TargetRpc]
+    public void RpcRemoveItemFromQuickslot(NetworkConnection conn, int amount)
+    {
+        ItemHandler.QuickSlots.GetSlots[ActiveQuickslot].RemoveAmount(amount);
+    }
+
+    [Client]
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     void FixedUpdate()
     {
-        mousePos = Input.mousePosition;
-        worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
-        //  _camera.transform.position = new Vector3(Mathf.Clamp(rb2d.transform.position.x, (0) + 26.7f, (mapSize.startPosition.x) - 26.7f), rb2d.transform.position.y, -1);
-        _camera.transform.position = new Vector3(transform.position.x, transform.position.y, -1f);
-
-
-        CalculateMovement();
-
-        if (Input.GetKey("space") && jumpController.IsGrounded())
+        Debug.Log(IsReady);
+        if (IsReady)
         {
-            jumpController.Jump();
-        }
+            if (!isLocalPlayer)
+                return;
 
-        if (playerHP <= 0)
-        {
-            Die();
+            Vector3 mousePos = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y));
+            mousePos.z = 0;
+
+            if (isServer)
+                mousePosInWorld = mousePos;
+            else
+            {
+                CmdSendMousePos(mousePos);
+                mousePosInWorld = mousePos;
+            }
+                
+
+            if (playerHP <= 0)
+            {
+                Die();
+            }
         }
 
     }
-
-    private void CalculateMovement()
+    [Client]
+    public void UpdateActiveItem(int itemID)
     {
-        if (Input.GetKey(KeyCode.D))
-        {
-            legMovement.MoveFootTarget(Vector2.right);
-            Flip(Vector2.right.x);
-        }
-
-        if (Input.GetKey(KeyCode.A))
-        {
-
-            legMovement.MoveFootTarget(Vector2.left);
-            Flip(Vector2.left.x);
-        }
-
-        if (rb2d.velocity.y < -25f)
-        {
-            heightTimer += Time.deltaTime;
-            maxFallSpeed = Mathf.Clamp(heightTimer, 1f, 5f);
-            rb2d.velocity -= Vector2.down * maxFallSpeed;
-            if (rb2d.velocity.y > -35f)
-                heightTimer = 1f;
-        }
-
-        maxSpeed = Mathf.Abs(rb2d.velocity.x);
-
-        if (maxSpeed > 25f && rb2d.velocity.x > 0)
-        {
-            widthTimer += Time.deltaTime;
-            float asedf = Mathf.Clamp(widthTimer, 1f, 3f);
-            rb2d.velocity -= Vector2.right * asedf;
-            if (maxSpeed > 30f)
-                widthTimer = 1f;
-        }
-
-        if (maxSpeed > 25f && rb2d.velocity.x < 0)
-        {
-            widthTimer += Time.deltaTime;
-            float asedf = Mathf.Clamp(widthTimer, 1f, 3f);
-            rb2d.velocity -= Vector2.left * asedf;
-            if (maxSpeed > 30f)
-                widthTimer = 1f;
-        }
-
+        CmdActiveItemChanged(itemID);
     }
 
+    [Client]
+    private void QuickslotActiveChanged(int index)
+    {
+        Debug.Log("quickslot");
+        if (ActiveQuickslot != index)
+        {
+            ItemObject itemObj = ItemHandler.QuickSlots.Container.InventorySlot[index].ItemObject;
+
+            int id = itemObj != null ? itemObj.Data.ID : -1;
+            CmdActiveItemChanged(id);
+            ActiveQuickslot = index;
+        }
+        else
+        {
+            CmdActiveItemChanged(-1);
+            ActiveQuickslot = -1;
+        }
+    }
+
+    [Client]
     private void CheckQuickslotInput()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[0].ItemObject;
-            if (itemObj != null)
-            {
-                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
-
-                SetPlayerState(itemObj.ItemType);
-            }
-            else
-            {
-                playerStates = PlayerStates.Normal;
-                item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = false;
-            }
+            QuickslotActiveChanged(0);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[1].ItemObject;
-            if (itemObj != null)
-            {
-                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
-
-                SetPlayerState(itemObj.ItemType);
-            }
-            else
-            {
-                playerStates = PlayerStates.Normal;
-                item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = false;
-            }
+            QuickslotActiveChanged(1);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[2].ItemObject;
-            if (itemObj != null)
-            {
-                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
-
-                SetPlayerState(itemObj.ItemType);
-            }
-            else
-            {
-                playerStates = PlayerStates.Normal;
-                item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = false;
-            }
-
+            QuickslotActiveChanged(2);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[3].ItemObject;
-            if (itemObj != null)
-            {
-                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
-
-                SetPlayerState(itemObj.ItemType);
-            }
-            else
-            {
-                playerStates = PlayerStates.Normal;
-                item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = false;
-            }
+            QuickslotActiveChanged(3);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[4].ItemObject;
-            if (itemObj != null)
-            {
-                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
-
-                SetPlayerState(itemObj.ItemType);
-            }
-            else
-            {
-                playerStates = PlayerStates.Normal;
-                item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = false;
-            }
+            QuickslotActiveChanged(4);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha6))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[5].ItemObject;
-            if (itemObj != null)
-            {
-                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
-
-                SetPlayerState(itemObj.ItemType);
-            }
-            else
-            {
-                playerStates = PlayerStates.Normal;
-                item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = false;
-            }
+            QuickslotActiveChanged(5);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha7))
         {
-            ItemObject itemObj = itemHandler.QuickSlots.Container.InventorySlot[6].ItemObject;
-            if (itemObj != null)
-            {
-                item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
-
-                SetPlayerState(itemObj.ItemType);
-            }
-            else
-            {
-                playerStates = PlayerStates.Normal;
-                item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = false;
-            }
+            QuickslotActiveChanged(6);
         }
     }
 
+    [Client]
     private void SetPlayerState(ITEM_TYPE itemType)
     {
         switch (itemType)
         {
             case ITEM_TYPE.TileBlock:
                 playerStates = PlayerStates.Building;
-                item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = false;
+                //GetComponent<MiningController>().enabled = false;
+                //item.GetComponent<DefaultGun>().enabled = false;
                 break;
             case ITEM_TYPE.Weapon:
                 playerStates = PlayerStates.Normal;
-                item.GetComponent<MiningController>().enabled = false;
+                //GetComponent<MiningController>().enabled = false;
                 item.GetComponent<DefaultGun>().enabled = true;
                 break;
             case ITEM_TYPE.MiningLaser:
                 playerStates = PlayerStates.Mining;
-                item.GetComponent<MiningController>().enabled = true;
-                item.GetComponent<DefaultGun>().enabled = false;
+                //GetComponent<MiningController>().enabled = true;
+                //item.GetComponent<DefaultGun>().enabled = false;
                 break;
             default:
                 playerStates = PlayerStates.Idle;
-                item.GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = false;
+                //GetComponent<MiningController>().enabled = false;
+                //item.GetComponent<DefaultGun>().enabled = false;
                 break;
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if(collision.collider.CompareTag("EnemyWeapon"))
-        {
-            EnemyBehaviour enemy = collision.collider.gameObject.GetComponentInParent<EnemyBehaviour>();
-            playerHP -= enemy.GetStats.strength;
+    //[Client]
+    //public void SetReady(bool ready)
+    //{
+    //    IsReady = ready;
 
-            if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x > 0f)
-            {
-                rb2d.AddForceAtPosition(Vector2.right * 1000, transform.position);
-            }
+    //    if (!isLocalPlayer)
+    //        return;
 
-            else if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x < 0f)
-            {
-                rb2d.AddForceAtPosition(Vector2.left * 1000, transform.position);
-            }
-        }
-
-    }
-
-
-
-
-
-    #region GameLogic
+    //    if (IsReady)
+    //    {
+    //        itemHandler.ShowGUI();
+    //        //GetComponent<MiningController>().UpdateTiles();
+    //    }
+    //}
+    //[Client]
+    //public void RemoveItemFromGround(GameObject obj)
+    //{
+    //    if (isLocalPlayer)
+    //        CmdRemoveGroundItem(obj);
+    //}
 
     void Die()
     {
-        deathScreen.gameObject.SetActive(true);
+        //deathScreen.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
+    #endregion
 
+    #endregion
 
-    IEnumerator CoroutineCoordinator()
+    private IEnumerator FadeServerMessage()
+    {
+        if(sceneScript)
+        {
+            yield return new WaitForSeconds(5f);
+
+            sceneScript.canvasStatusText.enabled = false;
+        }
+    }
+
+    private IEnumerator CoroutineCoordinator()
     {
         while (true)
         {
@@ -340,36 +454,52 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
     }
+
+    #region Getter
+
+    public ItemObject GetActiveItem()
+    {
+        if (ActiveQuickslot == -1)
+            return null;
+
+        return ItemHandler.QuickSlots.GetSlots[ActiveQuickslot].ItemObject;
+    }
+
     public InventoryObject GetInventoryObject
     {
-        get { return itemHandler.Inventory; }
+        get { return ItemHandler.Inventory; }
     }
 
-    public float DistanceFromPlayerX
+    public bool IsReady
     {
-        get { return distanceFromPlayerx; }
+        get { return isReady; }
 
-        set { distanceFromPlayerx = value; }
+        private set { isReady = value; }
     }
 
-    public float DistanceFromPlayerY
+    //public float DistanceFromPlayerX
+    //{
+    //    get { return distanceFromPlayerx; }
+
+    //    set { distanceFromPlayerx = value; }
+    //}
+
+    //public float DistanceFromPlayerY
+    //{
+    //    get { return distanceFromPlayery; }
+
+    //    set { distanceFromPlayery = value; }
+    //}
+
+
+    public int ActiveItemID
+    { 
+        get { return activeItemID; } 
+    }
+
+    public int MiningStrength
     {
-        get { return distanceFromPlayery; }
-
-        set { distanceFromPlayery = value; }
+        get { return miningStrength; }
     }
-
-  
     #endregion
-    private void Flip(float horizontal)
-    {
-        if (horizontal > 0 && !facingRight || horizontal < 0 && facingRight)
-        {
-            facingRight = !facingRight;
-
-            Vector3 theScale = transform.localScale;
-            theScale.x *= -1;
-            transform.localScale = theScale;
-        }
-    }
 }

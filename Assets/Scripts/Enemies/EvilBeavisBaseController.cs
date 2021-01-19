@@ -78,7 +78,7 @@ public class EvilBeavisBaseController : MonoBehaviour, HasCoolDownInterFace
                 if (chunk.HasTile(blockInLocal))
                 {
                     
-                    blockType = tileMapManager.BlockTypeGet(blockInLocal, chunk);
+                    blockType = tileMapManager.GetBlockType(blockInLocal, chunk);
                     if(blockType == "Ore")
                     {
                         targetedOre.Add(new Vector3Int(x, y, 0));
@@ -101,7 +101,7 @@ public class EvilBeavisBaseController : MonoBehaviour, HasCoolDownInterFace
                 if (chunk.HasTile(blockInLocal))
                 {
                     
-                    blockType = tileMapManager.BlockNameGet(blockInLocal, chunk);
+                    blockType = tileMapManager.GetBlockName(blockInLocal, chunk);
                     if (blockType == "Ore")
                         targetedOre.Add(new Vector3Int(x, y, 0));
                 }

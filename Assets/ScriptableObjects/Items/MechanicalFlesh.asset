@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiDisplaySprite: {fileID: 21300000, guid: 66d124378a02ba942bff6ca8d65bf22d, type: 3}
   stackable: 1
-  itemType: 8
+  itemType: 12
   description: 
   data:
     name: Mechanical Flesh
-    id: -1
+    id: 18
     amount: 1
+  maxStackSize: 0

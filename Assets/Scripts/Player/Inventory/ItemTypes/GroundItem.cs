@@ -1,20 +1,26 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using Mirror;
 
-public class GroundItem : MonoBehaviour, ISerializationCallbackReceiver
+public class GroundItem : NetworkBehaviour, ISerializationCallbackReceiver
 {
-    [SerializeField]
-    private ItemObject item;
-    private float pickupCooldown = 2f;
+    [SerializeField] private ItemObject item;
 
-    void Start()
+    public float PickupTime { get; private set; } = 2f;
+
+    struct ItemData
     {
+        public int itemID;
+        public int itemAmount;
     }
+
+    [SyncVar(hook = nameof(OnItemUpdate))]
+    private ItemData itemData;
 
     private void Update()
     {
-        if (pickupCooldown >= 0f)
-            pickupCooldown -= Time.deltaTime;
+        if (PickupTime >= 0f)
+            PickupTime -= Time.deltaTime;
     }
 
     public void SetItemObject(ItemObject item, float cooldown = 2f)
@@ -22,9 +28,30 @@ public class GroundItem : MonoBehaviour, ISerializationCallbackReceiver
         this.item = item;
         if (item != null)
         {
-            pickupCooldown = cooldown;
+            PickupTime = cooldown;
             GetComponentInChildren<SpriteRenderer>().sprite = item.UIDisplaySprite;
+
+            itemData = new ItemData
+            {
+                itemID = item.Data.ID,
+                itemAmount = item.Data.Amount
+            };
         }
+    }
+    private void OnItemUpdate(ItemData _old, ItemData _new)
+    {
+        GameObject parentObject = GameObject.Find("ItemSpawner");
+
+        transform.SetParent(parentObject.transform, true);
+
+        ItemDatabaseObject db = Resources.Load("ScriptableObjects/ItemDatabase") as ItemDatabaseObject;
+
+        ItemObject item = db.GetItemAt(_new.itemID);
+        item.Data.Amount = _new.itemAmount;
+
+        this.item = item;
+
+        GetComponentInChildren<SpriteRenderer>().sprite = item.UIDisplaySprite;
     }
 
     public ItemObject Item
@@ -32,14 +59,6 @@ public class GroundItem : MonoBehaviour, ISerializationCallbackReceiver
         get 
         {
             return this.item;
-        }
-    }
-
-    public float PickupTime
-    {
-        get
-        {
-            return this.pickupCooldown;
         }
     }
 
