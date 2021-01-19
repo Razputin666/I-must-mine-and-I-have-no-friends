@@ -9,7 +9,7 @@ public class TilemapSyncer : NetworkBehaviour
 {
     private Tilemap tilemap;
     private TileBase[] tileAssets;
-
+    private Dictionary<string, TileBase> tilebaseLookup;
     private GameTiles gametiles;
     private NetworkTransmitter networkTransmitter;
 
@@ -42,6 +42,11 @@ public class TilemapSyncer : NetworkBehaviour
             tilemap = GetComponent<Tilemap>();
 
         tileAssets = Resources.LoadAll<TileBase>("Tilebase");
+
+        foreach (var tilebase in tileAssets)
+        {
+            tilebaseLookup.Add(tilebase.name, tilebase);
+        }
     }
 
     public override void OnStartClient()
@@ -80,13 +85,13 @@ public class TilemapSyncer : NetworkBehaviour
         }
         else
         {
-            foreach (TileBase tileAsset in tileAssets)
-            {
-                if (tileAsset.name == tilebaseName)
-                {
-                    return UpdateTilemap(tilePositionCell, tileAsset);
-                }
-            }
+            tilebaseLookup.TryGetValue(tilebaseName, out TileBase tileAsset);
+
+            if (tileAsset != null)
+                return UpdateTilemap(tilePositionCell, tileAsset);
+            else
+                Debug.LogError("Couldn't find tilebase, Missing in Resource folder");
+
         }
         return false;
     }
@@ -125,13 +130,12 @@ public class TilemapSyncer : NetworkBehaviour
             }
             else
             {
-                foreach (TileBase tileAsset in tileAssets)
-                {
-                    if (tileAsset.name == data.tilebaseName)
-                    {
-                        tilemap.SetTile(data.blockCellPos, tileAsset);
-                    }
-                }
+                tilebaseLookup.TryGetValue(data.tilebaseName, out TileBase tileAsset);
+
+                if (tileAsset != null)
+                    tilemap.SetTile(data.blockCellPos, tileAsset);
+                else
+                    Debug.LogError("Couldn't find tilebase, Missing in Resource folder");
             }
         }
         tileUpdateData.Clear();
