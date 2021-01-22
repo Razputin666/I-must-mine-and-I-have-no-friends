@@ -104,6 +104,18 @@ public class TileMapManager : NetworkBehaviour
         Tilemaps.Add(tilemap);
     }
 
+    public Tilemap GetTileChunk(int index)
+    {
+        if(index < Tilemaps.Count)
+        {
+            return Tilemaps[index];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public bool UpdateTilemap(string tilemapName, Vector3Int tilePositionCell, string tileBaseName)
     {
         foreach (Tilemap tilemapChunk in Tilemaps)

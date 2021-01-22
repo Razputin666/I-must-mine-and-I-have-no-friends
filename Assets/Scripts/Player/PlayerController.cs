@@ -87,7 +87,7 @@ public class PlayerController : NetworkBehaviour
             //}
             if(isLocalPlayer)
             {
-                Debug.Log("local");
+               // Debug.Log("local");
                 CheckQuickslotInput();
             }
                 
@@ -163,7 +163,7 @@ public class PlayerController : NetworkBehaviour
     [Server]
     private void CheckItemCollision()
     {
-        Debug.Log("Checking collision");
+       // Debug.Log("Checking collision");
         Collider2D[] colliderArray = Physics2D.OverlapCircleAll(transform.position, itemPickupRange);
         
         foreach (Collider2D collider2D in colliderArray)
@@ -292,7 +292,7 @@ public class PlayerController : NetworkBehaviour
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     void FixedUpdate()
     {
-        Debug.Log(IsReady);
+       // Debug.Log(IsReady);
         if (IsReady)
         {
             if (!isLocalPlayer)

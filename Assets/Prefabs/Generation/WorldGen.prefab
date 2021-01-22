@@ -9,8 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3163931115760460336}
-  - component: {fileID: 993429306439773751}
-  - component: {fileID: 1160258766}
+  - component: {fileID: 1508111169}
+  - component: {fileID: 1508111170}
+  - component: {fileID: 1522409692357797863}
   m_Layer: 0
   m_Name: WorldGen
   m_TagString: GameManager
@@ -32,7 +33,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &993429306439773751
+--- !u!114 &1508111169
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,32 +42,47 @@ MonoBehaviour:
   m_GameObject: {fileID: 3163931115760460343}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ede07e3ffac2ce44984a67f52336e8d, type: 3}
+  m_Script: {fileID: 11500000, guid: 80649f7813e3e3049bb9f2c56b7d0885, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  tileDatas: []
+--- !u!114 &1508111170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3163931115760460343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
+--- !u!114 &1522409692357797863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3163931115760460343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a493e11b9591054a8f3ebef36f613a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   grid: {fileID: 0}
   horizontalChunks: 10
-  verticalChunks: 5
+  verticalChunks: 7
   chunkPrefab: {fileID: 4802906064719502046, guid: f1fc65f761491f74abdd69e1daf070b8,
     type: 3}
   defaultChunk: {fileID: 11400000, guid: 142c074dbc6f1554eb927690b627468c, type: 2}
-  blockTypes: {fileID: 1160258766}
+  useJobs: 1
   chunks: []
---- !u!114 &1160258766
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3163931115760460343}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e377b769f7da77c49bc7517917379bcb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blocks:
-  - {fileID: 11400000, guid: d2a454cdcf61587439cbe5ede10d0c9c, type: 2}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
