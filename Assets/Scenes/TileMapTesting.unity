@@ -463,6 +463,10 @@ PrefabInstance:
       propertyPath: m_AssetId
       value: 2aebd52ad1cab5b4babd8935c208b58a
       objectReference: {fileID: 0}
+    - target: {fileID: 1508111170, guid: 2aebd52ad1cab5b4babd8935c208b58a, type: 3}
+      propertyPath: serverOnly
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1522409692357797863, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}
       propertyPath: grid
@@ -476,7 +480,7 @@ PrefabInstance:
     - target: {fileID: 1522409692357797863, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}
       propertyPath: horizontalChunks
-      value: 5
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3163931115760460336, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}

@@ -33,87 +33,64 @@ public class DefaultPlanetGeneration : Worldgeneration
     {
         Init();
         
-        NativeArray<int> chunkArray = new NativeArray<int>(horizontalChunks * width * verticalChunks * height, Allocator.TempJob);
+        NativeArray<int> worldArray = new NativeArray<int>(horizontalChunks * width * verticalChunks * height, Allocator.TempJob);
         NativeArray<int> topLayer = new NativeArray<int>(horizontalChunks * width * height, Allocator.TempJob);
-        NativeArray<int>[] chunks = new NativeArray<int>[horizontalChunks * verticalChunks];
+        NativeArray<int>[] chunkArray = new NativeArray<int>[horizontalChunks * verticalChunks];
 
-        GenerateJobs(chunkArray);
+        GenerateJobs(worldArray);
 
-        for (int x = 0; x < horizontalChunks * width; x++)
+        CreateTopTerrain(topLayer);
+        //Copy values from the array with the topWalk values to the array with the entire world
+        for (int x = 0; x < (horizontalChunks * width); x++)
         {
-
             for (int y = 0; y < height; y++)
             {
                 int topLayerIndex = x * height + y;
                 int index = x * verticalChunks * height + y + (verticalChunks - 1) * height;
-                topLayer[topLayerIndex] = chunkArray[index];
-            }
-        }
+                //Debug.Log("topLayerIndex: " + topLayerIndex + ", index: " + index);
+                // int index = (verticalChunks - 1) * height + topLayerIndex;
 
-        topLayer = CreateTopTerrain(topLayer);
-
-        for (int x = 0; x < horizontalChunks * width; x++)
-        {
-
-            for (int y = 0; y < height; y++)
-            {
-                int topLayerIndex = x * height + y;
-                int index = x * verticalChunks * height + y + (verticalChunks - 1) * height;
-               // int index = (verticalChunks - 1) * height + topLayerIndex;
-                
                 // index += verticalChunks * height * (x - 1);
-                
-               // topLayer[topLayerIndex] = chunkArray[index];
-                chunkArray[index] = topLayer[topLayerIndex]; 
+
+                // topLayer[topLayerIndex] = chunkArray[index];
+                worldArray[index] = topLayer[topLayerIndex]; 
             }
         }
 
-        //for (int i = 0; i < chunks.Length; i++)
-        //{
-        //    chunks[i] = new NativeArray<int>(width * height, Allocator.TempJob);
-        //    for (int x = 0; x < width; x++)
-        //    {
-
-        //        for (int y = 0; y < height; y++)
-        //        {
-                        
-        //            int chunkIndex = x * height + y;
-        //           // int index = i * height + (verticalChunks * height) * x + chunkIndex;
-        //            int index = x * verticalChunks * height + y + (i % verticalChunks) * height;
-        //            chunks[i][chunkIndex] = chunkArray[index];
-        //        }
-        //    }
-        //}
-        for (int i = 0; i < verticalChunks; i++)
+        //Copy worldarray(contains the entire world) to Chunk(same size as a tilemap)
+        for (int i = 0; i < horizontalChunks; i++)
         {
-            for (int j = 0; j < horizontalChunks; j++)
+            for (int j = 0; j < verticalChunks; j++)
             {
-                int currentChunkIndex = j * verticalChunks + i;
-                chunks[currentChunkIndex] = new NativeArray<int>(width * height, Allocator.TempJob);
+                //Calculate the correct index of the Chunk.
+                int currentChunkIndex = i * verticalChunks + j;
+                chunkArray[currentChunkIndex] = new NativeArray<int>(width * height, Allocator.TempJob);
+                NativeArray<int> currentChunk = chunkArray[currentChunkIndex];
                 for (int x = 0; x < width; x++)
                 {
-
                     for (int y = 0; y < height; y++)
                     {
-
-                        int chunkIndexPos = y * width + x;
-                        // int index = i * height + (verticalChunks * height) * x + chunkIndex;
-                        int index = x * verticalChunks * height + y + i  * height + j * verticalChunks * height * width;
-                        chunks[currentChunkIndex][chunkIndexPos] = chunkArray[index];
+                        //Calculate the indexPosition of the Tiles
+                        int chunkIndexPos = x * height + y;
+                        //Calculate the index position from the array that has the entire world
+                        int index = x * verticalChunks * height + y + j * height + i * verticalChunks * height * width;
+                        //Debug.Log("ChunkIndex: " + chunkIndexPos + ", index: " + index);
+                        //Copy Tile from the world array to the chunkArray
+                        currentChunk[chunkIndexPos] = worldArray[index];
                     }
                 }
             }
         }
 
-        Render(chunks);
-        for (int i = 0; i < chunks.Length; i++)
+        Render(chunkArray);
+
+        //Cleanup
+        for (int i = 0; i < chunkArray.Length; i++)
         {
-            chunks[i].Dispose();
+            chunkArray[i].Dispose();
         }
         topLayer.Dispose();
-        chunkArray.Dispose();
-
-
+        worldArray.Dispose();
     }
 
     //public override void OnStartServer()
@@ -156,14 +133,13 @@ public class DefaultPlanetGeneration : Worldgeneration
         int lastHeight = Random.Range(height - heighRandomize, height);
 
         //Used to determine which direction to go
-        int nextMove = 0;
+        int nextMove;
         //Used to keep track of the current sections width
         int sectionWidth = 0;
 
         //Work through the array width
         for (int x = 0; x < horizontalChunks * width; x++)
         {
-
             //Determine the next move
             nextMove = rand.Next(2);
 
@@ -182,16 +158,15 @@ public class DefaultPlanetGeneration : Worldgeneration
             sectionWidth++;
 
             //Work our way from the height down to 0
-            //for (int y = lastHeight; y > 0; y--)
-            //{
-            //    mapCoords[x * height + y] = 1;
-
-            //}
-
-            for (int y = height - 1; y > lastHeight; y--)
+            for (int y = lastHeight; y >= 0; y--)
             {
-                mapCoords[x * height + y] = 0;
+                mapCoords[x * height + y] = 1;
             }
+
+            //for (int y = height - 1; y > lastHeight; y--)
+            //{
+            //    mapCoords[x * height + y] = 0;
+            //}
         }
         return mapCoords;
     }
