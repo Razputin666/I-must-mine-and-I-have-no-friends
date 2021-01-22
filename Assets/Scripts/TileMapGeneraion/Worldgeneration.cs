@@ -151,11 +151,10 @@ public class Worldgeneration : NetworkBehaviour
 
     protected virtual void Render(NativeArray<int>[] chunkArray)
     {
+        //Loop through all chunks and render on the Tilemap
         for (int i = 0; i < chunkArray.Length; i++)
         {
-            UnityEngine.Debug.Log(i);
             RenderMapJobs(chunkArray[i], TileMapManager.Instance.GetTileChunk(i), tilebaseLookup["Dirt Block"]);
-            
         }
     }
     #region NotJobs
@@ -231,7 +230,7 @@ public class Worldgeneration : NetworkBehaviour
         {
             for (int y = 0; y < height; y++) //Loop through the height of the map
             {
-                int index = y * width + x;
+                int index = x * height + y;
                 tilepositions[index] = new Vector3Int(x, y, 0);
                 if (map[index] == 1) // 1 = tile, 0 = no tile
                 {
