@@ -52,17 +52,17 @@ public class PlayerMovementController : NetworkBehaviour
         if(isServer && GetComponent<PlayerController>().IsReady)
         {
             RotateArm();
-            pathfinder.Move();
+            //pathfinder.Move();
         }
 
         if (isClient)
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                PlayerController player = GetComponent<PlayerController>();
+            //if (Input.GetMouseButtonDown(0))
+            //{
+            //    PlayerController player = GetComponent<PlayerController>();
 
-                CmdSetTargetPath(player.mousePosInWorld);
-            }
+            //    CmdSetTargetPath(player.mousePosInWorld);
+            //}
         }
     }
     #region PF Testing
@@ -108,7 +108,7 @@ public class PlayerMovementController : NetworkBehaviour
         if (!GetComponent<PlayerController>().IsReady)
             return;
 
-        previousInput = pathfinder.Direction;
+        //previousInput = pathfinder.Direction;
 
         Flip(previousInput.x);
         if(previousInput != Vector2.zero)
@@ -119,7 +119,6 @@ public class PlayerMovementController : NetworkBehaviour
                 rb2d.velocity += previousInput * movementSpeed;
         }
         
-
         if (rb2d.velocity.y < -25f)
         {
             heightTimer += Time.deltaTime;

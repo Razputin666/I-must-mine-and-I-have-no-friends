@@ -43,6 +43,7 @@ public class TilemapSyncer : NetworkBehaviour
 
         tileAssets = Resources.LoadAll<TileBase>("Tilebase");
 
+        tilebaseLookup = new Dictionary<string, TileBase>();
         foreach (var tilebase in tileAssets)
         {
             tilebaseLookup.Add(tilebase.name, tilebase);

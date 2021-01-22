@@ -12,7 +12,6 @@ public class PathNode
     public int hCost;
     public int fCost;
 
-    public int amountFromBelow;
     public PathNode cameFromNode;
     public List<PathNode> neighbourNodes;
 
@@ -25,8 +24,7 @@ public class PathNode
         this.x = x;
         this.y = y;
         this.isWalkable = true;
-        this.hasBlock = false;
-        this.amountFromBelow = 0;
+        this.hasBlock = true;
     }
 
     public void CalculateFCost()
@@ -37,5 +35,30 @@ public class PathNode
     public override string ToString()
     {
         return x + "," + y;
+    }
+}
+
+struct PNode
+{
+    public int x;
+    public int y;
+
+    public int gCost;
+    public int hCost;
+    public int fCost;
+
+    public int cameFromNodeIndex;
+    public int index;
+
+    public bool isWalkable;
+    public bool hasBlock;
+
+    public void CalculateFCost()
+    {
+        fCost = gCost + hCost;
+    }
+    public void SetIsWalkable(bool value)
+    {
+        isWalkable = value;
     }
 }

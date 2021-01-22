@@ -1,32 +1,46 @@
-﻿//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using UnityEngine;
 
-//public class PathfindingTesting : MonoBehaviour
-//{
-//    //private Pathfinding pathfinding;
+public class PathfindingTesting : MonoBehaviour
+{
+    private Pathfinder pathfinder;
 
-//    private void Start()
-//    {
-//        //pathfinding = new Pathfinding(10, 10, Vector3.zero);
-//    }
+    private void Start()
+    {
+        Pathfinding pathfinding = new Pathfinding(10, 10, Vector3.zero);
+    }
 
-//    private void Update()
-//    {
-//        if(Input.GetMouseButtonDown(0))
-//        {
-//            Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    private void Update()
+    {
+        Vector3[] startPosList = new Vector3[1000];
+        for (int i = 0; i < 1000; i++)
+        {
+            int x = Random.Range(0, 1000);
+            int y = Random.Range(0, 1000);
 
-//            pathfinding.GetGrid().GetXY(mouseWorldPosition, out int x, out int y);
-//            List<PathNode> path = pathfinding.FindPath(0, 0, x, y);
-//            if (path != null)
-//            {
-//                for (int i = 0; i < path.Count - 1; i++)
-//                {
-//                    Debug.Log(path[i]);
-//                    Debug.DrawLine(new Vector3(path[i].x, path[i].y) * 1f + Vector3.one * .5f, new Vector3(path[i + 1].x, path[i + 1].y) * 1f + Vector3.one * .5f, Color.red, 10f, true);
-//                }
-//            }
-//        }
-//    }
-//}
+            startPosList[i] = new Vector3(x, y);
+        }
+
+        Vector3[] endPosList = new Vector3[1000];
+        for (int i = 0; i < 1000; i++)
+        {
+            int x = Random.Range(0, 1000);
+            int y = Random.Range(0, 1000);
+
+            endPosList[i] = new Vector3(x, y);
+        }
+
+        Stopwatch stopWatch = new Stopwatch();
+
+        stopWatch.Start();
+        for(int i = 0; i < 1000; i++)
+        {
+            pathfinder.CalculatePath(startPosList[i], endPosList[i]);
+        }
+        stopWatch.Stop();
+
+        UnityEngine.Debug.Log("Time: " + stopWatch.ElapsedMilliseconds / 1000);
+    }
+}

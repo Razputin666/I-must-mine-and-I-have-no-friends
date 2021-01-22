@@ -192,7 +192,7 @@ public class InventoryObject : ScriptableObject
 
     public void ToggleVisibility()
     {
-        GetSlots[0].parent.gameObject.SetActive(!GetSlots[0].parent.gameObject.activeSelf);
+        GetSlots[0].parent.gameObject.SetActive(false);//!GetSlots[0].parent.gameObject.activeSelf);
     }
     #region Getters
     public Inventory Container

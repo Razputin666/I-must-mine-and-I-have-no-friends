@@ -43,11 +43,12 @@ public class Pathfinding
         grid.GetXY(startWorldPosition, out int startX, out int startY);
         grid.GetXY(endWorldPosition, out int endX, out int endY);
 
-        if (endX > 100 || endY > 100)
+        if ((endX < 0 || endX > grid.GetWidth() || endY < 0 || endY > grid.GetHeight()) ||
+            (startX < 0 || startX > grid.GetWidth() || startY < 0 || startY > grid.GetHeight()))
         {
-            Debug.Log(endX + "," + endY);
-            Debug.Log(endWorldPosition);
+            return null;
         }
+
         List<PathNode> path = FindPath(startX, startY, endX, endY);
 
         if (path == null)
@@ -89,7 +90,6 @@ public class Pathfinding
                 pathNode.gCost = int.MaxValue;
                 pathNode.CalculateFCost();
                 pathNode.cameFromNode = null;
-                pathNode.amountFromBelow = 0;
             }
         }
 
@@ -135,10 +135,6 @@ public class Pathfinding
 
                 int nodesNeededToMine = 0;
 
-                //if (currentNode.y + 1 == neighbourNode.y)
-                //    movingUp = true;
-                //else
-                //    movingUp = false;
                 //Check if we have a faster path from current node to the neighbour node than we had previously
                 int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNode, neighbourNode);
 
@@ -151,7 +147,7 @@ public class Pathfinding
                         if (neighbourNode.y + 1 < grid.GetHeight() && GetNode(neighbourNode.x, neighbourNode.y + 1).hasBlock)
                             nodesNeededToMine++;
 
-                        if (neighbourNode.y - 1 >= 0 && GetNode(neighbourNode.x, neighbourNode.y - 1).hasBlock)
+                        if (neighbourNode.y + 2 >= 0 && GetNode(neighbourNode.x, neighbourNode.y - 1).hasBlock)
                             nodesNeededToMine++;
                     }
                 }
@@ -268,18 +264,11 @@ public class Pathfinding
 
     private int CalculateDistanceCost(PathNode a, PathNode b)
     {
-        if(a == null || b == null)
-        {
-            Debug.Log(a);
-            Debug.Log(b);
-        }
-
         int xDistance = Mathf.Abs(a.x - b.x);
         int yDistance = Mathf.Abs(a.y - b.y);
         int remaining = Mathf.Abs(xDistance - yDistance);
 
-        return (xDistance + yDistance) * MOVE_STRAIGHT_COST;
-        //return MOVE_DIAGONAL_COST * Mathf.Min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
+        return MOVE_DIAGONAL_COST * Mathf.Min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
     }
 
     private PathNode GetLowestFCostNode(List<PathNode> pathNodeList)

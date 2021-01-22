@@ -64,7 +64,7 @@
 //		float startY = -tilemapChunkHeight;
 
 //		int tilemapIndex = 0;
-
+		
 //		for (int y = 0; y < numberOfChunksY; y++)
 //		{
 //			for (int x = 0; x < numberOfChunksX; x++)
