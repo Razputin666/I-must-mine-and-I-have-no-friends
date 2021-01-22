@@ -260,3 +260,11 @@ public struct JobsGenerate : IJobParallelFor
         map[index] = 1;
     }
 }
+
+public struct JobsTopTerrain : IJobParallelFor
+{
+    public void Execute(int index)
+    {
+        throw new System.NotImplementedException();
+    }
+}
