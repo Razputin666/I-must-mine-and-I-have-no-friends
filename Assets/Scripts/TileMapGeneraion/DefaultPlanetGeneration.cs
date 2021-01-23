@@ -152,23 +152,25 @@ public class DefaultPlanetGeneration : Worldgeneration
 
     private NativeArray<int> CreateCaveTerrain(NativeArray<int> mapCoords)
     {
+        int worldWidth = horizontalChunks * width;
+        int worldHeight = verticalChunks * height;
 
         float seed = UnityEngine.Random.Range(0f, 1f);
         //Seed our random
         System.Random rand = new System.Random(seed.GetHashCode());
 
         //Define our start x position
-        int floorX = Random.Range(0, (horizontalChunks * width) - 1);
+        int floorX = Random.Range(0, (worldWidth) - 1);
         //Define our start y position
-        int floorY = Random.Range(0, (verticalChunks * height) - 1);
+        int floorY = Random.Range(0, (worldHeight) - 1);
         //Determine our required floorAmount
-        int reqFloorAmount = (verticalChunks * height * horizontalChunks * width) / 10;
+        int reqFloorAmount = (worldHeight * worldWidth) / 10;
         Debug.Log(reqFloorAmount);
         //Used for our while loop, when this reaches our reqFloorAmount we will stop tunneling
         int floorCount = 0;
         // Debug.Log(map.GetLength(0) + " width " + map.GetLength(1) + " height");
         //Set our start position to not be a tile (0 = no tile, 1 = tile)
-        mapCoords[floorX * height + floorY] = 1;
+        mapCoords[floorX * worldHeight + floorY] = 1;
         //Increase our floor count
         floorCount++;
         int maxLoops = verticalChunks + horizontalChunks;
@@ -177,14 +179,14 @@ public class DefaultPlanetGeneration : Worldgeneration
         {
             //Determine our next direction
             int randDir = rand.Next(8);
-            floorX = Random.Range(0, (horizontalChunks * width) - 1);
-            floorY = Random.Range(0, (verticalChunks * height) - 1);
+            floorX = Random.Range(0, worldWidth - 1);
+            floorY = Random.Range(0, worldHeight - 1);
 
             switch (randDir)
             {
                 case 0: //North-West
                     //Ensure we don't go off the map
-                    if ((floorY + 1) < verticalChunks * height && (floorX - 1) > 0)
+                    if ((floorY + 1) < worldHeight && (floorX - 1) > 0)
                     {
                         //Move the y up 
                         floorY++;
@@ -192,10 +194,10 @@ public class DefaultPlanetGeneration : Worldgeneration
                         floorX--;
 
                         //Check if the position is a tile
-                        if (mapCoords[floorX * height + floorY] == 1)
+                        if (mapCoords[floorX * worldHeight + floorY] == 1)
                         {
                             //Change it to not a tile
-                            mapCoords[floorX * height + floorY] = 0;
+                            mapCoords[floorX * worldHeight + floorY] = 0;
                             //Increase floor count
                             floorCount++;
                             maxLoops = numberOfLoops;
@@ -204,16 +206,16 @@ public class DefaultPlanetGeneration : Worldgeneration
                     break;
                 case 1: //North
                     //Ensure we don't go off the map
-                    if ((floorY + 1) < verticalChunks * height)
+                    if ((floorY + 1) < worldHeight)
                     {
                         //Move the y up
                         floorY++;
 
                         //Check if the position is a tile
-                        if (mapCoords[floorX * height + floorY] == 1)
+                        if (mapCoords[floorX * worldHeight + floorY] == 1)
                         {
                             //Change it to not a tile
-                            mapCoords[floorX * height + floorY] = 0;
+                            mapCoords[floorX * worldHeight + floorY] = 0;
                             //Increase the floor count
                             floorCount++;
                             maxLoops = numberOfLoops;
@@ -222,7 +224,7 @@ public class DefaultPlanetGeneration : Worldgeneration
                     break;
                 case 2: //North-East
                     //Ensure we don't go off the map
-                    if ((floorY + 1) < verticalChunks * height && (floorX + 1) < horizontalChunks * width)
+                    if ((floorY + 1) < worldHeight && (floorX + 1) < worldWidth)
                     {
                         //Move the y up
                         floorY++;
@@ -230,10 +232,10 @@ public class DefaultPlanetGeneration : Worldgeneration
                         floorX++;
 
                         //Check if the position is a tile
-                        if (mapCoords[floorX * height + floorY] == 1)
+                        if (mapCoords[floorX * worldHeight + floorY] == 1)
                         {
                             //Change it to not a tile
-                            mapCoords[floorX * height + floorY] = 0;
+                            mapCoords[floorX * worldHeight + floorY] = 0;
                             //Increase the floor count
                             floorCount++;
                             maxLoops = numberOfLoops;
@@ -242,16 +244,16 @@ public class DefaultPlanetGeneration : Worldgeneration
                     break;
                 case 3: //East
                     //Ensure we don't go off the map
-                    if ((floorX + 1) < horizontalChunks * width)
+                    if ((floorX + 1) < worldWidth)
                     {
                         //Move the x right
                         floorX++;
 
                         //Check if the position is a tile
-                        if (mapCoords[floorX * height + floorY] == 1)
+                        if (mapCoords[floorX * worldHeight + floorY] == 1)
                         {
                             //Change it to not a tile
-                            mapCoords[floorX * height + floorY] = 0;
+                            mapCoords[floorX * worldHeight + floorY] = 0;
                             //Increase the floor count
                             floorCount++;
                             maxLoops = numberOfLoops;
@@ -260,7 +262,7 @@ public class DefaultPlanetGeneration : Worldgeneration
                     break;
                 case 4: //South-East
                     //Ensure we don't go off the map
-                    if ((floorY - 1) > 0 && (floorX + 1) < horizontalChunks * width)
+                    if ((floorY - 1) > 0 && (floorX + 1) < worldWidth)
                     {
                         //Move the y down
                         floorY--;
@@ -268,10 +270,10 @@ public class DefaultPlanetGeneration : Worldgeneration
                         floorX++;
 
                         //Check if the position is a tile
-                        if (mapCoords[floorX * height + floorY] == 1)
+                        if (mapCoords[floorX * worldHeight + floorY] == 1)
                         {
                             //Change it to not a tile
-                            mapCoords[floorX * height + floorY] = 0;
+                            mapCoords[floorX * worldHeight + floorY] = 0;
                             //Increase the floor count
                             floorCount++;
                             maxLoops = numberOfLoops;
@@ -286,10 +288,10 @@ public class DefaultPlanetGeneration : Worldgeneration
                         floorY--;
 
                         //Check if the position is a tile
-                        if (mapCoords[floorX * height + floorY] == 1)
+                        if (mapCoords[floorX * worldHeight + floorY] == 1)
                         {
                             //Change it to not a tile
-                            mapCoords[floorX * height + floorY] = 0;
+                            mapCoords[floorX * worldHeight + floorY] = 0;
                             //Increase the floor count
                             floorCount++;
                             maxLoops = numberOfLoops;
@@ -306,10 +308,10 @@ public class DefaultPlanetGeneration : Worldgeneration
                         floorX--;
 
                         //Check if the position is a tile
-                        if (mapCoords[floorX * height + floorY] == 1)
+                        if (mapCoords[floorX * worldHeight + floorY] == 1)
                         {
                             //Change it to not a tile
-                            mapCoords[floorX * height + floorY] = 0;
+                            mapCoords[floorX * worldHeight + floorY] = 0;
                             //Increase the floor count
                             floorCount++;
                             maxLoops = numberOfLoops;
@@ -324,10 +326,10 @@ public class DefaultPlanetGeneration : Worldgeneration
                         floorX--;
 
                         //Check if the position is a tile
-                        if (mapCoords[floorX * height + floorY] == 1)
+                        if (mapCoords[floorX * worldHeight + floorY] == 1)
                         {
                             //Change it to not a tile
-                            mapCoords[floorX * height + floorY] = 0;
+                            mapCoords[floorX * worldHeight + floorY] = 0;
                             //Increase the floor count
                             floorCount++;
                             maxLoops = numberOfLoops;
