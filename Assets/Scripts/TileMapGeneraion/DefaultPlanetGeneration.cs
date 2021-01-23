@@ -36,10 +36,12 @@ public class DefaultPlanetGeneration : Worldgeneration
         NativeArray<int> worldArray = new NativeArray<int>(horizontalChunks * width * verticalChunks * height, Allocator.TempJob);
         NativeArray<int> topLayer = new NativeArray<int>(horizontalChunks * width * height, Allocator.TempJob);
         NativeArray<int>[] chunkArray = new NativeArray<int>[horizontalChunks * verticalChunks];
+        NativeArray<int> cavesArray = new NativeArray<int>(horizontalChunks * width * verticalChunks * height, Allocator.TempJob);
 
         GenerateJobs(worldArray);
-
+        GenerateJobs(cavesArray);
         CreateTopTerrain(topLayer);
+        
         //Copy values from the array with the topWalk values to the array with the entire world
         for (int x = 0; x < (horizontalChunks * width); x++)
         {
@@ -47,15 +49,19 @@ public class DefaultPlanetGeneration : Worldgeneration
             {
                 int topLayerIndex = x * height + y;
                 int index = x * verticalChunks * height + y + (verticalChunks - 1) * height;
-                //Debug.Log("topLayerIndex: " + topLayerIndex + ", index: " + index);
-                // int index = (verticalChunks - 1) * height + topLayerIndex;
-
-                // index += verticalChunks * height * (x - 1);
-
-                // topLayer[topLayerIndex] = chunkArray[index];
                 worldArray[index] = topLayer[topLayerIndex]; 
             }
         }
+        CreateCaveTerrain(cavesArray);
+        for (int x = 0; x < width * horizontalChunks; x++)
+        {
+            for (int y = 0; y < height * verticalChunks; y++)
+            {
+                int cavesIndex = x * height + y;
+                worldArray[cavesIndex] = cavesArray[cavesIndex];
+            }
+        }
+
 
         //Copy worldarray(contains the entire world) to Chunk(same size as a tilemap)
         for (int i = 0; i < horizontalChunks; i++)
@@ -74,13 +80,14 @@ public class DefaultPlanetGeneration : Worldgeneration
                         int chunkIndexPos = x * height + y;
                         //Calculate the index position from the array that has the entire world
                         int index = x * verticalChunks * height + y + j * height + i * verticalChunks * height * width;
-                        //Debug.Log("ChunkIndex: " + chunkIndexPos + ", index: " + index);
                         //Copy Tile from the world array to the chunkArray
                         currentChunk[chunkIndexPos] = worldArray[index];
                     }
                 }
             }
         }
+
+
 
         Render(chunkArray);
 
@@ -93,34 +100,6 @@ public class DefaultPlanetGeneration : Worldgeneration
         worldArray.Dispose();
     }
 
-    //public override void OnStartServer()
-    //{
-    //    Init();
-    //    NativeArray<int>[] chunkArray = new NativeArray<int>[horizontalChunks * verticalChunks];
-    //    //  NativeArray<int> toplayer = new NativeArray<int>(horizontalChunks * width * height, Allocator.Temp);
-    //    NativeArray<int>[] toplayer = new NativeArray<int>[1];
-    //    NativeArray<int>[] toplayerChunks = new NativeArray<int>[horizontalChunks];
-    //    toplayer[0] = new NativeArray<int>(horizontalChunks * width * height, Allocator.TempJob);
-    //    for (int i = 0; i < chunkArray.Length; i++)
-    //    {
-    //        chunkArray[i] = new NativeArray<int>(width * height, Allocator.TempJob);
-    //    }
-    //    GenerateJobs(chunkArray);
-    //    //GenerateJobs(toplayer);
-    //    toplayer[0] = CreateTopTerrain(toplayer[0]);
-
-    //    for (int i = 0; i < horizontalChunks; i++)
-    //    {
-    //        int index = verticalChunks - 1 + verticalChunks * i;
-    //      //  chunkArray[index] = new NativeArray<int>(width * height, Allocator.Temp);
-    //       // toplayerChunks[i] = new NativeSlice<int>(toplayer[0], toplayer[0].Length / horizontalChunks * i, toplayer[0].Length / horizontalChunks * i + 1);
-    //        toplayerChunks[i] = new NativeArray<int>((toplayer[0].Length / horizontalChunks * (i + 1)) - (toplayer[0].Length / horizontalChunks * i), Allocator.TempJob);
-    //        chunkArray[index] = toplayerChunks[i];
-
-    //    }
-
-    //    Render(chunkArray);
-    //}
 
     private NativeArray<int> CreateTopTerrain(NativeArray<int> mapCoords)
     {
@@ -171,7 +150,198 @@ public class DefaultPlanetGeneration : Worldgeneration
         return mapCoords;
     }
 
+    private NativeArray<int> CreateCaveTerrain(NativeArray<int> mapCoords)
+    {
 
+        float seed = UnityEngine.Random.Range(0f, 1f);
+        //Seed our random
+        System.Random rand = new System.Random(seed.GetHashCode());
+
+        //Define our start x position
+        int floorX = Random.Range(0, (horizontalChunks * width) - 1);
+        //Define our start y position
+        int floorY = Random.Range(0, (verticalChunks * height) - 1);
+        //Determine our required floorAmount
+        int reqFloorAmount = (verticalChunks * height * horizontalChunks * width) / 10;
+        Debug.Log(reqFloorAmount);
+        //Used for our while loop, when this reaches our reqFloorAmount we will stop tunneling
+        int floorCount = 0;
+        // Debug.Log(map.GetLength(0) + " width " + map.GetLength(1) + " height");
+        //Set our start position to not be a tile (0 = no tile, 1 = tile)
+        mapCoords[floorX * height + floorY] = 1;
+        //Increase our floor count
+        floorCount++;
+        int maxLoops = verticalChunks + horizontalChunks;
+        int numberOfLoops = maxLoops;
+        while (floorCount < reqFloorAmount && maxLoops > 0)
+        {
+            //Determine our next direction
+            int randDir = rand.Next(8);
+            floorX = Random.Range(0, (horizontalChunks * width) - 1);
+            floorY = Random.Range(0, (verticalChunks * height) - 1);
+
+            switch (randDir)
+            {
+                case 0: //North-West
+                    //Ensure we don't go off the map
+                    if ((floorY + 1) < verticalChunks * height && (floorX - 1) > 0)
+                    {
+                        //Move the y up 
+                        floorY++;
+                        //Move the x left
+                        floorX--;
+
+                        //Check if the position is a tile
+                        if (mapCoords[floorX * height + floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            mapCoords[floorX * height + floorY] = 0;
+                            //Increase floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 1: //North
+                    //Ensure we don't go off the map
+                    if ((floorY + 1) < verticalChunks * height)
+                    {
+                        //Move the y up
+                        floorY++;
+
+                        //Check if the position is a tile
+                        if (mapCoords[floorX * height + floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            mapCoords[floorX * height + floorY] = 0;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 2: //North-East
+                    //Ensure we don't go off the map
+                    if ((floorY + 1) < verticalChunks * height && (floorX + 1) < horizontalChunks * width)
+                    {
+                        //Move the y up
+                        floorY++;
+                        //Move the x right
+                        floorX++;
+
+                        //Check if the position is a tile
+                        if (mapCoords[floorX * height + floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            mapCoords[floorX * height + floorY] = 0;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 3: //East
+                    //Ensure we don't go off the map
+                    if ((floorX + 1) < horizontalChunks * width)
+                    {
+                        //Move the x right
+                        floorX++;
+
+                        //Check if the position is a tile
+                        if (mapCoords[floorX * height + floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            mapCoords[floorX * height + floorY] = 0;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 4: //South-East
+                    //Ensure we don't go off the map
+                    if ((floorY - 1) > 0 && (floorX + 1) < horizontalChunks * width)
+                    {
+                        //Move the y down
+                        floorY--;
+                        //Move the x right
+                        floorX++;
+
+                        //Check if the position is a tile
+                        if (mapCoords[floorX * height + floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            mapCoords[floorX * height + floorY] = 0;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 5: //South
+                    //Ensure we don't go off the map
+                    if ((floorY - 1) > 0)
+                    {
+                        //Move the y down
+                        floorY--;
+
+                        //Check if the position is a tile
+                        if (mapCoords[floorX * height + floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            mapCoords[floorX * height + floorY] = 0;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 6: //South-West
+                    //Ensure we don't go off the map
+                    if ((floorY - 1) > 0 && (floorX - 1) > 0)
+                    {
+                        //Move the y down
+                        floorY--;
+                        //move the x left
+                        floorX--;
+
+                        //Check if the position is a tile
+                        if (mapCoords[floorX * height + floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            mapCoords[floorX * height + floorY] = 0;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+                case 7: //West
+                    //Ensure we don't go off the map
+                    if ((floorX - 1) > 0)
+                    {
+                        //Move the x left
+                        floorX--;
+
+                        //Check if the position is a tile
+                        if (mapCoords[floorX * height + floorY] == 1)
+                        {
+                            //Change it to not a tile
+                            mapCoords[floorX * height + floorY] = 0;
+                            //Increase the floor count
+                            floorCount++;
+                            maxLoops = numberOfLoops;
+                        }
+                    }
+                    break;
+            }
+            maxLoops--;
+        }
+
+        return mapCoords;
+    }
+
+    #region oldcode
     public static int[,] RandomWalkTopSmoothed(int[,] map, float seed, int minSectionWidth, int randomizedRange)
     {
         //Seed our random
@@ -216,4 +386,7 @@ public class DefaultPlanetGeneration : Worldgeneration
         //Return the modified map
         return map;
     }
+
+
+    #endregion
 }

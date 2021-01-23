@@ -475,12 +475,12 @@ PrefabInstance:
     - target: {fileID: 1522409692357797863, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}
       propertyPath: verticalChunks
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1522409692357797863, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}
       propertyPath: horizontalChunks
-      value: 20
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3163931115760460336, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}
