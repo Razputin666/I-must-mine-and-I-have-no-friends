@@ -40,18 +40,7 @@ public class DefaultPlanetGeneration : Worldgeneration
 
         GenerateJobs(worldArray);
         GenerateJobs(cavesArray);
-        CreateTopTerrain(topLayer);
         
-        //Copy values from the array with the topWalk values to the array with the entire world
-        for (int x = 0; x < (horizontalChunks * width); x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                int topLayerIndex = x * height + y;
-                int index = x * verticalChunks * height + y + (verticalChunks - 1) * height;
-                worldArray[index] = topLayer[topLayerIndex]; 
-            }
-        }
         CreateCaveTerrain(cavesArray);
         for (int x = 0; x < width * horizontalChunks; x++)
         {
@@ -62,6 +51,18 @@ public class DefaultPlanetGeneration : Worldgeneration
             }
         }
 
+        CreateTopTerrain(topLayer);
+
+        //Copy values from the array with the topWalk values to the array with the entire world
+        for (int x = 0; x < (horizontalChunks * width); x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                int topLayerIndex = x * height + y;
+                int index = x * verticalChunks * height + y + (verticalChunks - 1) * height;
+                worldArray[index] = topLayer[topLayerIndex];
+            }
+        }
 
         //Copy worldarray(contains the entire world) to Chunk(same size as a tilemap)
         for (int i = 0; i < horizontalChunks; i++)
@@ -180,7 +181,7 @@ public class DefaultPlanetGeneration : Worldgeneration
             //Determine our next direction
             int randDir = rand.Next(8);
             floorX = Random.Range(0, worldWidth - 1);
-            floorY = Random.Range(0, worldHeight - 1);
+            floorY = Random.Range(0, worldHeight - 1 - height);
 
             switch (randDir)
             {
