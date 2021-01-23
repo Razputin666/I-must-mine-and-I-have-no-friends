@@ -57,7 +57,7 @@ public class DefaultPlanetGeneration : Worldgeneration
         {
             for (int y = 0; y < height * verticalChunks; y++)
             {
-                int cavesIndex = x * height + y;
+                int cavesIndex = x * height * verticalChunks + y;
                 worldArray[cavesIndex] = cavesArray[cavesIndex];
             }
         }
