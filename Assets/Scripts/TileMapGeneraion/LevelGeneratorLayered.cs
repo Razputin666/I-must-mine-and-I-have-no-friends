@@ -176,6 +176,7 @@ public class LevelGeneratorLayered : NetworkBehaviour
     private void WorldGeneration()
 	{
 		pathfinding = new Pathfinding(width * numberOfChunks, height * numberOfChunks, new Vector3(0, -height + 1));
+		PathfindingDots pfDots = new PathfindingDots(width * numberOfChunks, height * numberOfChunks, new Vector3(0, -height + 1));
 		//List<int[,]> mapList = new List<int[,]>();
 		//mapList = LoadMap();
 		switch (typeOfPlanet)

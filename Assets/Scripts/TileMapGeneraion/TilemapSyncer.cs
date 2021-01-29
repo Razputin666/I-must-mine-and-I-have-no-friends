@@ -116,6 +116,7 @@ public class TilemapSyncer : NetworkBehaviour
             bool mineable = tilebase == null ? false : true;
             
             Pathfinding.Instance.UpdateGridMineable(tilemap.CellToWorld(tilePositionCell), mineable);
+            PathfindingDots.Instance.UpdateGridMineable(tilemap.CellToWorld(tilePositionCell), mineable);
         }
         tilemap.SetTile(tilePositionCell, tilebase);
     }

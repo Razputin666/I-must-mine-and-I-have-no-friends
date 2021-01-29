@@ -18,7 +18,34 @@ public class Pathfinder : NetworkBehaviour
     public void CalculatePath(Vector3 startWorldPositon, Vector3 targetWorldPosition)
     {
         currentPathIndex = 0;
-        pathVectorList = Pathfinding.Instance.FindPath(startWorldPositon, targetWorldPosition);
+        System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        stopwatch.Start();
+
+        pathVectorList = Pathfinding.Instance.FindPath(
+            startWorldPositon,
+            targetWorldPosition);
+
+        stopwatch.Stop();
+
+        System.TimeSpan timeTaken = stopwatch.Elapsed;
+        Debug.Log("Time taken: " + timeTaken.ToString(@"m\:ss\.fff"));
+
+        stopwatch.Reset();
+
+        stopwatch.Start();
+        List<Vector3> path = PathfindingDots.Instance.FindPath(
+            Vector3Int.FloorToInt(startWorldPositon), 
+            Vector3Int.FloorToInt(targetWorldPosition));
+
+        stopwatch.Stop();
+
+        timeTaken = stopwatch.Elapsed;
+        Debug.Log("Time taken dots: " + timeTaken.ToString(@"m\:ss\.fff"));
+
+        //for (int i = 0; i < path.Count; i++)
+        //{
+        //    Debug.Log(i + " path1: " + path[i] + " path2: " + pathVectorList[i]);
+        //}
 
         if (pathVectorList != null && pathVectorList.Count > 1)
             pathVectorList.RemoveAt(0);

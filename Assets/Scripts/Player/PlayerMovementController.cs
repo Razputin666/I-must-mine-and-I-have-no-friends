@@ -57,7 +57,7 @@ public class PlayerMovementController : NetworkBehaviour
 
         if (isClient)
         {
-            //if (Input.GetMouseButtonDown(0))
+            //if (Input.GetMouseButtonDown(1))
             //{
             //    PlayerController player = GetComponent<PlayerController>();
 

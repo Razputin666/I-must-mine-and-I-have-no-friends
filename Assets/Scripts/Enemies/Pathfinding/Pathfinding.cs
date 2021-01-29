@@ -147,7 +147,7 @@ public class Pathfinding
                         if (neighbourNode.y + 1 < grid.GetHeight() && GetNode(neighbourNode.x, neighbourNode.y + 1).hasBlock)
                             nodesNeededToMine++;
 
-                        if (neighbourNode.y + 2 >= 0 && GetNode(neighbourNode.x, neighbourNode.y - 1).hasBlock)
+                        if (neighbourNode.y + 2 < grid.GetHeight() && GetNode(neighbourNode.x, neighbourNode.y + 2).hasBlock)
                             nodesNeededToMine++;
                     }
                 }
@@ -155,7 +155,7 @@ public class Pathfinding
                 {
                     if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x)
                     {
-                        for (int i = 0; i < 3; i++) //Check nodes 3 tiles up if they need to be mined in order to be able to move
+                        for (int i = 0; i < 4; i++) //Check nodes 4 tiles up if they need to be mined in order to be able to move
                         {
                             if (neighbourNode.y + i < grid.GetHeight() && GetNode(neighbourNode.x, neighbourNode.y + i).hasBlock)
                                 nodesNeededToMine++;
@@ -166,7 +166,7 @@ public class Pathfinding
                 {
                     if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x)
                     {
-                        for (int i = 0; i < 3; i++) //Check nodes 3 tiles up if the need to be mined in order to be able to move
+                        for (int i = 0; i < 4; i++) //Check nodes 4 tiles up if the need to be mined in order to be able to move
                         {
                             if (neighbourNode.y + i < grid.GetHeight() && GetNode(neighbourNode.x, neighbourNode.y + i).hasBlock)
                                 nodesNeededToMine++;
@@ -178,10 +178,9 @@ public class Pathfinding
                         if (neighbourNode.x - 1 >= 0 && GetNode(neighbourNode.x - 1, neighbourNode.y).hasBlock)
                             nodesNeededToMine++;
 
-                        if (neighbourNode.x + 1 >= 0 && GetNode(neighbourNode.x + 1, neighbourNode.y).hasBlock)
+                        if (neighbourNode.x + 1 >= grid.GetWidth() && GetNode(neighbourNode.x + 1, neighbourNode.y).hasBlock)
                             nodesNeededToMine++;
                     }
-                    
                 }
 
                 tentativeGCost += nodesNeededToMine * MINING_COST_PER_STR;
