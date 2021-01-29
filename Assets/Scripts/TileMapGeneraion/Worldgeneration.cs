@@ -15,48 +15,25 @@ public class Worldgeneration : NetworkBehaviour
     [SerializeField] protected int verticalChunks;
     [SerializeField] protected GameObject chunkPrefab;
     [SerializeField] protected MapSettings defaultChunk;
+    [Range(100, 1)]
+    [SerializeField] protected int oreAmount;
     [SerializeField] protected bool useJobs;
+    
     #endregion
     #region Constantvalues
-    protected const int height = 50;
-    protected const int width = 50;
+    public const int height = 50;
+    public const int width = 50;
+    protected const int copperModifier = 3000;
+    protected const int ironModifier = 1800;
+    protected const int coalModifier = 3300;
+    protected const int goldModifier = 1200;
     #endregion
     protected Vector2Int startPosition;
     [HideInInspector] public List<Tilemap> chunks = new List<Tilemap>();
-    protected TileBase[] blocks;
-    protected Dictionary<string, TileBase> tilebaseLookup;
+    [HideInInspector] public TileBase[] blocks;
+    [HideInInspector] public Dictionary<string, TileBase> tilebaseLookup;
+    private BlockTypeConversion blockTypeConversion;
 
-    // Start is called before the first frame update
-    //public override void OnStartServer()
-    //{
-    //    //tilebaseLookup = new Dictionary<string, TileBase>();
-    //    //blocks = Resources.LoadAll<TileBase>("Tilebase");
-    //    //foreach (var tilebase in blocks)
-    //    //{
-    //    //    tilebaseLookup.Add(tilebase.name, tilebase);
-    //    //}
-    //    Init();
-
-    //    if (useJobs)
-    //    {
-    //        Stopwatch stopwatchJobs = new Stopwatch();
-    //        stopwatchJobs.Start();
-    //        GenerateChunks();
-    //        stopwatchJobs.Stop();
-    //        System.TimeSpan timeTaken = stopwatchJobs.Elapsed;
-    //        UnityEngine.Debug.Log("Time taken: " + timeTaken.ToString(@"m\:ss\.fff"));
-    //    }
-    //    else
-    //    {
-    //        Stopwatch stopwatch = new Stopwatch();
-    //        stopwatch.Start();
-    //        GenerateChunksNoJobs();
-    //        stopwatch.Stop();
-    //        System.TimeSpan timeTaken = stopwatch.Elapsed;
-    //        UnityEngine.Debug.Log("Time taken: " + timeTaken.ToString(@"m\:ss\.fff"));
-    //    }
-
-    //}
 
     protected virtual void Init()
     {
@@ -84,57 +61,6 @@ public class Worldgeneration : NetworkBehaviour
         UnityEngine.Debug.Log("Init");
     }
 
-    //protected virtual void GenerateJobs(NativeArray<int>[] chunkArray)
-    //{
-    //  ////  NativeArray<int>[] chunkArray = new NativeArray<int>[horizontalChunks * verticalChunks];
-    //  //  for (int i = 0; i < chunkArray.Length; i++)
-    //  //  {
-    //  //      chunkArray[i] = new NativeArray<int>(width * height, Allocator.TempJob);
-    //  //  }
-    //    NativeList<JobHandle> jobsHandleList = new NativeList<JobHandle>(Allocator.Temp);
-
-    //    for (int i = 0; i < verticalChunks * horizontalChunks; i++)
-    //    {
-    //        JobsGenerate generateArray = new JobsGenerate
-    //        {
-    //            width = width, 
-    //            height = height,
-    //            map = chunkArray[i]
-    //        };
-    //        JobHandle jobHandle = generateArray.Schedule();
-    //        jobsHandleList.Add(jobHandle);
-    //    }
-
-
-    //    JobHandle.CompleteAll(jobsHandleList);
-    //    jobsHandleList.Dispose();
-    //    //for (int i = 0; i < chunkArray.Length; i++)
-    //    //{
-    //    //    RenderMapJobs(chunkArray[i], TileMapManager.Instance.GetTileChunk(i), tilebaseLookup["Dirt Block"]);
-    //    //    chunkArray[i].Dispose();
-    //    //}
-    //    UnityEngine.Debug.Log("GenerateChunk");
-    //}
-
-    //protected virtual void GenerateJobs(NativeArray<int> chunkArray)
-    //{
-    //    NativeList<JobHandle> jobsHandleList = new NativeList<JobHandle>(Allocator.Temp);
-
-    //    for (int i = 0; i < verticalChunks * horizontalChunks; i++)
-    //    {
-    //        JobsGenerate generateArray = new JobsGenerate
-    //        {
-    //            width = width,
-    //            height = height,
-    //            map = chunkArray
-    //        };
-    //        JobHandle jobHandle = generateArray.Schedule(chunkArray.Length, 100);
-    //        jobsHandleList.Add(jobHandle);
-    //    }
-    //    JobHandle.CompleteAll(jobsHandleList);
-    //    jobsHandleList.Dispose();
-    //}
-
     protected virtual void GenerateJobs(NativeArray<int> chunkArray)
     {
 
@@ -152,9 +78,10 @@ public class Worldgeneration : NetworkBehaviour
     protected virtual void Render(NativeArray<int>[] chunkArray)
     {
         //Loop through all chunks and render on the Tilemap
+        
         for (int i = 0; i < chunkArray.Length; i++)
         {
-            RenderMapJobs(chunkArray[i], TileMapManager.Instance.GetTileChunk(i), tilebaseLookup["Dirt Block"]);
+            RenderMapJobs(chunkArray[i], TileMapManager.Instance.GetTileChunk(i));
         }
     }
     #region NotJobs
@@ -221,7 +148,7 @@ public class Worldgeneration : NetworkBehaviour
         }
     }
     #endregion
-    public static void RenderMapJobs(NativeArray<int> map, Tilemap chunk, TileBase block)
+    public void RenderMapJobs(NativeArray<int> map, Tilemap chunk)
     {
         chunk.ClearAllTiles(); //Clear the map (ensures we dont overlap)
         Vector3Int[] tilepositions = new Vector3Int[width * height];
@@ -232,19 +159,55 @@ public class Worldgeneration : NetworkBehaviour
             {
                 int index = x * height + y;
                 tilepositions[index] = new Vector3Int(x, y, 0);
-                if (map[index] == 1) // 1 = tile, 0 = no tile
+                if (map[index] >= 1) // 1+ = tile, 0 = no tile
                 {
-                    // tilemap.SetTile(new Vector3Int(x, y, 0), block);
-                    tileArray[index] = block;
+                    tileArray[index] = tilebaseLookup[BlockType(map[index]) + " Block"];
                 }
                 else
                 {
-                    // tilemap.SetTile(new Vector3Int(x, y, 0), null);
                     tileArray[index] = null;
                 }
             }
         }
         chunk.SetTiles(tilepositions, tileArray);
+    }
+    protected virtual void RemoveLoneBlocks(Tilemap chunk)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height + (height / 2); y++)
+            {
+
+                if (chunk.HasTile(new Vector3Int(x, y, 0)) && !chunk.HasTile(new Vector3Int(x + 1, y, 0)) && !chunk.HasTile(new Vector3Int(x - 1, y, 0)) && !chunk.HasTile(new Vector3Int(x, y + 1, 0)) && !chunk.HasTile(new Vector3Int(x, y - 1, 0)))
+                {
+                    chunk.SetTile(new Vector3Int(x, y, 0), null);
+                }
+            }
+
+        }
+    }
+
+    private string BlockType(int block)
+    {
+        switch (blockTypeConversion = (BlockTypeConversion)block)
+        {
+            case BlockTypeConversion.Empty:
+                return "";
+            case BlockTypeConversion.Dirt:
+                return BlockTypeConversion.Dirt.ToString();
+            case BlockTypeConversion.Stone:
+                return BlockTypeConversion.Stone.ToString();
+            case BlockTypeConversion.Copper:
+                return BlockTypeConversion.Copper.ToString();
+            case BlockTypeConversion.Iron:
+                return BlockTypeConversion.Iron.ToString();
+            case BlockTypeConversion.Coal:
+                return BlockTypeConversion.Coal.ToString();
+            case BlockTypeConversion.Gold:
+                return BlockTypeConversion.Gold.ToString();
+            default:
+                return "";
+        }
     }
 
 }
@@ -266,4 +229,17 @@ public struct JobsTopTerrain : IJobParallelFor
     {
         throw new System.NotImplementedException();
     }
+}
+
+public enum BlockTypeConversion
+{
+    Empty, 
+    Dirt,
+    Stone,
+    Copper,
+    Iron,
+    Coal,
+    Gold,
+
+
 }

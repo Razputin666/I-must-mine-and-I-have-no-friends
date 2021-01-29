@@ -14,14 +14,16 @@ public class ChunkSettings : NetworkBehaviour
     public Tilemap tileChunk;
     [SerializeField] public TileBase[] tilebases;
     [SerializeField] private bool SetJobs;
-    private LevelGeneratorLayered mapGen;
-    private int width;
-    private int height;
-    //private bool hasInitialized = false;
+    private Worldgeneration mapGen;
+    private int width = Worldgeneration.width;
+    private int height = Worldgeneration.height;
+    private bool hasInitialized = false;
+    private TileBase[] blocks;
+    private Dictionary<string, TileBase> tilebaseLookup;
 
     public override void OnStartServer()
     {
-        Init();
+     //   Invoke("Init", 5f);
     }
 
     public void Init()
@@ -29,17 +31,19 @@ public class ChunkSettings : NetworkBehaviour
         //if (hasInitialized)
         //    return;
 
-        //hasInitialized = true;
+        hasInitialized = true;
 
-        mapGen = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
-        width = (int)gameObject.transform.position.x + mapGen.width;
-        height = (int)gameObject.transform.position.y + mapGen.height;
+        mapGen = GameObject.Find("WorldGen").GetComponent<Worldgeneration>();
+        tilebaseLookup = mapGen.tilebaseLookup;
+        blocks = mapGen.blocks;
+        width += (int)gameObject.transform.position.x;
+        height += (int)gameObject.transform.position.y;
         tileChunk = GetComponent<Tilemap>();
         //TreeGrowth();
-
+        Debug.Log("chunker");
         StartCoroutine(GrassGrowth());
     }
-
+     
     public IEnumerator GrassGrowth()
     {
         for (int i = 0; i < width; i++)
@@ -48,22 +52,22 @@ public class ChunkSettings : NetworkBehaviour
             for (int j = height; j < height * 2; j++)
             {
                // yield return new WaitForSeconds(0.02f);
-                if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i,j + 1, 0)) && tileChunk.GetTile(new Vector3Int(i, j, 0)) == tilebases[3])
+                if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i,j + 1, 0)) && tileChunk.GetTile(new Vector3Int(i, j, 0)) == tilebaseLookup["Dirt Block"])
                 {
                     int randomizer = UnityEngine.Random.Range(1, 10);
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0.01f, 0.2f));
                     if (randomizer > 5)
                     {
-                        TileMapManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j, 0), tilebases[0].name);
+                        TileMapManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j, 0), "Plants");
                     }
                 }
-                else if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i, j + 1, 0)) && tileChunk.GetTile(new Vector3Int(i, j, 0)) == tilebases[0])
+                else if (tileChunk.HasTile(new Vector3Int(i, j, 0)) && j > height && !tileChunk.HasTile(new Vector3Int(i, j + 1, 0)) && tileChunk.GetTile(new Vector3Int(i, j, 0)) == tilebaseLookup["Dirt Block"])
                 {
                     int randomizer = UnityEngine.Random.Range(1, 10);
                     yield return new WaitForSeconds(UnityEngine.Random.Range(0.01f, 0.2f));
                     if (randomizer > 5)
                     {
-                        TileMapManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j + 1, 0), tilebases[2].name);
+                        TileMapManager.Instance.UpdateTilemap(tileChunk.name, new Vector3Int(i, j + 1, 0), "Grass Block");
                     }   
                 }
             }
@@ -99,9 +103,11 @@ public class ChunkSettings : NetworkBehaviour
 
     private void Update()
     {
-        if (!isServer)
-            return;
-
+        //if (!isServer)
+        //    return;
+        if(!hasInitialized)
+        Init();
+        
         grassGrowthTimer += Time.deltaTime;
         
         if(grassGrowthTimer > 30)
@@ -110,7 +116,6 @@ public class ChunkSettings : NetworkBehaviour
             grassGrowthTimer = 0f;
         }
     }
-
 
     //private JobHandle CheckChunks(int i)
     //{
