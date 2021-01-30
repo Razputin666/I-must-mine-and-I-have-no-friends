@@ -53,6 +53,9 @@ struct PNode
     public bool isWalkable;
     public bool hasBlock;
 
+    public int openListIndex;
+    public bool isOnOpenList;
+    public bool isOnClosedList;
     public void CalculateFCost()
     {
         fCost = gCost + hCost;
