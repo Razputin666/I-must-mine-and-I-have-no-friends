@@ -45,7 +45,6 @@ struct PNode
 
     public int gCost;
     public int hCost;
-    public int fCost;
 
     public int cameFromNodeIndex;
     public int index;
@@ -56,10 +55,16 @@ struct PNode
     public int openListIndex;
     public bool isOnOpenList;
     public bool isOnClosedList;
-    public void CalculateFCost()
+    //public void CalculateFCost()
+    //{
+    //    fCost = gCost + hCost;
+    //}
+
+    public int FCost
     {
-        fCost = gCost + hCost;
+        get { return gCost + hCost; }
     }
+
     public void SetIsWalkable(bool value)
     {
         isWalkable = value;

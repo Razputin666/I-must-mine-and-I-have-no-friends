@@ -13,22 +13,71 @@ public class PathfindingDots
     private const int MINING_COST_PER_STR = 15;
     public static PathfindingDots Instance { private set; get; }
 
-    public GridGen<GridNode> pathfindingGrid;
-    private GridRegion[] pathfindingRegions;
+    //public GridGen<GridNode> pathfindingGrid;
 
+    private GridRegion[] pathfindingRegions;
+    private NativeArray<PNode> pathNodeArray2;
     private int gridWidth;
     private int gridHeight;
+    private Vector3 startPosition;
     public PathfindingDots(int width, int height, Vector3 startPosition)
     {
         if (Instance != this && Instance != null)
             Debug.Log("Wrong instance");
 
         Instance = this;
-        pathfindingGrid = new GridGen<GridNode>(width, height, 1f, startPosition, (GridGen<GridNode> grid, int x, int y) => new GridNode(grid, x, y));
 
         gridWidth = width;
         gridHeight = height;
+        this.startPosition = startPosition;
+        //pathfindingGrid = new GridGen<GridNode>(width, height, 1f, startPosition, (GridGen<GridNode> grid, int x, int y) => new GridNode(grid, x, y));
+
+        pathNodeArray2 = new NativeArray<PNode>(width * height, Allocator.Persistent);
+        InitializeGrid();
+
         //CreateRegions(width, height, startPosition);
+    }
+
+    public void OnExit()
+    {
+        pathNodeArray2.Dispose();
+    }
+
+    private void InitializeGrid()
+    {
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                PNode pathNode = new PNode();
+                pathNode.x = x;
+                pathNode.y = y;
+                pathNode.index = CalculateIndex(x, y, gridWidth);
+
+                pathNode.gCost = int.MaxValue;
+
+                pathNode.hasBlock = true;
+                pathNode.isWalkable = true;
+                pathNode.cameFromNodeIndex = -1;
+
+                pathNode.openListIndex = -1;
+                pathNode.isOnClosedList = false;
+                pathNode.isOnOpenList = false;
+
+                pathNodeArray2[pathNode.index] = pathNode;
+            }
+        }
+    }
+
+    private void GetXY(Vector3 worldPosition, out int x, out int y)
+    {
+        x = Mathf.FloorToInt((worldPosition - startPosition).x);
+        y = Mathf.FloorToInt((worldPosition - startPosition).y);
+    }
+
+    private Vector3 GetWorldPosition(int x, int y)
+    {
+        return new Vector3(x, y) + startPosition;
     }
 
     private void CreateRegions(int width, int height, Vector3 startPos)
@@ -75,51 +124,68 @@ public class PathfindingDots
 
     public void UpdateGridWalkable(Vector3 worldPosition, bool isWalkable)
     {
-        GridNode pathNode = pathfindingGrid.GetGridObject(worldPosition);
+        //GridNode pathNode = pathfindingGrid.GetGridObject(worldPosition);
+        GetXY(worldPosition, out int x, out int y);
+        int index = CalculateIndex(x, y, gridWidth);
+        
+        PNode pathNode = pathNodeArray2[index];
+        pathNode.isWalkable = isWalkable;
 
-        pathNode.IsWalkable = isWalkable;
+        pathNodeArray2[index] = pathNode;
     }
 
     public void UpdateGridMineable(Vector3 worldPosition, bool hasBlock)
     {
-        GridNode pathNode = pathfindingGrid.GetGridObject(worldPosition);
+        //GridNode pathNode = pathfindingGrid.GetGridObject(worldPosition);
 
-        pathfindingGrid.GetXY(worldPosition, out int x, out int y);
-        if (y + 1 < pathfindingGrid.GetHeight()) // Check the node above is inside grid
-        {
-            UpdateGridWalkable(worldPosition + Vector3.up, hasBlock);
-        }
+        //pathfindingGrid.GetXY(worldPosition, out int x, out int y);
+        //if (y + 1 < pathfindingGrid.GetHeight()) // Check the node above is inside grid
+        //{
+        //    UpdateGridWalkable(worldPosition + Vector3.up, hasBlock);
+        //}
 
         //int gridX = (int)worldPosition.x / gridWidth;
         //int gridY = (int)worldPosition.y / gridHeight;
-        
+
         //int index = gridX * gridHeight + gridY;
 
         //GridRegion gridRegion = pathfindingRegions[index];
         //GridNode pathNode = gridRegion.Grid.GetGridObject(worldPosition);
 
-        pathNode.HasBlock = hasBlock;
+        GetXY(worldPosition, out int x, out int y);
+        int index = CalculateIndex(x, y, gridWidth);
+
+        PNode pathNode = pathNodeArray2[index];
+        pathNode.hasBlock = hasBlock;
+
+        pathNodeArray2[index] = pathNode;
     }
 
     public List<Vector3> FindPath(Vector3Int startWorldPosition, Vector3Int endWorldPosition)
     {
-        int gridWidth = pathfindingGrid.GetWidth();
-        int gridHeight = pathfindingGrid.GetHeight();
+        //int gridWidth = pathfindingGrid.GetWidth();
+        //int gridHeight = pathfindingGrid.GetHeight();
         
         int2 gridSize = new int2(gridWidth, gridHeight);
 
-        pathfindingGrid.GetXY(startWorldPosition, out int startX, out int startY);
-        pathfindingGrid.GetXY(endWorldPosition, out int endX, out int endY);
+        GetXY(startWorldPosition, out int startX, out int startY);
+        GetXY(endWorldPosition, out int endX, out int endY);
 
         int2 startPosition = new int2(startX, startY);
         int2 endPosition = new int2(endX, endY);
-        NativeArray<PNode> pathNodeArray = GetPathNodeArray();
 
+        //System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        //stopwatch.Start();
+        //NativeArray<PNode> pathNodeArray = GetPathNodeArray();
+        //stopwatch.Stop();
+
+        //System.TimeSpan timeTaken = stopwatch.Elapsed;
+        //Debug.Log("Time taken Copy Array: " + timeTaken.ToString(@"m\:ss\.fff"));
         //NativeArray<PNode> tmpPathNodeArray = new NativeArray<PNode>(pathNodeArray, Allocator.TempJob);
         FindPathJob findPathJob = new FindPathJob
         {
             gridSize = gridSize,
-            pathNodeArray = pathNodeArray,
+            pathNodeArray = pathNodeArray2,
             startPosition = startPosition,
             endPosition = endPosition
         };
@@ -128,57 +194,57 @@ public class PathfindingDots
 
         jobHandle.Complete();
         int endNodeIndex = CalculateIndex(endPosition.x, endPosition.y, gridWidth);
-        PNode endNode = pathNodeArray[endNodeIndex];
+        PNode endNode = pathNodeArray2[endNodeIndex];
         
-        NativeList<int2> pathNative = CalculatePath(pathNodeArray, endNode);
+        NativeList<int2> pathNative = CalculatePath(pathNodeArray2, endNode);
         
-        GridGen<GridNode> grid = pathfindingGrid;
+        //GridGen<GridNode> grid = pathfindingGrid;
         List<Vector3> path = new List<Vector3>();
         for (int i = 0; i < pathNative.Length; i++)
         {
-            Vector3 worldPosition = grid.GetWorldPosition(pathNative[i].x, pathNative[i].y);
+            Vector3 worldPosition = GetWorldPosition(pathNative[i].x, pathNative[i].y);
             path.Add(new Vector3(worldPosition.x, worldPosition.y));
         }
         path.Reverse();
         pathNative.Dispose();
-        pathNodeArray.Dispose();
+        //pathNodeArray.Dispose();
 
         return path;
     }
 
-    private NativeArray<PNode> GetPathNodeArray()
-    {
-        GridGen<GridNode> grid = pathfindingGrid;
+    //private NativeArray<PNode> GetPathNodeArray()
+    //{
+    //    GridGen<GridNode> grid = pathfindingGrid;
         
-        int2 gridSize = new int2(grid.GetWidth(), grid.GetHeight());
-        NativeArray<PNode> pathNodeArray = new NativeArray<PNode>(gridSize.x * gridSize.y, Allocator.TempJob);
+    //    int2 gridSize = new int2(grid.GetWidth(), grid.GetHeight());
+    //    NativeArray<PNode> pathNodeArray = new NativeArray<PNode>(gridSize.x * gridSize.y, Allocator.TempJob);
 
-        for (int x = 0; x < grid.GetWidth(); x++)
-        {
-            for (int y = 0; y < grid.GetHeight(); y++)
-            {
-                PNode pathNode = new PNode();
-                pathNode.x = x;
-                pathNode.y = y;
-                pathNode.index = CalculateIndex(x, y, gridSize.x);
+    //    for (int x = 0; x < gridSize.x; x++)
+    //    {
+    //        for (int y = 0; y < gridSize.y; y++)
+    //        {
+    //            PNode pathNode = new PNode();
+    //            pathNode.x = x;
+    //            pathNode.y = y;
+    //            pathNode.index = CalculateIndex(x, y, gridSize.x);
 
-                pathNode.gCost = int.MaxValue;
+    //            pathNode.gCost = int.MaxValue;
 
-                pathNode.hasBlock = grid.GetGridObject(x, y).HasBlock;
-                pathNode.isWalkable = grid.GetGridObject(x, y).IsWalkable;
-                pathNode.cameFromNodeIndex = -1;
+    //            pathNode.hasBlock = grid.GetGridObject(x, y).HasBlock;
+    //            pathNode.isWalkable = grid.GetGridObject(x, y).IsWalkable;
+    //            pathNode.cameFromNodeIndex = -1;
 
-                pathNode.openListIndex = -1;
-                pathNode.isOnClosedList = false;
-                pathNode.isOnOpenList = false;
+    //            pathNode.openListIndex = -1;
+    //            pathNode.isOnClosedList = false;
+    //            pathNode.isOnOpenList = false;
 
-                pathNodeArray[pathNode.index] = pathNode;
-            }
-        }
+    //            pathNodeArray[pathNode.index] = pathNode;
+    //        }
+    //    }
 
-        return pathNodeArray;
-    }
-
+    //    return pathNodeArray;
+    //}
+    [BurstCompile]
     private struct FindPathJob : IJob
     {
         public int2 gridSize;
@@ -192,7 +258,12 @@ public class PathfindingDots
             {
                 PNode pathNode = pathNodeArray[i];
                 pathNode.hCost = CalculateDistanceCost(new int2(pathNode.x, pathNode.y), endPosition);
+                pathNode.gCost = int.MaxValue;
                 pathNode.cameFromNodeIndex = -1;
+
+                pathNode.openListIndex = -1;
+                pathNode.isOnClosedList = false;
+                pathNode.isOnOpenList = false;
 
                 pathNodeArray[i] = pathNode;
             }
@@ -212,7 +283,7 @@ public class PathfindingDots
 
             PNode startNode = pathNodeArray[CalculateIndex(startPosition.x, startPosition.y, gridSize.x)];
             startNode.gCost = 0;
-            startNode.CalculateFCost();
+            //startNode.CalculateFCost();
 
             openList.Add(startNode.index);
 
@@ -236,7 +307,7 @@ public class PathfindingDots
 
                 openList.RemoveAtSwapBack(currentNode.openListIndex);
 
-                closedList.Add(currentNodeIndex);
+                closedList.Add(currentNodeIndex); //Kanske kan tas bort
 
                 currentNode.isOnClosedList = true;
                 currentNode.isOnOpenList = false;
@@ -246,12 +317,12 @@ public class PathfindingDots
                 for (int i = 0; i < neighbourOffsetArray.Length; i++)
                 {
                     int2 neighbourOffset = neighbourOffsetArray[i];
-                    int2 neighbourPosition = new int2(currentNode.x + neighbourOffset.x, currentNode.y + neighbourOffset.y);
+                    int2 neighbourNodePosition = new int2(currentNode.x + neighbourOffset.x, currentNode.y + neighbourOffset.y);
 
-                    if (!IsPositionInsideGrid(neighbourPosition, gridSize))
+                    if (!IsPositionInsideGrid(neighbourNodePosition, gridSize))
                         continue; // Continue to the next Neighbour
 
-                    int neighboutNodeIndex = CalculateIndex(neighbourPosition.x, neighbourPosition.y, gridSize.x);
+                    int neighboutNodeIndex = CalculateIndex(neighbourNodePosition.x, neighbourNodePosition.y, gridSize.x);
                     
                     PNode neighbourNode = pathNodeArray[neighboutNodeIndex];
 
@@ -261,19 +332,19 @@ public class PathfindingDots
                     if (!neighbourNode.isWalkable)
                         continue; // Not walkable
 
-                    int nodesNeededToMine = GetNodesNeededToMine(pathNodeArray, currentNode, neighbourNode, gridSize);
+                    //int nodesNeededToMine = GetNodesNeededToMine(pathNodeArray, currentNode, neighbourNode, gridSize);
 
                     int2 currentNodePosition = new int2(currentNode.x, currentNode.y);
 
-                    int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNodePosition, neighbourPosition);
+                    int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNodePosition, neighbourNodePosition);
 
-                    tentativeGCost += nodesNeededToMine * MINING_COST_PER_STR;
+                    //tentativeGCost += nodesNeededToMine * MINING_COST_PER_STR;
 
                     if (tentativeGCost < neighbourNode.gCost)
                     {
                         neighbourNode.cameFromNodeIndex = currentNodeIndex;
                         neighbourNode.gCost = tentativeGCost;
-                        neighbourNode.CalculateFCost();
+                        //neighbourNode.CalculateFCost();
                         
                         if (!neighbourNode.isOnOpenList)
                         {
@@ -322,7 +393,7 @@ public class PathfindingDots
 
             PNode startNode = pathNodeArray[CalculateIndex(startPosition.x, startPosition.y, gridSize.x)];
             startNode.gCost = 0;
-            startNode.CalculateFCost();
+            //startNode.CalculateFCost();
             pathNodeArray[startNode.index] = startNode;
 
             NativeList<int> openList = new NativeList<int>(Allocator.Temp);
@@ -383,19 +454,19 @@ public class PathfindingDots
                     //        continue;
                     //    }
                     //}
-                    int nodesNeededToMine = GetNodesNeededToMine(pathNodeArray, currentNode, neighbourNode, gridSize);
+                    //int nodesNeededToMine = GetNodesNeededToMine(pathNodeArray, currentNode, neighbourNode, gridSize);
 
                     int2 currentNodePosition = new int2(currentNode.x, currentNode.y);
 
                     int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNodePosition, neighbourPosition);
 
-                    tentativeGCost += nodesNeededToMine * MINING_COST_PER_STR;
+                    //tentativeGCost += nodesNeededToMine * MINING_COST_PER_STR;
 
                     if (tentativeGCost < neighbourNode.gCost)
                     {
                         neighbourNode.cameFromNodeIndex = currentNodeIndex;
                         neighbourNode.gCost = tentativeGCost;
-                        neighbourNode.CalculateFCost();
+                        //neighbourNode.CalculateFCost();
                         pathNodeArray[neighboutNodeIndex] = neighbourNode;
 
                         if (!openList.Contains(neighbourNode.index))
@@ -533,9 +604,9 @@ public class PathfindingDots
     {
         int xDistance = Mathf.Abs(aPosition.x - bPosition.x);
         int yDistance = Mathf.Abs(aPosition.y - bPosition.y);
-        int remaining = Mathf.Abs(xDistance - yDistance);
+        int distance = Mathf.Abs(xDistance + yDistance);
 
-        return MOVE_DIAGONAL_COST * Mathf.Min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
+        return MOVE_STRAIGHT_COST * distance;
     }
 
     private static int GetLowestFCostNodeIndex(NativeList<int> openList, NativeArray<PNode> pathNodeArray)
@@ -544,7 +615,7 @@ public class PathfindingDots
         for (int i = 1; i < openList.Length; i++)
         {
             PNode testPathNode = pathNodeArray[openList[i]];
-            if (testPathNode.fCost < lowestFCostNode.fCost)
+            if (testPathNode.FCost < lowestFCostNode.FCost)
             {
                 lowestFCostNode = testPathNode;
             }

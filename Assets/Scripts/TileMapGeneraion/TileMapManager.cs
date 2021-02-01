@@ -130,7 +130,7 @@ public class TileMapManager : NetworkBehaviour
         Tilemap tilemap = GetTilemap(tilemapName);
         if(tilemap != null)
             return tilemap.GetComponent<TilemapSyncer>().UpdateTilemap(tilePositionCell, tileBaseName);
-
+        
         return false;
     }
 
@@ -140,6 +140,35 @@ public class TileMapManager : NetworkBehaviour
         return tilemap.GetComponent<TilemapSyncer>().UpdateTilemap(tilePositionCell, tileBase);
     }
 
+    [Server]
+    public TileBase GetTile(Vector3Int tilePositionWorld)
+    {
+        foreach (Tilemap tilemap in Tilemaps)
+        {
+            Vector2 worldPos = new Vector2(tilePositionWorld.x, tilePositionWorld.y);
+            BoundsInt bounds = tilemap.cellBounds;
+            Vector3 tilemapPos = tilemap.transform.position;
+            if (IsInside(tilemapPos, bounds.size, worldPos))
+            {
+                Vector3Int tilePositionCell = tilemap.WorldToCell(tilePositionWorld);
+                return tilemap.GetTile(tilePositionCell);
+            } 
+        }
+
+        return null;
+    }
+    private bool IsInside(Vector3 pos, Vector3Int size, Vector2 point)
+    {
+        if (pos.x <= point.x &&
+            point.x <= pos.x + size.x &&
+            pos.y <= point.y &&
+            point.y <= pos.y + size.y)
+        {
+            return true;
+        }
+
+        return false;
+    }
     [Client]
     public void InitTilemaps()
     {

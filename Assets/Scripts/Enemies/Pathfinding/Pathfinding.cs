@@ -77,7 +77,7 @@ public class Pathfinding
             Debug.LogError("EndNode is null at: " + endX + "," + endY);
             return null;
         }
-            
+        
         openList = new List<PathNode>() { startNode };
         closedList = new List<PathNode>();
 

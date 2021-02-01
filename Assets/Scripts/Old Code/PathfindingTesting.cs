@@ -6,22 +6,28 @@ public class PathfindingTesting : MonoBehaviour
 {
     private void Start()
     {
-        int width = 1000;
-        int height = 1000;
+        int width = 4000;
+        int height = 4000;
 
         PathfindingDots pathfindingDots = new PathfindingDots(width, height, Vector3.zero);
         //Pathfinding pathfinding = new Pathfinding(width, height, Vector3.zero);
+        
     }
 
     private void Update()
     {
-        Pathfind();
+        Pathfind(false);
     }
 
-    private void Pathfind()
+    private void OnApplicationQuit()
+    {
+        PathfindingDots.Instance.OnExit();
+    }
+
+    private void Pathfind(bool debug)
     {
         Vector3Int startPos = Vector3Int.zero;
-        Vector3Int endPos = new Vector3Int(150, 100, 0);
+        Vector3Int endPos = new Vector3Int(500, 400, 0);
 
         System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
         stopwatch.Start();
@@ -37,11 +43,14 @@ public class PathfindingTesting : MonoBehaviour
 
         //timeTaken = stopwatch.Elapsed;
         //Debug.Log("Time taken: " + timeTaken.ToString(@"m\:ss\.fff"));
-
-        //Debug.Log(path1.Count + ", " + path2.Count);
-        //for (int i = 0; i < path1.Count; i++)
-        //{
-        //    Debug.Log(i + " path1: " + path1[i] + " path2: " + path2[i]);
-        //}
+        if(debug)
+        {
+            //Debug.Log(path1.Count + ", " + path2.Count);
+            for (int i = 0; i < path1.Count; i++)
+            {
+                Debug.Log(i + " path1: " + path1[i]);// + " path2: " + path2[i]);
+            }
+        }
+        
     }
 }
