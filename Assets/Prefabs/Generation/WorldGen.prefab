@@ -61,7 +61,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneId: 0
-  serverOnly: 0
+  serverOnly: 1
   m_AssetId: 
   hasSpawned: 0
 --- !u!114 &1522409692357797863
@@ -78,11 +78,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  mapManager: {fileID: 1508111169}
   grid: {fileID: 0}
-  horizontalChunks: 10
-  verticalChunks: 7
+  horizontalChunks: 8
+  verticalChunks: 8
   chunkPrefab: {fileID: 4802906064719502046, guid: f1fc65f761491f74abdd69e1daf070b8,
     type: 3}
   defaultChunk: {fileID: 11400000, guid: 142c074dbc6f1554eb927690b627468c, type: 2}
+  oreAmount: 30
   useJobs: 1
   chunks: []
+  blocks: []

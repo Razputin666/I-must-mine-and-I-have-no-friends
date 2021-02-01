@@ -6,6 +6,7 @@ using Mirror;
 using Unity.Jobs;
 using Unity.Collections;
 using System.Diagnostics;
+using System;
 
 public class Worldgeneration : NetworkBehaviour
 {
@@ -18,11 +19,11 @@ public class Worldgeneration : NetworkBehaviour
     [Range(100, 1)]
     [SerializeField] protected int oreAmount;
     [SerializeField] protected bool useJobs;
-    
+
     #endregion
     #region Constantvalues
-    public const int height = 50;
-    public const int width = 50;
+    protected const int height = 50;  
+    protected const int width = 50;
     protected const int copperModifier = 3000;
     protected const int ironModifier = 1800;
     protected const int coalModifier = 3300;
@@ -33,10 +34,13 @@ public class Worldgeneration : NetworkBehaviour
     [HideInInspector] public TileBase[] blocks;
     [HideInInspector] public Dictionary<string, TileBase> tilebaseLookup;
     private BlockTypeConversion blockTypeConversion;
+    public static Worldgeneration Instance { get; private set; }
+
 
 
     protected virtual void Init()
     {
+        Instance = this;
         tilebaseLookup = new Dictionary<string, TileBase>();
         blocks = Resources.LoadAll<TileBase>("Tilebase");
         foreach (var tilebase in blocks)
@@ -53,12 +57,14 @@ public class Worldgeneration : NetworkBehaviour
                 GameObject chunk = Instantiate(chunkPrefab, grid.transform);
                 chunk.name = "Chunk_" + index;
                 TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
+                NetworkServer.Spawn(chunk);
                 chunk.transform.position = new Vector2(startPosition.x, startPosition.y);
                 startPosition.y += height;
             }
             startPosition.x += width;
         }
-        UnityEngine.Debug.Log("Init");
+        blockTypeConversion = (BlockTypeConversion)Enum.Parse(typeof(BlockTypeConversion), "CoalBlock");
+        UnityEngine.Debug.Log((int)blockTypeConversion);
     }
 
     protected virtual void GenerateJobs(NativeArray<int> chunkArray)
@@ -161,7 +167,7 @@ public class Worldgeneration : NetworkBehaviour
                 tilepositions[index] = new Vector3Int(x, y, 0);
                 if (map[index] >= 1) // 1+ = tile, 0 = no tile
                 {
-                    tileArray[index] = tilebaseLookup[BlockType(map[index]) + " Block"];
+                    tileArray[index] = tilebaseLookup[BlockType(map[index])];
                 }
                 else
                 {
@@ -170,6 +176,7 @@ public class Worldgeneration : NetworkBehaviour
             }
         }
         chunk.SetTiles(tilepositions, tileArray);
+       
     }
     protected virtual void RemoveLoneBlocks(Tilemap chunk)
     {
@@ -193,23 +200,56 @@ public class Worldgeneration : NetworkBehaviour
         {
             case BlockTypeConversion.Empty:
                 return "";
-            case BlockTypeConversion.Dirt:
-                return BlockTypeConversion.Dirt.ToString();
-            case BlockTypeConversion.Stone:
-                return BlockTypeConversion.Stone.ToString();
-            case BlockTypeConversion.Copper:
-                return BlockTypeConversion.Copper.ToString();
-            case BlockTypeConversion.Iron:
-                return BlockTypeConversion.Iron.ToString();
-            case BlockTypeConversion.Coal:
-                return BlockTypeConversion.Coal.ToString();
-            case BlockTypeConversion.Gold:
-                return BlockTypeConversion.Gold.ToString();
+            case BlockTypeConversion.DirtBlock:
+                return BlockTypeConversion.DirtBlock.ToString();
+            case BlockTypeConversion.StoneBlock:
+                return BlockTypeConversion.StoneBlock.ToString();
+            case BlockTypeConversion.CopperBlock:
+                return BlockTypeConversion.CopperBlock.ToString();
+            case BlockTypeConversion.IronBlock:
+                return BlockTypeConversion.IronBlock.ToString();
+            case BlockTypeConversion.CoalBlock:
+                return BlockTypeConversion.CoalBlock.ToString();
+            case BlockTypeConversion.GoldBlock:
+                return BlockTypeConversion.GoldBlock.ToString();
+            case BlockTypeConversion.GrassBlock:
+                return BlockTypeConversion.GrassBlock.ToString();
+            case BlockTypeConversion.Plant:
+                return BlockTypeConversion.Plant.ToString();
             default:
                 return "";
         }
     }
 
+    public int GetVerticalChunks
+    {
+        get { return verticalChunks; }
+    }
+
+    public int GetHorizontalChunks
+    {
+        get { return horizontalChunks; }
+    }
+
+    public int GetHeight
+    {
+        get { return height; }
+    }
+
+    public int GetWidth
+    {
+        get { return width; }
+    }
+
+    public int GetWorldWidth
+    {
+        get { return width * horizontalChunks; }
+    }
+
+    public int GetWorldHeight
+    {
+        get { return height * verticalChunks; }
+    }
 }
 
 public struct JobsGenerate : IJobParallelFor
@@ -234,12 +274,12 @@ public struct JobsTopTerrain : IJobParallelFor
 public enum BlockTypeConversion
 {
     Empty, 
-    Dirt,
-    Stone,
-    Copper,
-    Iron,
-    Coal,
-    Gold,
-
-
+    DirtBlock,
+    StoneBlock,
+    CopperBlock,
+    IronBlock,
+    CoalBlock,
+    GoldBlock,
+    GrassBlock,
+    Plant,
 }

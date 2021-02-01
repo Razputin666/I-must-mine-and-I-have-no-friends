@@ -21,10 +21,10 @@ public class DefaultPlanetGeneration : Worldgeneration
         CreateTopTerrain(topLayer);
         CreateCaveTerrain(worldArray);
         AddCommonBlocks(worldArray);
-        AddOreBlocks(worldArray, (int)BlockTypeConversion.Copper);
-        AddOreBlocks(worldArray, (int)BlockTypeConversion.Iron);
-        AddOreBlocks(worldArray, (int)BlockTypeConversion.Coal);
-        AddOreBlocks(worldArray, (int)BlockTypeConversion.Gold);
+        AddOreBlocks(worldArray, (int)BlockTypeConversion.CopperBlock);
+        AddOreBlocks(worldArray, (int)BlockTypeConversion.IronBlock);
+        AddOreBlocks(worldArray, (int)BlockTypeConversion.CoalBlock);
+        AddOreBlocks(worldArray, (int)BlockTypeConversion.GoldBlock);
 
         //Copy values from the array with the topWalk values to the array with the entire world
 
@@ -84,7 +84,13 @@ public class DefaultPlanetGeneration : Worldgeneration
             chunkArray[i].Dispose();
         }
         topLayer.Dispose();
+
+        // Skapar en ny persistent array som skickas till tilemapmanager för att kunna uppdateras. Vet inte om det här behöver nån nätverkgrej?
+        NativeArray<int> world = new NativeArray<int>(worldArray, Allocator.Persistent);
+        TileMapManager.Instance.worldArray = world;
+
         worldArray.Dispose();
+      //  InvokeRepeating("UpdateMap", 1f, 1f);
 
     }
 
@@ -102,7 +108,7 @@ public class DefaultPlanetGeneration : Worldgeneration
                 if ((x == 0 || y == 0 || x == width * horizontalChunks - 1 || y == height * verticalChunks - 1) && edgeWall > 0)
                 {
                     //Keep the edges as walls
-                    mapCoords[x * height * verticalChunks + y] = (int)BlockTypeConversion.Stone;
+                    mapCoords[x * height * verticalChunks + y] = (int)BlockTypeConversion.StoneBlock;
                 }
                 else
                 {
@@ -113,11 +119,11 @@ public class DefaultPlanetGeneration : Worldgeneration
                     if (newPoint == 1 && mapCoords[x * height * verticalChunks + y] > 0 && intRnd > y)
                     {
 
-                        mapCoords[x * height * verticalChunks + y] = (int)BlockTypeConversion.Stone;
+                        mapCoords[x * height * verticalChunks + y] = (int)BlockTypeConversion.StoneBlock;
                     }
                     else if (mapCoords[x * height * verticalChunks + y] > 0)
                     {
-                        mapCoords[x * height * verticalChunks + y] = (int)BlockTypeConversion.Dirt;
+                        mapCoords[x * height * verticalChunks + y] = (int)BlockTypeConversion.DirtBlock;
                     }
 
                 }
@@ -397,7 +403,7 @@ public class DefaultPlanetGeneration : Worldgeneration
             //Work our way from the height down to 0
             for (int y = lastHeight; y >= 0; y--)
             {
-                mapCoords[x * height + y] = (int)BlockTypeConversion.Dirt;
+                mapCoords[x * height + y] = (int)BlockTypeConversion.DirtBlock;
             }
 
             //for (int y = height - 1; y > lastHeight; y--)
@@ -637,23 +643,49 @@ public class DefaultPlanetGeneration : Worldgeneration
         {
             case BlockTypeConversion.Empty:
                 return 0;
-            case BlockTypeConversion.Dirt:
+            case BlockTypeConversion.DirtBlock:
                 return 0;
-            case BlockTypeConversion.Stone:
+            case BlockTypeConversion.StoneBlock:
                 return 0;
-            case BlockTypeConversion.Copper:
+            case BlockTypeConversion.CopperBlock:
                 return copperModifier;
-            case BlockTypeConversion.Iron:
+            case BlockTypeConversion.IronBlock:
                 return ironModifier;
-            case BlockTypeConversion.Coal:
+            case BlockTypeConversion.CoalBlock:
                 return coalModifier;
-            case BlockTypeConversion.Gold:
+            case BlockTypeConversion.GoldBlock:
                 return goldModifier;
             default:
                 return 0;
         }
     }
 
+    //private NativeArray<int> GrassGrowth(NativeArray<int> worldArray)
+    //{
+    //    for (int x = 0; x < width * horizontalChunks; x++)
+    //    {
+    //        for (int y = (height * verticalChunks) - (height * 2); y < height * verticalChunks; y++)
+    //        {
+    //            if (worldArray[x * height * verticalChunks + y] == (int)BlockTypeConversion.GrassBlock && worldArray[x * height * verticalChunks + y + 1] == (int)BlockTypeConversion.Empty)
+    //            {
+    //                int randomizer = UnityEngine.Random.Range(1, 10);
+    //                if (randomizer > 5)
+    //                {
+    //                    worldArray[x * height * verticalChunks + y + 1] = (int)BlockTypeConversion.Plant;
+    //                }
+    //            }
+    //            else if (worldArray[x * height * verticalChunks + y] == (int)BlockTypeConversion.DirtBlock && worldArray[x * height * verticalChunks + y + 1] == (int)BlockTypeConversion.Empty)
+    //            {
+    //                int randomizer = UnityEngine.Random.Range(1, 10);
+    //                if (randomizer > 5)
+    //                {
+    //                    worldArray[x * height * verticalChunks + y + 1] = (int)BlockTypeConversion.GrassBlock;
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return worldArray;
+    //}
     #region oldcode
     public static int[,] RandomWalkTopSmoothed(int[,] map, float seed, int minSectionWidth, int randomizedRange)
     {

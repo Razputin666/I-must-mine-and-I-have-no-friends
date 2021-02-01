@@ -463,10 +463,6 @@ PrefabInstance:
       propertyPath: m_AssetId
       value: 2aebd52ad1cab5b4babd8935c208b58a
       objectReference: {fileID: 0}
-    - target: {fileID: 1508111170, guid: 2aebd52ad1cab5b4babd8935c208b58a, type: 3}
-      propertyPath: serverOnly
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1522409692357797863, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}
       propertyPath: grid
@@ -474,18 +470,13 @@ PrefabInstance:
       objectReference: {fileID: 479811913}
     - target: {fileID: 1522409692357797863, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}
-      propertyPath: oreAmount
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 1522409692357797863, guid: 2aebd52ad1cab5b4babd8935c208b58a,
-        type: 3}
       propertyPath: verticalChunks
-      value: 8
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 1522409692357797863, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}
       propertyPath: horizontalChunks
-      value: 8
+      value: 24
       objectReference: {fileID: 0}
     - target: {fileID: 3163931115760460336, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}
