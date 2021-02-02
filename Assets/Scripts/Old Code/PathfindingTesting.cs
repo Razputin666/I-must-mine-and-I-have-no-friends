@@ -11,12 +11,12 @@ public class PathfindingTesting : MonoBehaviour
 
         PathfindingDots pathfindingDots = new PathfindingDots(width, height, Vector3.zero);
         //Pathfinding pathfinding = new Pathfinding(width, height, Vector3.zero);
-        
+        Pathfind(true);
     }
 
     private void Update()
     {
-        Pathfind(false);
+        
     }
 
     private void OnApplicationQuit()
@@ -27,7 +27,7 @@ public class PathfindingTesting : MonoBehaviour
     private void Pathfind(bool debug)
     {
         Vector3Int startPos = Vector3Int.zero;
-        Vector3Int endPos = new Vector3Int(500, 400, 0);
+        Vector3Int endPos = new Vector3Int(500, 0, 0);
 
         System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
         stopwatch.Start();
