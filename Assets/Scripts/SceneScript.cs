@@ -18,9 +18,9 @@ public class SceneScript : NetworkBehaviour
         canvasStatusText.text = statusText;
     }
 
-    public void ButtonSendMessage()
-    {
-        if (playerController != null)
-            playerController.CmdSendPlayerMessage();
-    }
+    //public void ButtonSendMessage()
+    //{
+    //    if (playerController != null)
+    //        playerController.CmdSendPlayerMessage();
+    //}
 }
