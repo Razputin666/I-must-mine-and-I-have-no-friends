@@ -31,7 +31,6 @@ public class PlayerMovementController : NetworkBehaviour
         //faceMouse = GetComponentInChildren<FaceMouse>();
         armTransform = transform.Find("Gubb_arm");
         rb2d.simulated = true;
-        pathfinder = GetComponent<Pathfinder>();
     }
 
     public override void OnStartLocalPlayer()
@@ -63,14 +62,6 @@ public class PlayerMovementController : NetworkBehaviour
             //}
         }
     }
-    #region PF Testing
-    [Command]
-    private void CmdSetTargetPath(Vector3 targetPositon)
-    {
-        pathfinder.CalculatePath(transform.position + Vector3.down, targetPositon);
-    }
-
-    #endregion
     private void FixedUpdate() => Move();
 
     [Client]
