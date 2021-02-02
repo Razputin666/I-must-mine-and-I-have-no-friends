@@ -4,21 +4,6 @@ using UnityEngine;
 using Unity.Mathematics;
 using Unity.Jobs;
 
-public class JobsGeneration : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-}
-
 public struct GenerateArrayJob : IJob
 {
     public int width;

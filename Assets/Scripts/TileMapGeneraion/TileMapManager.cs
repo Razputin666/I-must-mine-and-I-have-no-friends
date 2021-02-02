@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 using Mirror;
 using UnityEngine.Events;
 using System.Linq;
+using Unity.Collections;
 
 public class TileMapManager : NetworkBehaviour
 {
@@ -19,6 +20,14 @@ public class TileMapManager : NetworkBehaviour
         get { return tilemapss.Values.ToList(); }
     }
     private Dictionary<string, Tilemap> tilemapss;
+
+    public NativeArray<int> worldArray;
+
+    //private void Update()
+    //{
+    //    Debug.Log(Worldgeneration.Instance.GetWorldHeight);
+    //}
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -49,6 +58,35 @@ public class TileMapManager : NetworkBehaviour
             foreach (var tile in tileData.tiles)
             {
                 dataFromTiles.Add(tile, tileData);
+            }
+        }
+    }
+
+    private IEnumerator GrassGrowth(NativeArray<int> worldArray)
+    {
+        
+        for (int x = 0; x < Worldgeneration.Instance.GetWorldWidth; x++)
+        {
+            yield return new WaitForSeconds(0.01f);
+            for (int y = Worldgeneration.Instance.GetWorldHeight - (Worldgeneration.Instance.GetHeight * 2); y < Worldgeneration.Instance.GetWorldHeight; y++)
+            {
+                yield return new WaitForSeconds(0.01f);
+                if (worldArray[x * Worldgeneration.Instance.GetWorldHeight + y] == (int)BlockTypeConversion.GrassBlock && worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] == (int)BlockTypeConversion.Empty)
+                {
+                    int randomizer = UnityEngine.Random.Range(1, 10);
+                    if (randomizer > 5)
+                    {
+                        worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] = (int)BlockTypeConversion.Plant;
+                    }
+                }
+                else if (worldArray[x * Worldgeneration.Instance.GetWorldHeight + y] == (int)BlockTypeConversion.DirtBlock && worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] == (int)BlockTypeConversion.Empty)
+                {
+                    int randomizer = UnityEngine.Random.Range(1, 10);
+                    if (randomizer > 5)
+                    {
+                        worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] = (int)BlockTypeConversion.GrassBlock;
+                    }
+                }
             }
         }
     }
@@ -123,6 +161,18 @@ public class TileMapManager : NetworkBehaviour
     {
         tilemapss.Add(tilemap.name, tilemap);
         //Tilemaps.Add(tilemap);
+    }
+
+    public Tilemap GetTileChunk(int index)
+    {
+        if(index < Tilemaps.Count)
+        {
+            return Tilemaps[index];
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public bool UpdateTilemap(string tilemapName, Vector3Int tilePositionCell, string tileBaseName)

@@ -23,11 +23,7 @@ public class PlayerMovementController : NetworkBehaviour
     //float jumpTimer;
     private bool facingRight = true;
     private bool isJumping = false;
-
-    private int currentPathIndex;
-    private List<Vector3> pathVectorList;
-    private Pathfinder pathfinder;
-
+    
     public override void OnStartServer()
     {
         rb2d = GetComponent<Rigidbody2D>();
@@ -40,6 +36,7 @@ public class PlayerMovementController : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
+        //Callback events for input
         InputManager.Controls.Player.Move.performed += ctx => SetMovement(ctx.ReadValue<Vector2>());
         InputManager.Controls.Player.Move.canceled += ctx => ResetMovement();
 
@@ -49,6 +46,7 @@ public class PlayerMovementController : NetworkBehaviour
 
     private void Update()
     {  
+        //Only rotate the arm if it is done on the server and the player is ready
         if(isServer && GetComponent<PlayerController>().IsReady)
         {
             RotateArm();
@@ -76,26 +74,27 @@ public class PlayerMovementController : NetworkBehaviour
     private void FixedUpdate() => Move();
 
     [Client]
-    private void SetMovement(Vector2 movement)
+    private void SetMovement(Vector2 movement) // sets the movement direction and tells the server
     {
         previousInput = movement;
         CmdInputChanged(previousInput);
+        
     }
     [Client]
-    private void ResetMovement() 
+    private void ResetMovement() // sets the movement direction to 0 and tells the server
     {
         previousInput = Vector2.zero;
         CmdInputChanged(previousInput);
     }
 
     [Command]
-    private void CmdInputChanged(Vector2 input)
+    private void CmdInputChanged(Vector2 input) // Updates movement direction on the server
     {
         previousInput = input;
     }
 
     [Command]
-    private void CmdJumpChanged(bool isJumping)
+    private void CmdJumpChanged(bool isJumping) // updates isJumping variable on the server
     {
         this.isJumping = isJumping;
     }

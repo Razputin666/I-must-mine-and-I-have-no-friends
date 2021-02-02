@@ -13,7 +13,7 @@ using UnityEditor;
 
 public enum TypeOfPlanet
 {
-	Earthlike, meme
+	Earthlike, meme, Default
 }
 
 public class LevelGeneratorLayered : NetworkBehaviour

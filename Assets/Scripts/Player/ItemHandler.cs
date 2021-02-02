@@ -71,7 +71,6 @@ public class ItemHandler : NetworkBehaviour
         StaticInterface quickslotsUserInterface = quickSlotsUI.GetComponent<StaticInterface>();
         quickslotsUserInterface.Inventory = quickSlots;
         quickslotsUserInterface.enabled = true;
-
         //Hides Gui's
         GameObject craftingUI = canvas.gameObject.transform.Find("CraftingScreen").gameObject;
 

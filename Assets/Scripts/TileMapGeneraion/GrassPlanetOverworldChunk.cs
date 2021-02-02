@@ -157,7 +157,7 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
             float seed = UnityEngine.Random.Range(0f, 1f);
             int removeAmount = chunkSettings[2].fillAmount / 2;
             // mapGen.GenerateMainMap(chunkSettings[2], new Vector2Int(spawnPositionX, spawnPositionY), spawnWidthX, spawnHeightY, false, tilemap);
-            mapCoords = MapFunctions.GenerateArray(spawnWidthX, spawnHeightY, false);
+            mapCoords = MapFunctions.GenerateArray(Mathf.Clamp(spawnWidthX, 0, width / 2), Mathf.Clamp(spawnHeightY, 0, height / 2), false);
             mapCoords = MapFunctions.RandomWalkCaveCustom(mapCoords, seed, removeAmount, numberOfLoops);
             MapFunctions.RemoveExistingBlocks(mapCoords, tilemap, new Vector2Int(spawnPositionX, spawnPositionY));
 
@@ -311,6 +311,7 @@ public class GrassPlanetOverworldChunk : MonoBehaviour
         }
         if (firstChunkHasValue && secondChunkHasValue)
         {
+           // Debug.Log("added chunk");
             chunk.transform.position = new Vector3(transform.position.x, (firstChunkHeight + firstChunk.gameObject.transform.position.y) - Mathf.Abs(secondChunkHeight), 0);
             chunkHeightOffset.Add((firstChunkHeight + (int)firstChunk.gameObject.transform.position.y) - Mathf.Abs(secondChunkHeight));
         }

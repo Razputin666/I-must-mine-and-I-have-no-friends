@@ -5,6 +5,8 @@ using Mirror;
 using UnityEngine.Tilemaps;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System;
+using Unity.Collections;
 public class TilemapSyncer : NetworkBehaviour
 {
     private Tilemap tilemap;
@@ -52,6 +54,8 @@ public class TilemapSyncer : NetworkBehaviour
 
     public override void OnStartClient()
     {
+        Debug.Log(int.Parse(gameObject.name.Substring(6)));
+
         if (isServer)
             return;
 
@@ -60,6 +64,7 @@ public class TilemapSyncer : NetworkBehaviour
         tileUpdateData = new List<TileUpdateData>();
 
         TileMapManager.Instance.AddTileChunk(GetComponent<Tilemap>());
+        
     }
 
     private void OnNameChanged(string _Old, string _New)
@@ -73,6 +78,18 @@ public class TilemapSyncer : NetworkBehaviour
         tilemapName = name;
     }
 
+    private void FrequentTilemapUpdate()
+    {
+        int index = Worldgeneration.Instance.GetHeight * Worldgeneration.Instance.GetWidth;
+        int[] chunkArray = new int[index];
+        int[] test = TileMapManager.Instance.worldArray.ToArray();
+        Array.Copy(test, int.Parse(gameObject.name.Substring(6)) * index, chunkArray, 0 , index);
+
+        Buffer.BlockCopy(chunkArray, 0, chunkArray, 0, index);
+
+
+    }
+
     public bool UpdateTilemap(Vector3Int tilePositionCell, string tilebaseName)
     {
         if (tilebaseName == string.Empty)
@@ -80,6 +97,8 @@ public class TilemapSyncer : NetworkBehaviour
             if (isServer)
                 RpcUpdateTilemap(tilePositionCell, tilebaseName);
 
+            Vector3 tileWorldPos = tilemap.CellToWorld(tilePositionCell);
+            TileMapManager.Instance.worldArray[(int)tileWorldPos.x * Worldgeneration.Instance.GetWorldHeight + (int)tileWorldPos.y] = (int)BlockTypeConversion.Empty;
             SetTile(tilePositionCell, null);
 
             return true;
@@ -89,10 +108,13 @@ public class TilemapSyncer : NetworkBehaviour
             tilebaseLookup.TryGetValue(tilebaseName, out TileBase tileAsset);
 
             if (tileAsset != null)
+            {
+                BlockTypeConversion block = (BlockTypeConversion)Enum.Parse(typeof(BlockTypeConversion), tileAsset.name);
+                TileMapManager.Instance.worldArray[tilePositionCell.x * Worldgeneration.Instance.GetWorldHeight + tilePositionCell.y] = (int)block;
                 return UpdateTilemap(tilePositionCell, tileAsset);
+            }
             else
                 Debug.LogError("Couldn't find tilebase, Missing in Resource folder");
-
         }
         return false;
     }
@@ -107,6 +129,11 @@ public class TilemapSyncer : NetworkBehaviour
         SetTile(tilePositionCell, tilebase);
 
         return true;
+    }
+
+    private void SetTile(int tilePositionCellX, int tilePositionCellY , int tilebase)
+    {
+       // tilemap.SetTile(new Vector3Int(tilePositionCellX, tilePositionCellY, 0), tilebase);
     }
 
     private void SetTile(Vector3Int tilePositionCell, TileBase tilebase)
