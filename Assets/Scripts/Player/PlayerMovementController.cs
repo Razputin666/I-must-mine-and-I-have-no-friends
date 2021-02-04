@@ -8,9 +8,10 @@ public class PlayerMovementController : NetworkBehaviour
 {
     [SerializeField] private float movementSpeed = 1f;
     [SerializeField] Rigidbody2D rb2d;
+    [SerializeField] private Transform armTransform;
     private JumpController jumpController;
     //private FaceMouse faceMouse;
-    private Transform armTransform;
+
     private Vector2 previousInput;
 
     public float jumpVelocity;
@@ -25,12 +26,19 @@ public class PlayerMovementController : NetworkBehaviour
     private int currentPathIndex;
     private List<Vector3> pathVectorList;
 
+    //Swinging stuff
+    [SerializeField] private Transform backSwingTarget;
+    [SerializeField] private Transform frontSwingTarget;
+    float swingTimer;
+    private bool isSwinging;
+    private bool swingInMotion;
+
     public override void OnStartServer()
     {
         rb2d = GetComponent<Rigidbody2D>();
         jumpController = GetComponent<JumpController>();
         //faceMouse = GetComponentInChildren<FaceMouse>();
-        armTransform = transform.Find("Gubb_arm");
+        //armTransform = transform.Find("Gubb_arm");
         rb2d.simulated = true;
     }
 
@@ -45,12 +53,37 @@ public class PlayerMovementController : NetworkBehaviour
 
     private void Update()
     {  
-        if(isServer && GetComponent<PlayerController>().IsReady)
-        {
-            RotateArm();
-            //PathfindingTest();
-        }
+        //if(isServer && GetComponent<PlayerController>().IsReady)
+        //{
+        //    if (!isSwinging && !swingInMotion)
+        //    RotateArm();
+        //    else if (!swingInMotion)
+        //    {
+        //       StartCoroutine(SwingAt(armTransform));
+        //    }
+        //    //PathfindingTest();
 
+        //}
+
+        //if (isLocalPlayer)
+        //{
+        //    PlayerController player = GetComponent<PlayerController>();
+        //   Vector2 direction = new Vector2(
+        // Mathf.Clamp(Mathf.Abs(player.mousePosInWorld.x), 0, 1f),
+        //  Mathf.Clamp(Mathf.Abs(player.mousePosInWorld.y), 0, 1f));
+        //     Debug.Log(Vector2.Dot(direction , armTransform.up));
+        //   // Debug.Log(direction);
+        //    if (Input.GetMouseButton(0))
+        //    {
+        //        CmdSwingAt(true);
+        //        isSwinging = true;
+        //    }
+        //    else if (isSwinging)
+        //    {
+        //        CmdSwingAt(false);
+        //        isSwinging = false;
+        //    }
+        //}
         //if (isClient)
         //{
         //    if (Input.GetMouseButtonDown(0))
@@ -67,6 +100,72 @@ public class PlayerMovementController : NetworkBehaviour
         //    }
         //}
     }
+    
+    private IEnumerator SwingAt(Transform arm)
+    {
+        int heavyness = 10; // represents how heavy a melee weapon is. Should be brought along with a parameter
+        float strength = 1; // represents strength of user
+        swingInMotion = true;
+        swingTimer = 1f;
+
+        PlayerController player = GetComponent<PlayerController>();
+        Vector3 difference = backSwingTarget.position - armTransform.position;
+        difference.Normalize();
+
+        float rotationZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
+        float backswingRotation = 100f;
+        while (isSwinging)
+        {
+            Quaternion backswing = Quaternion.Euler(0, 0, rotationZ);
+            armTransform.rotation = Quaternion.Lerp(armTransform.rotation, backswing, strength * Time.deltaTime);
+            yield return null;
+        }
+        
+        //while (isSwinging) //|| Quaternion.Dot(arm.rotation, backswing) < 0.9999f)
+        //{
+        //    backswingRotation = 100f;
+        //    // Debug.Log(Vector2.Dot(arm.up, direction));
+        //    // direction = new Vector2(backSwingTarget.position.x - arm.position.x, backSwingTarget.position.y - arm.position.y);
+        //    // arm.up = Vector2.Lerp(arm.up, direction, 1 * Time.deltaTime);
+        //    Quaternion.Lerp(arm.rotation, backswing, strength * Time.deltaTime);
+        //    yield return null;
+        //}
+        //PlayerController player = GetComponent<PlayerController>();
+        //direction = new Vector2(
+        //Mathf.Clamp(Mathf.Abs(player.mousePosInWorld.x), 0, 1f),
+        // Mathf.Clamp(Mathf.Abs(player.mousePosInWorld.y), 0, 1f));
+
+        //while (Mathf.Abs(Vector2.Dot(arm.up, direction)) < 1f)
+        //{
+            
+        //    arm.up = Vector2.Lerp(arm.up, direction, Mathf.Clamp(heavyness - strength, 1f, 100f) * Time.deltaTime);
+        //    yield return null;
+        //}
+        // Mathf.Clamp(heavyness - strength, 1f, 100f)
+        // }
+        //swingTimer = 0f;
+        //// direction = new Vector2(frontSwingTarget.position.x - arm.position.x, frontSwingTarget.position.y - arm.position.y);
+        //PlayerController player = GetComponent<PlayerController>();
+        //direction = new Vector2(player.mousePosInWorld.x - arm.position.x, player.mousePosInWorld.y - arm.position.y);
+        //while (swingTimer < heavyness * Time.deltaTime)
+        //{
+        //    arm.up = Vector2.Lerp(arm.up, direction, strength * Time.deltaTime);
+        //    swingTimer += strength * Time.deltaTime;
+        //    yield return null;
+        //}
+
+
+        swingInMotion = false;
+
+    }
+
+
+    [Command]
+    private void CmdSwingAt(bool swing)
+    {
+        isSwinging = swing;
+    }
+
     [Command]
     private void CmdSetTargetPath(Vector3 targetPositon)
     {
@@ -258,7 +357,36 @@ public class PlayerMovementController : NetworkBehaviour
         return false;
     }
 
-    private void FixedUpdate() => Move();
+    private void FixedUpdate()
+    {
+        Move();
+
+        if (isServer && GetComponent<PlayerController>().IsReady)
+        {
+            if (!isSwinging && !swingInMotion)
+                RotateArm();
+            else if (!swingInMotion)
+            {
+                StartCoroutine(SwingAt(armTransform));
+            }
+            //PathfindingTest();
+
+        }
+
+        if (isLocalPlayer)
+        {
+            if (Input.GetMouseButton(0))
+            {
+                CmdSwingAt(true);
+                isSwinging = true;
+            }
+            else if (isSwinging)
+            {
+                CmdSwingAt(false);
+                isSwinging = false;
+            }
+        }
+    }
 
     [Client]
     private void SetMovement(Vector2 movement)
@@ -333,13 +461,22 @@ public class PlayerMovementController : NetworkBehaviour
 
     private void Flip(float horizontal)
     {
-        if (horizontal > 0 && !facingRight || horizontal < 0 && facingRight)
-        {
-            facingRight = !facingRight;
+        //if (horizontal > 0 && !facingRight || horizontal < 0 && facingRight)
+        //{
+        //    facingRight = !facingRight;
 
-            Vector3 theScale = transform.localScale;
-            theScale.x *= -1;
-            transform.localScale = theScale;
+        //    Vector3 theScale = transform.localScale;
+        //    theScale.x *= -1;
+        //    transform.localScale = theScale;
+        //}
+
+        if (horizontal > 0)
+        {
+            transform.rotation = new Quaternion(transform.rotation.x, 0, transform.rotation.z, transform.rotation.w);
+        }
+        else if (horizontal < 0)
+        {
+            transform.rotation = new Quaternion(transform.rotation.x, 180, transform.rotation.z, transform.rotation.w);
         }
     }
 
@@ -347,11 +484,29 @@ public class PlayerMovementController : NetworkBehaviour
     {
         PlayerController player = GetComponent<PlayerController>();
         //Transform armTransform = transform.Find("Gubb_arm");
-        Vector2 direction = new Vector2(
-        player.mousePosInWorld.x - armTransform.position.x,
-        player.mousePosInWorld.y - armTransform.position.y);
+        //Vector2 direction = 
+        //player.mousePosInWorld - armTransform.position;
 
-        armTransform.up = direction;
+        //armTransform.up = direction;
+        Vector3 difference = player.mousePosInWorld - armTransform.position;
+        difference.Normalize();
+
+        float rotationZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
+
+        armTransform.rotation = Quaternion.Euler(0, 0, rotationZ);
+        
+        if (rotationZ < -90 || rotationZ > 90)
+        {
+            if (player.transform.eulerAngles.y == 0)
+            {
+                armTransform.localRotation = Quaternion.Euler(180, 0, -rotationZ);
+            }
+            else if (player.transform.eulerAngles.y == 180)
+            {
+                armTransform.localRotation = Quaternion.Euler(180, 180, -rotationZ);
+            }
+        }
+        Debug.Log(rotationZ);
     }
 
     private bool IsJumping

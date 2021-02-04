@@ -17,8 +17,8 @@ MonoBehaviour:
   itemType: 9
   description: 
   data:
-    name: Gold Block
-    id: 12
+    name: GoldBlock
+    id: 18
     amount: 1
     type: Ore
   maxStackSize: 0

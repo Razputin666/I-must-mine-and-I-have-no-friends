@@ -55,7 +55,7 @@ public class Worldgeneration : NetworkBehaviour
             {
                 int index = x * verticalChunks + y;
                 GameObject chunk = Instantiate(chunkPrefab, grid.transform);
-                chunk.name = "Chunk_" + index;
+                chunk.GetComponent<TilemapSyncer>().SetName("Chunk_" + index);
                 TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
                 NetworkServer.Spawn(chunk);
                 chunk.transform.position = new Vector2(startPosition.x, startPosition.y);
@@ -63,8 +63,6 @@ public class Worldgeneration : NetworkBehaviour
             }
             startPosition.x += width;
         }
-        blockTypeConversion = (BlockTypeConversion)Enum.Parse(typeof(BlockTypeConversion), "CoalBlock");
-        UnityEngine.Debug.Log((int)blockTypeConversion);
     }
 
     protected virtual void GenerateJobs(NativeArray<int> chunkArray)

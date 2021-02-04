@@ -48,7 +48,6 @@ public class TilemapSyncer : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        Debug.Log(int.Parse(gameObject.name.Substring(6)));
 
         if (isServer)
             return;
@@ -74,25 +73,64 @@ public class TilemapSyncer : NetworkBehaviour
 
     private void FrequentTilemapUpdate()
     {
-        int index = Worldgeneration.Instance.GetHeight * Worldgeneration.Instance.GetWidth;
-        int[] chunkArray = new int[index];
-        int[] test = TileMapManager.Instance.worldArray.ToArray();
-        Array.Copy(test, int.Parse(gameObject.name.Substring(6)) * index, chunkArray, 0 , index);
+        //int index = Worldgeneration.Instance.GetHeight * Worldgeneration.Instance.GetWidth;
+        //int[] chunkArray = new int[index];
+        //int[] test = TileMapManager.Instance.worldArray.ToArray();
+        //Array.Copy(test, int.Parse(gameObject.name.Substring(6)) * index, chunkArray, 0 , index);
 
-        Buffer.BlockCopy(chunkArray, 0, chunkArray, 0, index);
+        //int xThreshold = index * Worldgeneration.Instance.GetVerticalChunks;
+        //int x = int.Parse(gameObject.name.Substring(6)) * index / xThreshold;
+
+       // Buffer.BlockCopy(chunkArray, 0, chunkArray, 0, index);
 
 
+    }
+
+    public IEnumerator GrassGrowth()
+    {
+        for (int i = 0; i < Worldgeneration.Instance.GetWidth; i++)
+        {
+            yield return new WaitForSeconds(0.01f);
+            for (int j = Worldgeneration.Instance.GetHeight; j < Worldgeneration.Instance.GetHeight * 2; j++)
+            {
+                // yield return new WaitForSeconds(0.02f);
+                if (tilemap.HasTile(new Vector3Int(i, j, 0)) && j > Worldgeneration.Instance.GetHeight && !tilemap.HasTile(new Vector3Int(i, j + 1, 0)) && tilemap.GetTile(new Vector3Int(i, j, 0)) == tileAssets[(int)BlockTypeConversion.GrassBlock])
+                {
+                    int randomizer = UnityEngine.Random.Range(1, 10);
+                    yield return new WaitForSeconds(UnityEngine.Random.Range(0.01f, 0.2f));
+                    if (randomizer > 5)
+                    {
+                        UpdateTilemap(new Vector3Int(i, j, 0), BlockTypeConversion.Plant.ToString());
+                    }
+                }
+                else if (tilemap.HasTile(new Vector3Int(i, j, 0)) && j > Worldgeneration.Instance.GetHeight && !tilemap.HasTile(new Vector3Int(i, j + 1, 0)) && tilemap.GetTile(new Vector3Int(i, j, 0)) == tileAssets[(int)BlockTypeConversion.Plant])
+                {
+                    int randomizer = UnityEngine.Random.Range(1, 10);
+                    yield return new WaitForSeconds(UnityEngine.Random.Range(0.01f, 0.2f));
+                    if (randomizer > 5)
+                    {
+                        UpdateTilemap(new Vector3Int(i, j + 1, 0), BlockTypeConversion.GrassBlock.ToString());
+                    }
+                }
+            }
+        }
     }
 
     public bool UpdateTilemap(Vector3Int tilePositionCell, string tilebaseName)
     {
         if (tilebaseName == string.Empty)
         {
-            if (isServer)
-                RpcUpdateTilemap(tilePositionCell, tilebaseName);
 
-            Vector3 tileWorldPos = tilemap.CellToWorld(tilePositionCell);
-            TileMapManager.Instance.worldArray[(int)tileWorldPos.x * Worldgeneration.Instance.GetWorldHeight + (int)tileWorldPos.y] = (int)BlockTypeConversion.Empty;
+            if (isServer)
+            {
+                Vector3 tileWorldPos = tilemap.CellToWorld(tilePositionCell);
+                RpcUpdateTilemap(tilePositionCell, tilebaseName);
+                TileMapManager.Instance.worldArray[(int)tileWorldPos.x * Worldgeneration.Instance.GetWorldHeight + (int)tileWorldPos.y] = (int)BlockTypeConversion.Empty;
+            }
+
+
+
+
             SetTile(tilePositionCell, null);
 
             return true;
@@ -104,8 +142,13 @@ public class TilemapSyncer : NetworkBehaviour
             {
                 if (tileAsset.name == tilebaseName)
                 {
-                    BlockTypeConversion block = (BlockTypeConversion)Enum.Parse(typeof(BlockTypeConversion), tileAsset.name);
-                    TileMapManager.Instance.worldArray[tilePositionCell.x * Worldgeneration.Instance.GetWorldHeight + tilePositionCell.y] = (int)block;
+                    if (isServer)
+                    {
+                        BlockTypeConversion block = (BlockTypeConversion)Enum.Parse(typeof(BlockTypeConversion), tileAsset.name);
+                        TileMapManager.Instance.worldArray[tilePositionCell.x * Worldgeneration.Instance.GetWorldHeight + tilePositionCell.y] = (int)block;
+                    }
+
+                    
                     return UpdateTilemap(tilePositionCell, tileAsset);
                 }
             }

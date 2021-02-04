@@ -17,8 +17,8 @@ MonoBehaviour:
   itemType: 9
   description: 
   data:
-    name: Stone Block
-    id: 20
+    name: StoneBlock
+    id: 29
     amount: 1
     type: Common
   maxStackSize: 0

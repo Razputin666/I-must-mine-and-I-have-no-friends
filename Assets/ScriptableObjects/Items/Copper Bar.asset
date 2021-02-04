@@ -17,7 +17,8 @@ MonoBehaviour:
   itemType: 12
   description: 
   data:
-    name: Copper Bar
-    id: 6
+    name: CopperBar
+    id: 5
     amount: 1
+    type: 
   maxStackSize: 0

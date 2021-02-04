@@ -23,6 +23,11 @@ public class TileMapManager : NetworkBehaviour
     //    Debug.Log(Worldgeneration.Instance.GetWorldHeight);
     //}
 
+    private void OnApplicationQuit()
+    {
+        worldArray.Dispose();
+    }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -106,14 +111,18 @@ public class TileMapManager : NetworkBehaviour
     {
         target = new Vector3Int(target.x, target.y, 0);
         TileBase targetedBlock = tilemap.GetTile(target);
+        Debug.Log(dataFromTiles[targetedBlock].blockName);
+        Debug.Log(targetedBlock);
         
         if (!targetedBlock)
         {
+            Debug.Log("No targetedblock");
             return "";
         }
         TileData check;
         if (dataFromTiles.TryGetValue(targetedBlock, out check))
         {
+            
             return dataFromTiles[targetedBlock].blockName;
         }
         return "";

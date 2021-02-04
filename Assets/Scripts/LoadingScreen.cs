@@ -13,6 +13,7 @@ public class LoadingScreen : NetworkBehaviour
     [SerializeField] private TMP_Text loadingScreenProgressText = null;
     [SerializeField] private Image loadingScreenProgressBar = null;
     [SerializeField] private GameObject playerPrefab = null;
+    [SerializeField] private GameObject drillPrefab = null;
     private GameTiles gameTiles = null;
     private NetworkTransmitter networkTransmitter = null;
     
@@ -53,7 +54,10 @@ public class LoadingScreen : NetworkBehaviour
 
         //Spawn player
         GameObject playerInstance = Instantiate(playerPrefab, NetworkManager.startPositions[0].position, Quaternion.identity);
-        
+
+        GameObject drill = Instantiate(drillPrefab, NetworkManager.startPositions[0].position, Quaternion.identity);
+        drill.GetComponent<Rigidbody2D>().simulated = true;
+        NetworkServer.Spawn(drill);
         //Destroy gameobject
         GameObject go = conn.identity.gameObject;
 
@@ -152,7 +156,7 @@ public class LoadingScreen : NetworkBehaviour
 
         //loadingScreenProgressText.text = "Loading: " + perc * 100;
 
-        Tilemap tm = TileMapManager.Instance.GetTilemap("Tilemap_" + transmissionID);
+        Tilemap tm = TileMapManager.Instance.GetTilemap("Chunk_" + transmissionID);
         if (!tm)
         {
             Debug.LogError("Error finding the correct tilemap");

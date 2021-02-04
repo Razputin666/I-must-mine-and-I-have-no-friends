@@ -75,10 +75,10 @@ public class ItemHandler : NetworkBehaviour
         GameObject craftingUI = canvas.gameObject.transform.Find("CraftingScreen").gameObject;
 
         CraftingInterface CraftingUserInterface = craftingUI.GetComponent<CraftingInterface>();
-        CraftingUserInterface.Inventory.ToggleVisibility();
-        inventory.ToggleVisibility();
-        equipment.ToggleVisibility();
-        quickSlots.ToggleVisibility();
+        //CraftingUserInterface.Inventory.ToggleVisibility();
+        //inventory.ToggleVisibility();
+        //equipment.ToggleVisibility();
+        //quickSlots.ToggleVisibility();
     }
 
     public void OnBeforeSlotUpdate(InventorySlot slot)

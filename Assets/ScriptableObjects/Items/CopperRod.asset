@@ -17,6 +17,8 @@ MonoBehaviour:
   itemType: 11
   description: 
   data:
-    name: Copper Rod
-    id: -1
+    name: CopperRod
+    id: 8
     amount: 1
+    type: 
+  maxStackSize: 0

@@ -17,7 +17,8 @@ MonoBehaviour:
   itemType: 9
   description: 
   data:
-    name: Copper Block
-    id: 7
+    name: CopperBlock
+    id: 6
     amount: 1
+    type: 
   maxStackSize: 0

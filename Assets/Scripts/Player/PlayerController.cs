@@ -12,7 +12,7 @@ public class PlayerController : NetworkBehaviour
 
     public enum PlayerStates
     {
-        Idle, Mining, Normal, Building
+        Idle, Mining, Normal, Building, Swinging,
     }
 
     public PlayerStates playerStates { get; private set; }
@@ -38,6 +38,7 @@ public class PlayerController : NetworkBehaviour
     private JumpController jumpController;
     [SerializeField] 
     private LevelGeneratorLayered mapSize;
+
 
     //Network
     [SerializeField]
@@ -65,7 +66,7 @@ public class PlayerController : NetworkBehaviour
     {
         //allow all players to run this
         sceneScript = GameObject.FindObjectOfType<SceneScript>();
-        item = gameObject.transform.Find("Gubb_arm").gameObject.transform.Find("ItemHeldInHand");
+        //item = gameObject.transform.Find("Gubb_arm").gameObject.transform.Find("ItemHeldInHand");
 
         ItemHandler = GetComponent<ItemHandler>();
         IsReady = false;
@@ -108,6 +109,7 @@ public class PlayerController : NetworkBehaviour
     #region Network
 
     #region Commands
+
     [Command]
     public void CmdActiveItemChanged(int itemID)
     {
@@ -234,7 +236,7 @@ public class PlayerController : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         if (camera == null)
-            camera = Instantiate(Camera.main, transform);
+            camera = Instantiate(Camera.main);
         
         Camera.main.GetComponentInParent<AudioListener>().enabled = false;
         camera.GetComponent<AudioListener>().enabled = true;
@@ -298,6 +300,7 @@ public class PlayerController : NetworkBehaviour
             if (!isLocalPlayer)
                 return;
 
+            camera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
             Vector3 mousePos = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y));
             mousePos.z = 0;
 
@@ -314,6 +317,7 @@ public class PlayerController : NetworkBehaviour
             {
                 Die();
             }
+
         }
 
     }

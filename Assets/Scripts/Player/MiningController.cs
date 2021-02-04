@@ -11,6 +11,8 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     [SerializeField] private int id = 2;
     [SerializeField] private float coolDownDuration;
     [SerializeField] private CoolDownSystem coolDownSystem;
+    [SerializeField] private Transform arm;
+    [SerializeField] private Transform heldItem;
     //[SerializeField] private Transform[] points;
 
     [SerializeField] private Tilemap chunk;
@@ -38,8 +40,8 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     {
         if (endOfGun == null)
         {
-            Transform arm = gameObject.transform.Find("Gubb_arm");
-            Transform heldItem = arm.Find("ItemHeldInHand");
+            //Transform arm = gameObject.transform.Find("Gubb_arm");
+           // Transform heldItem = arm.Find("ItemHeldInHand");
             endOfGun = heldItem.Find("EndOfGun");
         }
 
@@ -206,7 +208,7 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     private void DropItemFromBlock(Vector3Int blockPosition, string blockName, Tilemap tilemap)
     {
         ItemObject itemObj = itemDatabase.GetItemOfName(blockName);
-
+        Debug.Log(blockName);
         if (itemObj != null)
         {
             spawnManager.SpawnItemAt(tilemap.CellToWorld(blockPosition), blockName);
