@@ -1,53 +1,56 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-
-public abstract class EnemyBehaviour : MonoBehaviour
+public abstract class EnemyBehaviour : NetworkBehaviour
 {
     public enum EnemyTypes
     {
         Default, Frog
     }
+
+    protected enum EnemyStates
+    {
+        FrogMining,
+        FrogAggressive,
+        FrogReturn,
+        FrogIdle
+    }
+
     [SerializeField] private InventoryObject inventory;
     [SerializeField] protected Stats stats;
-    public Rigidbody2D rb2d;
+    protected Rigidbody2D rb2d;
     [SerializeField] protected LimbMovement limbMovement;
     [HideInInspector] protected EnemyTypes enemyTypes;
-
-
+    protected EnemyStates state;
     [HideInInspector] public Vector3 target;
-    protected List<PlayerController> players;
     protected int currentHitpoints;
     protected bool foundPlayer;
     private float currentSpeed;
-
-
 
     private float fallSpeedReduction;
     private float heightReductionTimer;
     private float widthReductionTimer;
     private Vector3 previousLocation = Vector3.zero;
 
+    protected Pathfinder pathfinder;
 
-    protected virtual void Start()
+    [Server]
+    protected void Init()
     {
+        rb2d = GetComponent<Rigidbody2D>();
+        rb2d.simulated = true;
         stats = Instantiate(stats);
         currentHitpoints = stats.hitPoints;
-        // players = GameObject.Find("PlayerList").GetComponent<PlayerList>.players; Fixa det efter multiplayer
+        pathfinder = GetComponent<Pathfinder>();
     }
 
-    protected virtual void FixedUpdate()
-    {
-        DeathCheck();
-        //  MaxSpeedCheck();
-    }
-
-    private void DeathCheck()
+    protected void DeathCheck()
     {
         if (currentHitpoints <= 0)
         {
-            Destroy(gameObject);
+            NetworkServer.Destroy(gameObject);
         }
     }
 
@@ -57,7 +60,7 @@ public abstract class EnemyBehaviour : MonoBehaviour
         Mathf.Clamp(currentHitpoints, 0, stats.hitPoints);
     }
 
-    private void MaxSpeedCheck()
+    protected void MaxSpeedCheck()
     {
         if (rb2d.velocity.y < stats.maxFallSpeed)
         {
@@ -91,7 +94,7 @@ public abstract class EnemyBehaviour : MonoBehaviour
 
     protected virtual Vector3 FindTarget()
     {
-    Collider2D[] playerTargets = Physics2D.OverlapCircleAll(transform.position, stats.aggroRange, LayerMask.GetMask("Player"));
+        Collider2D[] playerTargets = Physics2D.OverlapCircleAll(transform.position, stats.aggroRange, LayerMask.GetMask("Player"));
 
         foreach (Collider2D playerTarget in playerTargets)
         {
@@ -104,8 +107,28 @@ public abstract class EnemyBehaviour : MonoBehaviour
             }
         }
 
-            foundPlayer = false;
-            return AlternativeTarget();
+        foundPlayer = false;
+        return AlternativeTarget();
+    }
+
+    protected virtual bool FindPlayerTarget()
+    {
+        //playerSearchTimer = 0;
+        Collider2D[] colliderArray = Physics2D.OverlapCircleAll(transform.position, stats.aggroRange, LayerMask.GetMask("Player"));
+
+        foreach (Collider2D collider2D in colliderArray)
+        {
+            if (collider2D.TryGetComponent<PlayerController>(out PlayerController player))
+            {
+                Debug.Log("found player");
+                if (pathfinder.CalculatePath(transform.position + Vector3.down, player.transform.position))
+                {
+                    Debug.Log("Hunting Player at: " + player.transform.position);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     protected abstract Vector3 AlternativeTarget();
@@ -124,6 +147,20 @@ public abstract class EnemyBehaviour : MonoBehaviour
         previousLocation = transform.position;
     }
 
+    protected void Flip(float moveDirX)
+    {
+        Vector3 tar = transform.position + new Vector3(moveDirX, 0, 0);
+
+        if (tar.x - transform.position.x > 0)
+        {
+            transform.rotation = new Quaternion(transform.rotation.x, 0, transform.rotation.z, transform.rotation.w);
+        }
+        else if (tar.x - transform.position.x < 0)
+        {
+            transform.rotation = new Quaternion(transform.rotation.x, 180, transform.rotation.z, transform.rotation.w);
+        }
+    }
+
     public Stats GetStats
     {
         get { return stats; }
@@ -136,4 +173,8 @@ public abstract class EnemyBehaviour : MonoBehaviour
         set { inventory = value; }
     }
 
+    public float MiningStrength
+    {
+        get { return stats.mineStrength; }
+    }
 }

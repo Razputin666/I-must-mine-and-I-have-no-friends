@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-
+using Mirror;
 public class FrogBehaviour : EnemyBehaviour
 {
-
-    
     [SerializeField] private MiningController miningMode;
     [SerializeField] private Transform arm;
     //[SerializeField] private PathfindingCustom pathfinding;
@@ -24,69 +22,129 @@ public class FrogBehaviour : EnemyBehaviour
     private float nextDistance;
     private float previousDistance;
 
-    protected override void Start()
+    //Path Variables
+    private Vector3 previousPosition;
+    private float timeStoodStill;
+    private Vector2 moveDir;
+    private float playerSearchTimer;
+    private float movedCheckTimer;
+
+    //Item pickup variables
+    [SerializeField] private float itemPickupRange;
+    private float itemPickupCooldown;
+    private const float itemPickupCooldownDefault = 0.5f;
+
+    public override void OnStartServer()
     {
-        base.Start();
-        frogBase = GameObject.FindWithTag("EnemyBase").GetComponent<EvilBeavisBaseController>();
-        SetAggressiveMode();
+        Init();
+        //frogBase = GameObject.FindWithTag("EnemyBase").GetComponent<EvilBeavisBaseController>();
+        SetIdleMode();
         enemyTypes = EnemyBehaviour.EnemyTypes.Frog;
+
+        moveDir = Vector2.right;
+        timeStoodStill = 0f;
+        playerSearchTimer = 0f;
+        movedCheckTimer = 0f;
+        previousPosition = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!isServer)
+            return;
+
+        playerSearchTimer += Time.deltaTime;
+        itemPickupCooldown += Time.deltaTime;
+        movedCheckTimer += Time.deltaTime;
+        CheckState();
+
+        if (itemPickupCooldown >= itemPickupCooldownDefault)
+        {
+            CheckItemCollision();
+            itemPickupCooldown = 0f;
+        }
+        if (movedCheckTimer > 0.2f)
+        {
+            previousPosition = transform.position;
+            movedCheckTimer = 0f;
+        }
+
+        if (playerSearchTimer >= 3f)
+        {
+            if (FindPlayerTarget())
+                SetAggressiveMode();
+        }
+
         //ArmDirection();
-        if (!limbMovement.isSwinging)
-        {
-            MoveBody();
-        }
-        findTargetTimer += Time.deltaTime;
-        distanceCheckTimer += Time.deltaTime;
-        if (findTargetTimer > 0.1f)
-        {
-            previousDistance = 0f;
-            previousDistance = Vector2.Distance(transform.position, target);
-            target = base.FindTarget();
-            Debug.DrawLine(transform.position, target);
-           
-            findTargetTimer = 0f;
+        //if (!limbMovement.isSwinging)
+        //{
+        //    MoveBody();
+        //}
+        //findTargetTimer += Time.deltaTime;
+        //distanceCheckTimer += Time.deltaTime;
+        //if (findTargetTimer > 0.1f)
+        //{
+        //    previousDistance = 0f;
+        //    previousDistance = Vector2.Distance(transform.position, target);
+        //    if(FindPlayerTarget())
+        //    {
+        //        SetAggressiveMode();
+        //    }
+        //    //Debug.DrawLine(transform.position, target);
 
-        }
-        if (distanceCheckTimer > 5f)
-        {
-            nextDistance = 0f;
-            nextDistance = Vector2.Distance(transform.position, target);
-            distanceCheckTimer = 0f;
-        }
+        //    findTargetTimer = 0f;
 
-        if (foundPlayer && miningMode.enabled == true)
-        {
-            SetAggressiveMode();
-        }
-        else if (!foundPlayer && miningMode.enabled == false)
-        {
-            SetMiningMode();
-        }
-        Debug.Log(Mathf.Abs(nextDistance) - Mathf.Abs(previousDistance));
-        if (Mathf.Abs(nextDistance) - Mathf.Abs(previousDistance) < 5f)
-            Mining();
+        //}
+        //if (distanceCheckTimer > 5f)
+        //{
+        //    nextDistance = 0f;
+        //    nextDistance = Vector2.Distance(transform.position, target);
+        //    distanceCheckTimer = 0f;
+        //}
+
+        //if (foundPlayer && miningMode.enabled == true)
+        //{
+        //    SetAggressiveMode();
+        //}
+        //else if (!foundPlayer && miningMode.enabled == false)
+        //{
+        //    SetMiningMode();
+        //}
+        //Debug.Log(Mathf.Abs(nextDistance) - Mathf.Abs(previousDistance));
+        //if (Mathf.Abs(nextDistance) - Mathf.Abs(previousDistance) < 5f)
+        //    Mining();
+    }
+
+    protected virtual void FixedUpdate()
+    {
+        if (!isServer)
+            return;
+
+        DeathCheck();
+        
+        moveDir.Normalize();
+        Flip(moveDir.x);
+        rb2d.velocity += moveDir * stats.moveSpeed * Time.fixedDeltaTime;
+
+        MaxSpeedCheck();
     }
 
     //protected override Vector3 FindTarget()
     //{
- 
-    //        blockAmount = GetBlockAmount();
-    //        oreAmount = GetOreAmount();
-    //        if (blockAmount >= 50 || oreAmount >= 10)
-    //        {
-    //           return target = frogBase.transform.position - transform.position;  
-    //        }
-    //        else
-    //        {
-    //           return target = frogBase.targetedOre[frogBase.targetedOre.Count - 1] - transform.position;
-    //            //  distanceToTarget = Vector3.Distance(frogBase.targetedOre[frogBase.targetedOre.Count - 1], transform.position);
-    //        }
-    //}
+
+        //        blockAmount = GetBlockAmount();
+        //        oreAmount = GetOreAmount();
+        //        if (blockAmount >= 50 || oreAmount >= 10)
+        //        {
+        //           return target = frogBase.transform.position - transform.position;  
+        //        }
+        //        else
+        //        {
+        //           return target = frogBase.targetedOre[frogBase.targetedOre.Count - 1] - transform.position;
+        //            //  distanceToTarget = Vector3.Distance(frogBase.targetedOre[frogBase.targetedOre.Count - 1], transform.position);
+        //        }
+        //}
 
     protected override Vector3 AlternativeTarget()
     {
@@ -225,7 +283,6 @@ public class FrogBehaviour : EnemyBehaviour
         }
     }
 
-
     private Vector3Int[] GetNextBlocks(Vector3 distanceToTarget, int blocksOut)
     {
         Vector3Int[] newBlockPos = new Vector3Int[8];
@@ -343,18 +400,88 @@ public class FrogBehaviour : EnemyBehaviour
 
     private void SetMiningMode()
     {
+        state = EnemyStates.FrogMining;
         item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Diamond Pick 1");
-        miningMode.enabled = true;
-        item.GetComponent<PolygonCollider2D>().enabled = false;
+        //item.GetComponent<PolygonCollider2D>().enabled = false;
     }
 
     private void SetAggressiveMode()
     {
+        state = EnemyStates.FrogAggressive;
         item.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/Diamond Sword");
-        miningMode.enabled = false;
-        item.GetComponent<PolygonCollider2D>().enabled = true;
+        //item.GetComponent<PolygonCollider2D>().enabled = true;
+    }
+    private void SetIdleMode()
+    {
+        state = EnemyStates.FrogIdle;
+        item.GetComponent<SpriteRenderer>().sprite = null;
+        //item.GetComponent<PolygonCollider2D>().enabled = false;
+    }
+
+    private void CheckState()
+    {
+        switch (state)
+        {
+            case EnemyStates.FrogIdle:
+                if (Mathf.Abs(transform.position.x - previousPosition.x) < 0.1f)
+                {
+                    timeStoodStill += Time.deltaTime;
+
+                    //Change direction if we stand still for too long
+                    if (timeStoodStill >= 3f)
+                    {
+                        moveDir *= -1;
+                    }
+                    else if (timeStoodStill >= 0.5f)//Try jumping if we are stuck
+                    {
+                        GetComponent<JumpController>().Jump();
+                    }
+                }
+                else
+                {
+                    timeStoodStill = 0f;
+                }
+                break;
+
+            case EnemyStates.FrogAggressive:
+                pathfinder.Move();
+
+                if (pathfinder.pathCompleted)
+                {
+                    if(FindPlayerTarget())
+                        SetAggressiveMode();
+                    else
+                        SetIdleMode();
+
+                    break;
+                }
+
+                moveDir = pathfinder.Direction;
+
+                break;
+
+            default:
+                break;
+        }
     }
     #endregion
+
+    [Server]
+    private void CheckItemCollision()
+    {
+        Collider2D[] colliderArray = Physics2D.OverlapCircleAll(transform.position, itemPickupRange);
+
+        foreach (Collider2D collider2D in colliderArray)
+        {
+            if (collider2D.TryGetComponent<GroundItem>(out GroundItem groundItem))
+            {
+                Item newItem = new Item(groundItem.Item);
+                //tell the client to add the item we collided with
+                GetInventory.AddItem(newItem, newItem.Amount);
+                NetworkServer.Destroy(collider2D.gameObject);
+            }
+        }
+    }
 
     private int GetBlockAmount()
     {
@@ -381,9 +508,10 @@ public class FrogBehaviour : EnemyBehaviour
         List<int> listOfItems = new List<int>();
         if (GetInventory.FindItemsInInventory("Ore") != null)
         {
-            for (int i = 0; i < GetInventory.FindItemsInInventory("Ore").Count; i++)
+            List<InventorySlot> oreItems = GetInventory.FindItemsInInventory("Ore");
+            for (int i = 0; i < oreItems.Count; i++)
             {
-                listOfItems.Add(GetInventory.FindItemsInInventory("Ore")[i].Amount);
+                listOfItems.Add(oreItems[i].Amount);
             }
             for (int j = 0; j < listOfItems.Count; j++)
             {
@@ -407,8 +535,4 @@ public class FrogBehaviour : EnemyBehaviour
 
         set { blockAmount = value; }
     }
-
-
-
-
 }

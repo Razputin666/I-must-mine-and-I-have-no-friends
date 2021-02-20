@@ -64,7 +64,6 @@ public class TileMapManager : NetworkBehaviour
 
     private IEnumerator GrassGrowth(NativeArray<int> worldArray)
     {
-        
         for (int x = 0; x < Worldgeneration.Instance.GetWorldWidth; x++)
         {
             yield return new WaitForSeconds(0.01f);
@@ -173,6 +172,21 @@ public class TileMapManager : NetworkBehaviour
         {
             return null;
         }
+    }
+
+    public Tilemap GetTileChunk(Vector3 worldPosition)
+    {
+        foreach (Tilemap chunk in Tilemaps)
+        {
+            Vector2 worldPos = new Vector2(worldPosition.x, worldPosition.y);
+            BoundsInt bounds = chunk.cellBounds;
+            Vector3 tilemapPos = chunk.transform.position;
+
+            if (IsInside(tilemapPos, bounds.size, worldPos))
+                return chunk;
+
+        }
+        return null;
     }
 
     public bool UpdateTilemap(string tilemapName, Vector3Int tilePositionCell, string tileBaseName)

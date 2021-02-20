@@ -36,7 +36,7 @@ public class Worldgeneration : NetworkBehaviour
     private BlockTypeConversion blockTypeConversion;
     public static Worldgeneration Instance { get; private set; }
 
-
+    [SerializeField] protected GameObject enemyPrefab;
 
     protected virtual void Init()
     {
@@ -64,7 +64,6 @@ public class Worldgeneration : NetworkBehaviour
             startPosition.x += width;
         }
         blockTypeConversion = (BlockTypeConversion)Enum.Parse(typeof(BlockTypeConversion), "CoalBlock");
-        UnityEngine.Debug.Log((int)blockTypeConversion);
     }
 
     protected virtual void GenerateJobs(NativeArray<int> chunkArray)
@@ -88,6 +87,30 @@ public class Worldgeneration : NetworkBehaviour
         for (int i = 0; i < chunkArray.Length; i++)
         {
             RenderMapJobs(chunkArray[i], TileMapManager.Instance.GetTileChunk(i));
+        }
+    }
+
+    protected virtual void UpdatePathfinding(NativeArray<int>[] chunkArray)
+    {
+        for (int i = 0; i < horizontalChunks; i++)
+        {
+            for (int j = 0; j < verticalChunks; j++)
+            {
+                int currentChunkIndex = i * verticalChunks + j;
+                NativeArray<int> chunk = chunkArray[currentChunkIndex];
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        int gridX = x + i * width;
+                        int gridY = y + j * height;
+
+                        int index = x * height + y;
+                        bool hasBlock = chunk[index] != 0;
+                        PathfindingDots.Instance.UpdateGridMineable(new Vector3(gridX, gridY), hasBlock);
+                    }
+                }
+            }
         }
     }
     #region NotJobs

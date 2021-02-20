@@ -216,10 +216,10 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     {
         if (!coolDownSystem.IsOnCoolDown(id))
         {
-            if (isClient)
-                CmdMineBlockAt(blockWorldPosition, miningStr);
-            else
+            if (isServer)
                 ServerMine(blockWorldPosition, miningStr);
+            else
+                CmdMineBlockAt(blockWorldPosition, miningStr);
 
             coolDownSystem.PutOnCoolDown(this);
         }  

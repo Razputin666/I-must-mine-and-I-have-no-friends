@@ -78,7 +78,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  mapManager: {fileID: 1508111169}
   grid: {fileID: 0}
   horizontalChunks: 8
   verticalChunks: 8
@@ -89,3 +88,5 @@ MonoBehaviour:
   useJobs: 1
   chunks: []
   blocks: []
+  enemyPrefab: {fileID: 1786306752357913020, guid: 365e64ece74321b48bc3fccf204ae325,
+    type: 3}

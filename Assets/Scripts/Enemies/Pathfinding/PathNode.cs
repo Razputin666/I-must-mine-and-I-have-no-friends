@@ -38,7 +38,7 @@ public class PathNode
     }
 }
 
-struct PNode
+public struct PNode
 {
     public int x;
     public int y;

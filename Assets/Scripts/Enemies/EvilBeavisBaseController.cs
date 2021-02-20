@@ -3,28 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Linq;
+using Mirror;
 
-public class EvilBeavisBaseController : MonoBehaviour, HasCoolDownInterFace
+public class EvilBeavisBaseController : NetworkBehaviour, HasCoolDownInterFace
 {
-
     [HideInInspector] public List<Vector3Int> targetedOre = new List<Vector3Int>();
-    [SerializeField] private List<Tilemap> chunkList;
     [SerializeField] private Tilemap currentChunk;
     [SerializeField] private TileMapManager tileMapManager;
     [SerializeField] private GameObject minion;
     [SerializeField] private int id = 5;
     [SerializeField] private float coolDownDuration;
     [SerializeField] private CoolDownSystem coolDownSystem;
+    [SerializeField] private float oreSearchDistance;
 
-    private LevelGeneratorLayered mapGen;
-    private int width;
-    private int height;
     private float timer;
 
     private int blockAmount;
     private int oreAmount;
     private FrogBehaviour targetedMinion;
     private List<GameObject> minions = new List<GameObject>();
+
+
 
     public int Id => id;
 
@@ -33,14 +32,8 @@ public class EvilBeavisBaseController : MonoBehaviour, HasCoolDownInterFace
     // Start is called before the first frame update
     void Start()
     {
-        tileMapManager = GameObject.FindWithTag("GameManager").GetComponent<TileMapManager>();
-        mapGen = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
-        chunkList = mapGen.chunks;
-        width = mapGen.width;
-        height = mapGen.height;
-        currentChunk = GetCurrentChunk(transform.position.x);
+        currentChunk = GetCurrentChunk(transform.position);
         StartCoroutine(SearchForOres());
-
     }
 
     private void Update()
@@ -55,68 +48,100 @@ public class EvilBeavisBaseController : MonoBehaviour, HasCoolDownInterFace
                 {
                     MinionDropOff(minions[i]);
                 }
-
             }
             timer = 0;
         }
     }
 
-
     private IEnumerator SearchForOres()
     {
-        string blockType;
-        for (int x = (int)transform.position.x; x > (int)transform.position.x - 35 && x >= 0; x--)
+        int startSearchX = (int)(transform.position.x - (oreSearchDistance / 2));
+        int stopSearchX = (int)(transform.position.x + (oreSearchDistance / 2));
+
+        int startSearchY = (int)(transform.position.y - (oreSearchDistance / 2));
+        int stopSearchY = (int)(transform.position.y + (oreSearchDistance / 2));
+
+        for (int x = startSearchX; x <= stopSearchX; x++)
         {
-            Tilemap chunk = GetCurrentChunk(x);
-           // yield return new WaitForSeconds(0.01f);
-            
-            for (int y = (int)transform.position.y; y > 0; y--)
+            yield return null;
+            for (int y = startSearchY; y <= stopSearchY; y++)
             {
-                
-                Vector3Int blockInLocal = chunk.WorldToCell(new Vector3Int(x, y, 0));
-               // yield return new WaitForSeconds(0.01f);
-                if (chunk.HasTile(blockInLocal))
+                Tilemap chunk = GetCurrentChunk(new Vector3(x, y));
+
+                Vector3Int cellPosition = chunk.WorldToCell(new Vector3(x, y));
+
+                if(chunk.HasTile(cellPosition))
                 {
-                    
-                    blockType = tileMapManager.GetBlockType(blockInLocal, chunk);
+                    string blockType = TileMapManager.Instance.GetBlockType(cellPosition, chunk);
+
                     if(blockType == "Ore")
                     {
                         targetedOre.Add(new Vector3Int(x, y, 0));
                     }
-                    
                 }
             }
         }
-        yield return new WaitForSeconds(0.01f);
-        for (int x = (int)transform.position.x; x < (int)transform.position.x + 35 && x < (chunkList.Count * 250); x++)
-        {
-          
-            Tilemap chunk = GetCurrentChunk(x);
-          //  yield return new WaitForSeconds(0.01f);
 
-            for (int y = (int)transform.position.y; y > 0; y--)
-            {
-                Vector3Int blockInLocal = chunk.WorldToCell(new Vector3Int(x, y, 0));
-             //   yield return new WaitForSeconds(0.01f);
-                if (chunk.HasTile(blockInLocal))
-                {
-                    
-                    blockType = tileMapManager.GetBlockName(blockInLocal, chunk);
-                    if (blockType == "Ore")
-                        targetedOre.Add(new Vector3Int(x, y, 0));
-                }
-            }
-        }
         targetedOre = targetedOre.OrderBy(x => Vector3Int.Distance(Vector3Int.FloorToInt(transform.position), x)).ToList();
         targetedOre.Reverse();
         minions.Add(Instantiate(minion, new Vector3(transform.position.x , transform.position.y), Quaternion.identity));
-        
+
     }
 
-    private Tilemap GetCurrentChunk(float positionX)
+    //private IEnumerator SearchForOres()
+    //{
+    //    string blockType;
+    //    for (int x = (int)transform.position.x; x > (int)transform.position.x - 35 && x >= 0; x--)
+    //    {
+    //        Tilemap chunk = GetCurrentChunk(x);
+    //       // yield return new WaitForSeconds(0.01f);
+
+    //        for (int y = (int)transform.position.y; y > 0; y--)
+    //        {
+
+    //            Vector3Int blockInLocal = chunk.WorldToCell(new Vector3Int(x, y, 0));
+    //           // yield return new WaitForSeconds(0.01f);
+    //            if (chunk.HasTile(blockInLocal))
+    //            {
+
+    //                blockType = TileMapManager.Instance.GetBlockType(blockInLocal, chunk);
+    //                if(blockType == "Ore")
+    //                {
+    //                    targetedOre.Add(new Vector3Int(x, y, 0));
+    //                }
+
+    //            }
+    //        }
+    //    }
+    //    yield return new WaitForSeconds(0.01f);
+    //    for (int x = (int)transform.position.x; x < (int)transform.position.x + 35 && x < (chunkList.Count * 250); x++)
+    //    {
+
+    //        Tilemap chunk = GetCurrentChunk(x);
+    //      //  yield return new WaitForSeconds(0.01f);
+
+    //        for (int y = (int)transform.position.y; y > 0; y--)
+    //        {
+    //            Vector3Int blockInLocal = chunk.WorldToCell(new Vector3Int(x, y, 0));
+    //         //   yield return new WaitForSeconds(0.01f);
+    //            if (chunk.HasTile(blockInLocal))
+    //            {
+
+    //                blockType = tileMapManager.GetBlockName(blockInLocal, chunk);
+    //                if (blockType == "Ore")
+    //                    targetedOre.Add(new Vector3Int(x, y, 0));
+    //            }
+    //        }
+    //    }
+    //    targetedOre = targetedOre.OrderBy(x => Vector3Int.Distance(Vector3Int.FloorToInt(transform.position), x)).ToList();
+    //    targetedOre.Reverse();
+    //    minions.Add(Instantiate(minion, new Vector3(transform.position.x , transform.position.y), Quaternion.identity));
+
+    //}
+
+    private Tilemap GetCurrentChunk(Vector3 worldPosition)
     {
-        Tilemap chunk = chunkList[Mathf.FloorToInt(positionX / width)];
-        return chunk;
+        return TileMapManager.Instance.GetTileChunk(worldPosition);
     }
 
 
@@ -138,12 +163,14 @@ public class EvilBeavisBaseController : MonoBehaviour, HasCoolDownInterFace
     {
         if (oreAmount >= 50)
         {
-            Instantiate(minion, new Vector3(transform.position.x, transform.position.y), Quaternion.identity);
+            GameObject newMinion = Instantiate(minion, new Vector3(transform.position.x, transform.position.y), Quaternion.identity);
+            NetworkServer.Spawn(newMinion);
             oreAmount = 0;
         }
         if (blockAmount >= 500)
         {
-            Instantiate(minion, new Vector3(transform.position.x, transform.position.y), Quaternion.identity);
+            GameObject newMinion = Instantiate(minion, new Vector3(transform.position.x, transform.position.y), Quaternion.identity);
+            NetworkServer.Spawn(newMinion);
             blockAmount = 0;
         }
     }

@@ -8,10 +8,12 @@ using Unity.Collections;
 
 public class DefaultPlanetGeneration : Worldgeneration
 {
-
+    
     public override void OnStartServer()
     {
         Init();
+
+        new PathfindingDots(horizontalChunks * width, verticalChunks * height, Vector3.zero);
 
         NativeArray<int> worldArray = new NativeArray<int>(horizontalChunks * width * verticalChunks * height, Allocator.TempJob);
         NativeArray<int> topLayer = new NativeArray<int>(horizontalChunks * width * height, Allocator.TempJob);
@@ -26,16 +28,6 @@ public class DefaultPlanetGeneration : Worldgeneration
         AddOreBlocks(worldArray, (int)BlockTypeConversion.CoalBlock);
         AddOreBlocks(worldArray, (int)BlockTypeConversion.GoldBlock);
 
-        //Copy values from the array with the topWalk values to the array with the entire world
-
-        //for (int x = 0; x < width * horizontalChunks; x++)
-        //{
-        //    for (int y = 0; y < height * verticalChunks; y++)
-        //    {
-        //        int cavesIndex = x * height * verticalChunks + y;
-        //        worldArray[cavesIndex] = cavesArray[cavesIndex];
-        //    }
-        //}
         for (int x = 0; x < (horizontalChunks * width); x++)
         {
             for (int y = 0; y < height; y++)
@@ -49,8 +41,6 @@ public class DefaultPlanetGeneration : Worldgeneration
 
             }
         }
-
-
 
         //Copy worldarray(contains the entire world) to Chunk(same size as a tilemap)
         for (int i = 0; i < horizontalChunks; i++)
@@ -75,7 +65,7 @@ public class DefaultPlanetGeneration : Worldgeneration
                 }
             }
         }
-
+        UpdatePathfinding(chunkArray);
         Render(chunkArray);
 
         //Cleanup
@@ -85,13 +75,54 @@ public class DefaultPlanetGeneration : Worldgeneration
         }
         topLayer.Dispose();
 
+        SetPlayerSpawn(worldArray);
+        SpawnEnemy(worldArray);
         // Skapar en ny persistent array som skickas till tilemapmanager för att kunna uppdateras. Vet inte om det här behöver nån nätverkgrej?
-        NativeArray<int> world = new NativeArray<int>(worldArray, Allocator.Persistent);
-        TileMapManager.Instance.worldArray = world;
+        TileMapManager.Instance.worldArray = new NativeArray<int>(worldArray, Allocator.Persistent);
 
         worldArray.Dispose();
       //  InvokeRepeating("UpdateMap", 1f, 1f);
 
+    }
+
+    private void SetPlayerSpawn(NativeArray<int> worldArray)
+    {
+        int xStart = (horizontalChunks * width) / 2;
+
+        for (int y = (verticalChunks * height) - 1; y >= 0; y--)
+        {
+            int index = xStart * verticalChunks * height + y;
+            if(worldArray[index] > 0)
+            {
+                if (NetworkManager.startPositions.Count > 0)
+                    NetworkManager.startPositions[0].position = new Vector3(xStart, y + 2);
+                else
+                {
+                    GameObject start = GameObject.Find("StartPosition");
+                    start.transform.position = new Vector3(xStart, y + 2);
+                    NetworkManager.RegisterStartPosition(start.transform);
+                }
+
+                break;
+            }
+        }
+        
+    }
+
+    private void SpawnEnemy(NativeArray<int> worldArray)
+    {
+        int xStart = (horizontalChunks * width) / 4;
+        for (int y = (verticalChunks * height) - 1; y >= 0; y--)
+        {
+            int index = xStart * verticalChunks * height + y;
+            if (worldArray[index] > 0)
+            {
+                GameObject enemy = Instantiate(enemyPrefab, new Vector3(xStart, y + 2), Quaternion.identity);
+                Debug.Log("EnemySpawned at: " + enemy.transform.position);
+                NetworkServer.Spawn(enemy);
+                break;
+            }
+        }
     }
 
     private NativeArray<int> AddCommonBlocks(NativeArray<int> mapCoords)
@@ -145,14 +176,11 @@ public class DefaultPlanetGeneration : Worldgeneration
         return mapCoords;
     }
 
-
-
     private NativeArray<int> AddOreBlocks(NativeArray<int> mapCoords, int block)
     {
         int worldWidth = horizontalChunks * width;
         int worldHeight = verticalChunks * height;
         int modifier = OreModifier(block);
-
 
         float seed = UnityEngine.Random.Range(0f, 1f);
 
@@ -364,7 +392,6 @@ public class DefaultPlanetGeneration : Worldgeneration
         return mapCoords;
     }
 
-
     private NativeArray<int> CreateTopTerrain(NativeArray<int> mapCoords)
     {
         int heighRandomize = UnityEngine.Random.Range(2, 7);
@@ -413,8 +440,6 @@ public class DefaultPlanetGeneration : Worldgeneration
         }
         return mapCoords;
     }
-
-
 
     private NativeArray<int> CreateCaveTerrain(NativeArray<int> mapCoords)
     {

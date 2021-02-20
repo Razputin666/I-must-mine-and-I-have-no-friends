@@ -106,7 +106,7 @@ public class PlayerMovementController : NetworkBehaviour
             if (legMovement != null)
                 legMovement.MoveFootTarget(previousInput);
             else
-                rb2d.velocity += previousInput * movementSpeed;
+                rb2d.velocity += previousInput * movementSpeed * Time.fixedDeltaTime;
         }
         
         if (rb2d.velocity.y < -25f)

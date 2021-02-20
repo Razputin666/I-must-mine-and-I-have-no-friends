@@ -53,8 +53,7 @@ public class PlayerController : NetworkBehaviour
     Camera _secondCamera;
 
     private SceneScript sceneScript;
-    [SerializeField]
-    private float itemPickupRange;
+    [SerializeField] private float itemPickupRange;
     private float itemPickupCooldown;
     private const float itemPickupCooldownDefault = 0.5f;
     [SyncVar]
@@ -333,7 +332,6 @@ public class PlayerController : NetworkBehaviour
                 mousePosInWorld = mousePos;
             }
                 
-
             if (playerHP <= 0)
             {
                 Die();

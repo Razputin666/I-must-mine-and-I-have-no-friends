@@ -6,17 +6,19 @@ public class PathfindingTesting : MonoBehaviour
 {
     private void Start()
     {
-        int width = 4000;
-        int height = 4000;
+        int width = 1000;
+        int height = 1000;
 
         PathfindingDots pathfindingDots = new PathfindingDots(width, height, Vector3.zero);
         //Pathfinding pathfinding = new Pathfinding(width, height, Vector3.zero);
-        Pathfind(true);
+        Pathfind(false);
+        Pathfind(false);
+        Pathfind(false);
     }
 
     private void Update()
     {
-        
+
     }
 
     private void OnApplicationQuit()
