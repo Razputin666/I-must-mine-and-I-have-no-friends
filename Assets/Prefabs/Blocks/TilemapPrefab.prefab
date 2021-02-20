@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 594149105958690445}
   - component: {fileID: 6611024963374839542}
   - component: {fileID: -7461722848896506654}
+  - component: {fileID: 7663779823202159461}
   - component: {fileID: 4780777864239414574}
   - component: {fileID: 875870659772456768}
   - component: {fileID: 696019320758138291}
@@ -220,6 +221,23 @@ CompositeCollider2D:
     m_Paths: []
   m_VertexDistance: 0.5
   m_OffsetDistance: 0.00005
+--- !u!114 &7663779823202159461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4802906064719502046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f2308b3fc85de84aa32866f516cf78b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  tileChunk: {fileID: 0}
+  tilebases: []
+  SetJobs: 0
 --- !u!114 &4780777864239414574
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -108,52 +108,41 @@ public class PlayerController : NetworkBehaviour
     #region Network
 
     #region Commands
-    /// <summary>
-    /// Sets the active itemID on the server so the sprite can be updatet for the client
-    /// </summary>
-    /// <param name="itemID">Id of the equipped item in hand</param>
     [Command]
     public void CmdActiveItemChanged(int itemID)
     {
         activeItemID = itemID;
     }
 
-    //[Command]
-    //public void CmdSetupPlayer(string name)
-    //{
+    [Command]
+    public void CmdSetupPlayer(string name)
+    {
 
-    //    //player info sent to server, then server updates sync vars which handles it on all clients
-    //    playerName = name;
-    //    //sceneScript.statusText = $"{playerName} joined.";
-    //    //sceneScript.canvasStatusText.enabled = true;
-    //    StartCoroutine(FadeServerMessage());
-    //}
+        //player info sent to server, then server updates sync vars which handles it on all clients
+        playerName = name;
+        //sceneScript.statusText = $"{playerName} joined.";
+        //sceneScript.canvasStatusText.enabled = true;
+        StartCoroutine(FadeServerMessage());
+    }
 
-    /// <summary>
-    /// Destroy the Gameobject on the server and on the clients
-    /// </summary>
-    /// <param name="obj">GameObject to be destroyed</param>
     [Command(ignoreAuthority = true)]
     private void CmdRemoveGroundItem(GameObject obj)
     {
         NetworkServer.Destroy(obj);
     }
 
-    //[Command]
-    //public void CmdSendPlayerMessage()
-    //{
-    //    if(sceneScript)
-    //    {
-    //        sceneScript.canvasStatusText.enabled = true;
-    //        sceneScript.statusText = $"{playerName} says hello {Random.Range(10, 99)}";
+    [Command]
+    public void CmdSendPlayerMessage()
+    {
+        if(sceneScript)
+        {
+            sceneScript.canvasStatusText.enabled = true;
+            sceneScript.statusText = $"{playerName} says hello {Random.Range(10, 99)}";
 
-    //        StartCoroutine(FadeServerMessage());
-    //    }
-    //}
+            StartCoroutine(FadeServerMessage());
+        }
+    }
 
-    /// <summary>
-    /// Sends the mouse position from the client to the server
-    /// </summary>
     [Command]
     private void CmdSendMousePos(Vector3 mousePos)
     {
@@ -171,9 +160,6 @@ public class PlayerController : NetworkBehaviour
 
         rb2d = GetComponent<Rigidbody2D>();
     }
-    /// <summary>
-    /// Check if we collide on the server with any items in the world and if so add it to the players inventory
-    /// </summary>
     [Server]
     private void CheckItemCollision()
     {
@@ -186,7 +172,7 @@ public class PlayerController : NetworkBehaviour
             {
                 Debug.Log("Collision");
                 Item newItem = new Item(groundItem.Item);
-                //tell the client to add the item we collided with
+
                 RpcAddItemToPlayer(GetComponent<NetworkIdentity>().connectionToClient, newItem.ID, newItem.Amount);
                 NetworkServer.Destroy(collider2D.gameObject);
             }
@@ -215,7 +201,7 @@ public class PlayerController : NetworkBehaviour
             }
         }
     }
-    //debug used to see item pickup range
+
     //private void OnDrawGizmos()
     //{
     //    Gizmos.color = Color.blue;
@@ -228,26 +214,17 @@ public class PlayerController : NetworkBehaviour
     {
         playerNameText.text = playerName;
     }
-    /// <summary>
-    /// Callback function used when we select another item from our Quickslot bar
-    /// </summary>
-    /// <param name="_Old">the old item ID we had selected before</param>
-    /// <param name="_New">the new Item ID selected</param>
     private void OnActiveItemChanged(int _Old, int _New)
     {
-        //Get itemObject from the database
         ItemObject itemObj = ItemHandler.ItemDatabase.GetItemAt(_New);
         if (itemObj != null)
         {
-            //Change Player state depending on the item we selected
             SetPlayerState(itemObj.ItemType);
-            //Update the sprite we see in our hand
             item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
         }
         else
         {
             SetPlayerState(ITEM_TYPE.None);
-            //Update the sprite we see in our hand
             item.GetComponent<SpriteRenderer>().sprite = null;
         }
     }
@@ -290,16 +267,10 @@ public class PlayerController : NetworkBehaviour
         StartCoroutine(CoroutineCoordinator());
     }
 
-    /// <summary>
-    /// Send a message to target client with Id and amount of an item to add
-    /// </summary>
-    /// <param name="conn">Connection to the specific client that recieves the message</param>
-    /// <param name="itemID">ID of the item that should be added</param>
-    /// <param name="itemAmount">how many of the item to be added</param>
     [TargetRpc]
     public void RpcAddItemToPlayer(NetworkConnection conn, int itemID, int itemAmount)
     {
-        //Create a copy of the item from the database
+        Debug.Log("Adding item. ID: " + itemID + " amount: " + itemAmount);
         ItemObject item = Instantiate(GetInventoryObject.ItemDatabase.GetItemAt(itemID));
         item.Data.Amount = itemAmount;
 
@@ -329,10 +300,10 @@ public class PlayerController : NetworkBehaviour
 
             Vector3 mousePos = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y));
             mousePos.z = 0;
-            //if the server is a client set the variable directly
+
             if (isServer)
                 mousePosInWorld = mousePos;
-            else // else send a message to the server with the variable
+            else
             {
                 CmdSendMousePos(mousePos);
                 mousePosInWorld = mousePos;
@@ -346,23 +317,16 @@ public class PlayerController : NetworkBehaviour
         }
 
     }
-    /// <summary>
-    /// Called when active quickslot i changed and sends a message to the server
-    /// </summary>
-    /// <param name="itemID">ID of the item being equipped in hand</param>
     [Client]
     public void UpdateActiveItem(int itemID)
     {
         CmdActiveItemChanged(itemID);
     }
-    /// <summary>
-    /// Updates active quickslot variable and tell the server that it should update the sprite in the hand slot.
-    /// </summary>
-    /// <param name="index">Quickslot index that is active</param>
 
     [Client]
     private void QuickslotActiveChanged(int index)
     {
+        Debug.Log("quickslot");
         if (ActiveQuickslot != index)
         {
             ItemObject itemObj = ItemHandler.QuickSlots.Container.InventorySlot[index].ItemObject;
@@ -469,15 +433,15 @@ public class PlayerController : NetworkBehaviour
 
     #endregion
 
-    //private IEnumerator FadeServerMessage()
-    //{
-    //    if(sceneScript)
-    //    {
-    //        yield return new WaitForSeconds(5f);
+    private IEnumerator FadeServerMessage()
+    {
+        if(sceneScript)
+        {
+            yield return new WaitForSeconds(5f);
 
-    //        sceneScript.canvasStatusText.enabled = false;
-    //    }
-    //}
+            sceneScript.canvasStatusText.enabled = false;
+        }
+    }
 
     private IEnumerator CoroutineCoordinator()
     {
