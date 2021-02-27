@@ -17,7 +17,6 @@ public class PlayerMovementController : NetworkBehaviour
     [SerializeField] private LimbMovement legMovement;
     public float jumpVelocity;
     public float maxFallSpeed;
-    private float maxSpeed;
     float heightTimer;
     float widthTimer;
     //float jumpTimer;
@@ -101,14 +100,25 @@ public class PlayerMovementController : NetworkBehaviour
         //previousInput = pathfinder.Direction;
 
         Flip(previousInput.x);
-        if(previousInput != Vector2.zero)
+
+        CheckMaxSpeed();
+
+        if (IsJumping && jumpController.IsGrounded())
+        {
+            jumpController.Jump();
+        }
+    }
+
+    private void CheckMaxSpeed()
+    {
+        if (previousInput != Vector2.zero)
         {
             if (legMovement != null)
                 legMovement.MoveFootTarget(previousInput);
             else
                 rb2d.velocity += previousInput * movementSpeed * Time.fixedDeltaTime;
         }
-        
+
         if (rb2d.velocity.y < -25f)
         {
             heightTimer += Time.deltaTime;
@@ -118,29 +128,18 @@ public class PlayerMovementController : NetworkBehaviour
                 heightTimer = 1f;
         }
 
-        maxSpeed = Mathf.Abs(rb2d.velocity.x);
+        float currentSpeed = Mathf.Abs(rb2d.velocity.x);
 
-        if (maxSpeed > 25f && rb2d.velocity.x > 0)
+        if(currentSpeed > 25f)
         {
             widthTimer += Time.deltaTime;
             float asedf = Mathf.Clamp(widthTimer, 1f, 3f);
-            rb2d.velocity -= Vector2.right * asedf;
-            if (maxSpeed > 30f)
-                widthTimer = 1f;
-        }
 
-        if (maxSpeed > 25f && rb2d.velocity.x < 0)
-        {
-            widthTimer += Time.deltaTime;
-            float asedf = Mathf.Clamp(widthTimer, 1f, 3f);
-            rb2d.velocity -= Vector2.left * asedf;
-            if (maxSpeed > 30f)
+            Vector2 oppositeDirection = rb2d.velocity.x > 0f ? Vector2.right : Vector2.left;
+            rb2d.velocity -= oppositeDirection * asedf;
+            if (currentSpeed > 30f)
                 widthTimer = 1f;
-        }
 
-        if (IsJumping && jumpController.IsGrounded())
-        {
-            jumpController.Jump();
         }
     }
 

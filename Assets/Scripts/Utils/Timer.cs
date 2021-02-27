@@ -4,30 +4,49 @@ using UnityEngine;
 
 namespace Utils
 {
-    public class Timer
+    public static class Timer
     {
-        private System.Diagnostics.Stopwatch stopwatch;
-        private string timerInfo;
-        public Timer(string info)
+        private static Dictionary<string, System.Diagnostics.Stopwatch> timers = new Dictionary<string, System.Diagnostics.Stopwatch>();
+        //private static System.Diagnostics.Stopwatch stopwatch;
+        //private static string timerInfo;
+        //public Timer(string info)
+        //{
+        //    stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        //    timerInfo = info;
+        //}
+
+        public static void StartTimer(string name)
         {
-            stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            timerInfo = info;
+            if(!timers.ContainsKey(name))
+            {
+                timers.Add(name, System.Diagnostics.Stopwatch.StartNew());
+            }
+
+            timers[name].Start();
         }
 
-        public void StartTimer()
+        public static void StopTimer(string name)
         {
-            stopwatch.Start();
+            if(!timers.ContainsKey(name))
+            {
+                Debug.Log("No timer with the name: " + name + " exists");
+                return;
+            }
+            timers[name].Stop();
         }
 
-        public void StopTimer()
+        public static void PrintTimer(string name)
         {
-            stopwatch.Stop();
-        }
+            if(!timers.ContainsKey(name))
+            {
+                Debug.Log("No timer with the name: " + name + " exists");
+                return;
+            }
+            
+            System.TimeSpan timeTaken = timers[name].Elapsed;
+            Debug.Log("Time taken for " + name + ": " + timeTaken.ToString(@"m\:ss\.fff"));
 
-        public void PrintTimer()
-        {
-            System.TimeSpan timeTaken = stopwatch.Elapsed;
-            Debug.Log("Time taken for " + timerInfo + ": " + timeTaken.ToString(@"m\:ss\.fff"));
+            timers.Remove(name);
         }
     }
 }

@@ -812,6 +812,10 @@ PrefabInstance:
       propertyPath: sceneId
       value: 1625665016
       objectReference: {fileID: 0}
+    - target: {fileID: 1508111170, guid: 2aebd52ad1cab5b4babd8935c208b58a, type: 3}
+      propertyPath: m_AssetId
+      value: 2aebd52ad1cab5b4babd8935c208b58a
+      objectReference: {fileID: 0}
     - target: {fileID: 1522409692357797863, guid: 2aebd52ad1cab5b4babd8935c208b58a,
         type: 3}
       propertyPath: grid

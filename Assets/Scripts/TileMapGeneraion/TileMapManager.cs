@@ -256,4 +256,25 @@ public class TileMapManager : NetworkBehaviour
             ts.SetTileData();
         }
     }
+
+    #region Debugging
+    [Server]
+    public void ChangeTileColor(Vector3 TileWorldPosition, Color color)
+    {
+        RpcChangeTileColor(TileWorldPosition, color);
+    }
+    //used for pathfinding debugging atm
+    [ClientRpc]
+    private void RpcChangeTileColor(Vector3 TileWorldPosition, Color color)
+    {
+        Tilemap chunk = GetTileChunk(TileWorldPosition);
+
+        Vector3Int tileCellPosition = chunk.WorldToCell(TileWorldPosition);
+
+        chunk.SetTileFlags(tileCellPosition, TileFlags.None);
+        chunk.SetColor(tileCellPosition, color);
+
+        chunk.SetTileFlags(tileCellPosition, TileFlags.LockColor);
+    }
+    #endregion
 }

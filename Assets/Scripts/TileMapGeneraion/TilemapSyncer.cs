@@ -36,7 +36,7 @@ public class TilemapSyncer : NetworkBehaviour
     {
         if (!gametiles)
             gametiles = GetComponent<GameTiles>();
-
+        
         if (!networkTransmitter)
             networkTransmitter = GetComponent<NetworkTransmitter>();
 

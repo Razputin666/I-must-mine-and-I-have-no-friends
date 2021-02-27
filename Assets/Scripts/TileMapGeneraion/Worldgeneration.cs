@@ -207,8 +207,11 @@ public class Worldgeneration : NetworkBehaviour
         {
             for (int y = 0; y < height + (height / 2); y++)
             {
-
-                if (chunk.HasTile(new Vector3Int(x, y, 0)) && !chunk.HasTile(new Vector3Int(x + 1, y, 0)) && !chunk.HasTile(new Vector3Int(x - 1, y, 0)) && !chunk.HasTile(new Vector3Int(x, y + 1, 0)) && !chunk.HasTile(new Vector3Int(x, y - 1, 0)))
+                if (chunk.HasTile(new Vector3Int(x, y, 0)) && 
+                    !chunk.HasTile(new Vector3Int(x + 1, y, 0)) && 
+                    !chunk.HasTile(new Vector3Int(x - 1, y, 0)) && 
+                    !chunk.HasTile(new Vector3Int(x, y + 1, 0)) && 
+                    !chunk.HasTile(new Vector3Int(x, y - 1, 0)))
                 {
                     chunk.SetTile(new Vector3Int(x, y, 0), null);
                 }

@@ -88,5 +88,5 @@ MonoBehaviour:
   useJobs: 1
   chunks: []
   blocks: []
-  enemyPrefab: {fileID: 1786306752357913020, guid: 365e64ece74321b48bc3fccf204ae325,
+  enemyPrefab: {fileID: 6940610309342446004, guid: 0952de538e9581b47b493481a71b149c,
     type: 3}

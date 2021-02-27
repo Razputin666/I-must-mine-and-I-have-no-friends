@@ -17,7 +17,7 @@ public class Pathfinder : NetworkBehaviour
     private EnemyBehaviour enemyController;
     public override void OnStartServer()
     {
-        pathVectorList = new List<Vector3>();
+        pathVectorList = null;
         pathCompleted = false;
         currentPathIndex = 0;
         miningController = GetComponent<MiningController>();
@@ -26,32 +26,63 @@ public class Pathfinder : NetworkBehaviour
 
     public bool CalculatePath(Vector3 startWorldPositon, Vector3 targetWorldPosition)
     {
-        currentPathIndex = 0;
-        System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        if(pathVectorList != null && pathVectorList.Count > 0)
+        {
+            //Debugging
+            //Go through every Node in our previous path and reset the color.
+            for (int i = 0; i < pathVectorList.Count; i++)
+            {
+                TileMapManager.Instance.ChangeTileColor(pathVectorList[i], Color.white);
+            }
+        }
 
-        stopwatch.Start();
+        currentPathIndex = 0;
         
+        Utils.Timer.StartTimer("Pathfinding");
         pathVectorList = PathfindingDots.Instance.FindPath(
             Vector3Int.FloorToInt(startWorldPositon), 
             Vector3Int.FloorToInt(targetWorldPosition));
 
-        stopwatch.Stop();
+        Utils.Timer.StopTimer("Pathfinding");
 
-        System.TimeSpan timeTaken = stopwatch.Elapsed;
-        Debug.Log("Time taken dots: " + timeTaken.ToString(@"m\:ss\.fff"));
+        Utils.Timer.PrintTimer("Pathfinding");
 
+        //Debugging
+        //Go through every node in our path and set the color to green for debugging.
+        for (int i = 1; i < pathVectorList.Count; i++)
+        {
+            TileMapManager.Instance.ChangeTileColor(pathVectorList[i], Color.green);
+        }
+
+        //If we found a path then remove the first node since it is our current position.
         if (pathVectorList != null && pathVectorList.Count > 1)
         {
             pathVectorList.RemoveAt(0);
             pathCompleted = false;
             return true;
         }
+
         return false;
     }
 
+    //public bool SetPath(List<Vector3> path)
+    //{
+    //    pathVectorList = path;
+    //    if (pathVectorList != null && pathVectorList.Count > 1)
+    //    {
+    //        pathVectorList.RemoveAt(0);
+    //        pathCompleted = false;
+    //        return true;
+    //    }
+    //    return false;
+    //}
+
     public void Move()
     {
-        if(pathVectorList == null || currentPathIndex >= pathVectorList.Count)
+        if (pathVectorList == null)
+            return;
+        // If we have gone through the pathfinding then the path is complete
+        if(currentPathIndex >= pathVectorList.Count)
         {
             pathVectorList = null;
             Direction = Vector2.zero;
@@ -63,21 +94,36 @@ public class Pathfinder : NetworkBehaviour
         Vector3Int adjustedTransform = Vector3Int.FloorToInt(transform.position + Vector3.zero);
         if (PathRequiresMining(targetPosition))
         {
+            Debug.Log("Mining");
         }
-        else if (Vector3.Distance(adjustedTransform, targetPosition) > 1.0f)
+        else if (Vector3.Distance(adjustedTransform, targetPosition) > 1.0f) // if the distance is to far away. Move closer
         {
+            //Debug.Log(targetPosition);
+            //if(PathfindingDots.Instance.GetNode(targetPosition).hasBlock)
+            //{
+            //    PathRequiresMining(targetPosition);
+            //}
+            //else
+            //{
+            Debug.Log("moving");
             Vector3 moveDir = (targetPosition - adjustedTransform).normalized;
-            if (moveDir.y > 0.4f)
+            if (moveDir.y > 0.4f) // if the direction is upwards then jump.
                 GetComponent<JumpController>().Jump();
+
             moveDir.y = 0;
             Direction = moveDir;
-            float distanceBefore = Vector3.Distance(transform.position, targetPosition);
+            //}
+            
+            //float distanceBefore = Vector3.Distance(transform.position, targetPosition);
         }
         else
         {
             currentPathIndex++;
         }
     }
+    /// <summary>
+    /// Check tiles on our next location if it needs to be mined and then check nearby tiles so it's walkable for the unit
+    /// </summary>
     private bool PathRequiresMining(Vector3 targetPosition)
     {
         float unitHeight = 4f;
@@ -93,15 +139,13 @@ public class Pathfinder : NetworkBehaviour
         {
             Vector3Int adjustedTransform = Vector3Int.FloorToInt(transform.position + Vector3.down);
 
-            Vector3 pos;
-
             if (adjustedTransform.y + 1 == targetPosition.y)//Check if we are moving upwards diagonally
             {
                 if (targetPosition.x == adjustedTransform.x + 1 || targetPosition.x == adjustedTransform.x - 1)
                 {
                     for (int i = 0; i < unitHeight; i++) // Then remove blocks 4 tiles high so we can move
                     {
-                        pos = targetPosition + Vector3.up * (i + 1);
+                        Vector3 pos = targetPosition + Vector3.up * (i + 1);
                         //Check if we are inside the grid
                         if (!PathfindingDots.Instance.IsInsideGrid(pos))
                             continue;
@@ -123,7 +167,7 @@ public class Pathfinder : NetworkBehaviour
                 {
                     for (int i = 0; i < unitHeight; i++) // Then remove blocks 4 tiles high so we can move
                     {
-                        pos = targetPosition + Vector3.up * (i + 1);
+                        Vector3 pos = targetPosition + Vector3.up * (i + 1);
 
                         //Check if we are inside the grid
                         if (!PathfindingDots.Instance.IsInsideGrid(pos))
@@ -141,7 +185,7 @@ public class Pathfinder : NetworkBehaviour
                 }
                 else // if we are moving straight down
                 {
-                    pos = targetPosition + Vector3.right;
+                    Vector3 pos = targetPosition + Vector3.right;
 
                     //Check if we are inside the grid
                     if (PathfindingDots.Instance.IsInsideGrid(pos))
@@ -170,7 +214,6 @@ public class Pathfinder : NetworkBehaviour
                         }
                     }
                 }
-
             }
             else if (targetPosition.y == adjustedTransform.y)//if we are not moving up or down we are moving straight sideways
             {
@@ -178,7 +221,7 @@ public class Pathfinder : NetworkBehaviour
                 {
                     for (int i = 0; i < unitHeight; i++) //Then remove block 2 tiles up from target
                     {
-                        pos = targetPosition + Vector3.up * (i + 1);
+                        Vector3 pos = targetPosition + Vector3.up * (i + 1);
                         //Check if we are inside the grid
                         if (PathfindingDots.Instance.IsInsideGrid(pos))
                         {

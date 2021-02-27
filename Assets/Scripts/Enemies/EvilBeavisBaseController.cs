@@ -20,10 +20,7 @@ public class EvilBeavisBaseController : NetworkBehaviour, HasCoolDownInterFace
 
     private int blockAmount;
     private int oreAmount;
-    private FrogBehaviour targetedMinion;
     private List<GameObject> minions = new List<GameObject>();
-
-
 
     public int Id => id;
 
@@ -148,7 +145,7 @@ public class EvilBeavisBaseController : NetworkBehaviour, HasCoolDownInterFace
     private void MinionDropOff(GameObject minion)
     {
 
-        targetedMinion = minion.GetComponent<FrogBehaviour>();
+        FrogBehaviour targetedMinion = minion.GetComponent<FrogBehaviour>();
         oreAmount += targetedMinion.OreAmount;
         blockAmount += targetedMinion.BlockAmount;
         targetedMinion.BlockAmount = 0;

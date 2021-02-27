@@ -112,6 +112,7 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     [Server]
     private void ServerMine(Vector3 blockToMine, float miningStr)
     {
+        TileMapManager.Instance.ChangeTileColor(blockToMine, Color.blue);
         chunk = GetChunk(blockToMine);
 
         if (chunk == null)
@@ -140,8 +141,10 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
             blockStr -= miningStr * coolDownDuration;
             blockChecker[blockInCell] = blockStr;
         }
+
         if (blockStr <= 0)
         {
+            Debug.Log("Removed tile: " + blockToMine);
             DropItemFromBlock(blockInCell, blockName, chunk);
             CheckBlockRules(blockInCell, blockName, chunk, blockToMine);
             blockChecker.Remove(blockInCell);

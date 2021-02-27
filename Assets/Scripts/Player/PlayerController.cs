@@ -339,6 +339,7 @@ public class PlayerController : NetworkBehaviour
         }
 
     }
+
     /// <summary>
     /// Called when active quickslot i changed and sends a message to the server
     /// </summary>
@@ -348,11 +349,11 @@ public class PlayerController : NetworkBehaviour
     {
         CmdActiveItemChanged(itemID);
     }
+
     /// <summary>
     /// Updates active quickslot variable and tell the server that it should update the sprite in the hand slot.
     /// </summary>
     /// <param name="index">Quickslot index that is active</param>
-
     [Client]
     private void QuickslotActiveChanged(int index)
     {

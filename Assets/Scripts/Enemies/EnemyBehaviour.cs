@@ -24,6 +24,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     [SerializeField] protected LimbMovement limbMovement;
     [HideInInspector] protected EnemyTypes enemyTypes;
     protected EnemyStates state;
+    protected EnemyStates prevState;
     [HideInInspector] public Vector3 target;
     protected int currentHitpoints;
     protected bool foundPlayer;
@@ -33,7 +34,7 @@ public abstract class EnemyBehaviour : NetworkBehaviour
     private float heightReductionTimer;
     private float widthReductionTimer;
     private Vector3 previousLocation = Vector3.zero;
-
+    protected BaseBehaviour frogBase;
     protected Pathfinder pathfinder;
 
     [Server]
@@ -44,6 +45,8 @@ public abstract class EnemyBehaviour : NetworkBehaviour
         stats = Instantiate(stats);
         currentHitpoints = stats.hitPoints;
         pathfinder = GetComponent<Pathfinder>();
+
+        frogBase = GameObject.FindWithTag("EnemyBase").GetComponent<BaseBehaviour>();
     }
 
     protected void DeathCheck()
@@ -91,25 +94,28 @@ public abstract class EnemyBehaviour : NetworkBehaviour
                 widthReductionTimer = 1f;
         }
     }
-
-    protected virtual Vector3 FindTarget()
+    public virtual void SetPath(List<Vector3> path)
     {
-        Collider2D[] playerTargets = Physics2D.OverlapCircleAll(transform.position, stats.aggroRange, LayerMask.GetMask("Player"));
-
-        foreach (Collider2D playerTarget in playerTargets)
-        {
-            if (playerTargets != null && playerTarget.TryGetComponent<PlayerController>(out PlayerController player) && Vector2.Distance(transform.position, player.transform.position) < stats.aggroRange)
-            {
-                Debug.Log("Found player");
-                foundPlayer = true;
-                Vector3 tempTarget = player.transform.position;
-                return tempTarget;
-            }
-        }
-
-        foundPlayer = false;
-        return AlternativeTarget();
     }
+
+    //protected virtual Vector3 FindTarget()
+    //{
+    //    Collider2D[] playerTargets = Physics2D.OverlapCircleAll(transform.position, stats.aggroRange, LayerMask.GetMask("Player"));
+
+    //    foreach (Collider2D playerTarget in playerTargets)
+    //    {
+    //        if (playerTargets != null && playerTarget.TryGetComponent<PlayerController>(out PlayerController player) && Vector2.Distance(transform.position, player.transform.position) < stats.aggroRange)
+    //        {
+    //            Debug.Log("Found player");
+    //            foundPlayer = true;
+    //            Vector3 tempTarget = player.transform.position;
+    //            return tempTarget;
+    //        }
+    //    }
+
+    //    foundPlayer = false;
+    //    return AlternativeTarget();
+    //}
 
     protected virtual bool FindPlayerTarget()
     {
@@ -121,17 +127,33 @@ public abstract class EnemyBehaviour : NetworkBehaviour
             if (collider2D.TryGetComponent<PlayerController>(out PlayerController player))
             {
                 Debug.Log("found player");
-                if (pathfinder.CalculatePath(transform.position + Vector3.down, player.transform.position))
-                {
-                    Debug.Log("Hunting Player at: " + player.transform.position);
-                    return true;
-                }
+                //PathfindingDots.Instance.CalculatePaths(
+                //this,
+                //Vector3Int.FloorToInt(transform.position),
+                //Vector3Int.FloorToInt(player.transform.position));
+
+                //return true;
+
+                return pathfinder.CalculatePath(
+                    Vector3Int.FloorToInt(transform.position),
+                    Vector3Int.FloorToInt(player.transform.position));
+
+                //PathfindingDots.Instance.CalculatePaths(
+                //    this, 
+                //    Vector3Int.FloorToInt(transform.position) + Vector3Int.down, 
+                //    Vector3Int.FloorToInt(player.transform.position) + Vector3Int.down);
+
+                //if (pathfinder.CalculatePath(transform.position + Vector3.down, player.transform.position))
+                //{
+                //    Debug.Log("Hunting Player at: " + player.transform.position);
+                //    return true;
+                //}
             }
         }
         return false;
     }
 
-    protected abstract Vector3 AlternativeTarget();
+    protected abstract void AlternativeTarget();
 
     protected void Flip()
     {

@@ -42,6 +42,9 @@ public class DefaultPlanetGeneration : Worldgeneration
             }
         }
 
+        SetPlayerSpawn(worldArray);
+        SpawnEnemy(worldArray);
+
         //Copy worldarray(contains the entire world) to Chunk(same size as a tilemap)
         for (int i = 0; i < horizontalChunks; i++)
         {
@@ -66,6 +69,7 @@ public class DefaultPlanetGeneration : Worldgeneration
             }
         }
         UpdatePathfinding(chunkArray);
+
         Render(chunkArray);
 
         //Cleanup
@@ -75,8 +79,7 @@ public class DefaultPlanetGeneration : Worldgeneration
         }
         topLayer.Dispose();
 
-        SetPlayerSpawn(worldArray);
-        SpawnEnemy(worldArray);
+        
         // Skapar en ny persistent array som skickas till tilemapmanager för att kunna uppdateras. Vet inte om det här behöver nån nätverkgrej?
         TileMapManager.Instance.worldArray = new NativeArray<int>(worldArray, Allocator.Persistent);
 
@@ -111,16 +114,43 @@ public class DefaultPlanetGeneration : Worldgeneration
 
     private void SpawnEnemy(NativeArray<int> worldArray)
     {
-        int xStart = (horizontalChunks * width) / 4;
-        for (int y = (verticalChunks * height) - 1; y >= 0; y--)
+        int xStart = (horizontalChunks * width) / 2;
+        int yStart = (verticalChunks * height) / 2;
+
+        Vector3 spawnPos = new Vector3(xStart, yStart);
+
+        ClearAreaAroundEnemyBase(worldArray, spawnPos);
+
+        GameObject enemy = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
+        Debug.Log("Enemy base spawned at: " + enemy.transform.position);
+        NetworkServer.Spawn(enemy);
+                
+        //for (int y = (verticalChunks * height) - 1; y >= 0; y--)
+        //{
+        //    int index = xStart * verticalChunks * height + y;
+        //    if (worldArray[index] > 0)
+        //    {
+        //        GameObject enemy = Instantiate(enemyPrefab, new Vector3(xStart, y + 2), Quaternion.identity);
+        //        Debug.Log("Enemy base spawned at: " + enemy.transform.position);
+        //        NetworkServer.Spawn(enemy);
+        //        break;
+        //    }
+        //}
+    }
+
+    private void ClearAreaAroundEnemyBase(NativeArray<int> worldArray, Vector3 spawnPosition)
+    {
+        int clearRadius = 10;
+
+        for (int x  = (int)spawnPosition.x - (clearRadius / 2); x < (int)spawnPosition.x + (clearRadius / 2); x++)
         {
-            int index = xStart * verticalChunks * height + y;
-            if (worldArray[index] > 0)
+            for (int y = (int)spawnPosition.y - 2; y < (int)spawnPosition.y + (clearRadius / 2); y++)
             {
-                GameObject enemy = Instantiate(enemyPrefab, new Vector3(xStart, y + 2), Quaternion.identity);
-                Debug.Log("EnemySpawned at: " + enemy.transform.position);
-                NetworkServer.Spawn(enemy);
-                break;
+                if (Vector2.Distance(new Vector2(x, y), spawnPosition) < clearRadius / 2)
+                {
+                    int index = x * verticalChunks * height + y;
+                    worldArray[index] = (int)BlockTypeConversion.Empty;
+                }
             }
         }
     }
