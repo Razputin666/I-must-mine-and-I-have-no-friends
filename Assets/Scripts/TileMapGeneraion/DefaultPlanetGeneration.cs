@@ -28,14 +28,6 @@ public class DefaultPlanetGeneration : Worldgeneration
 
         //Copy values from the array with the topWalk values to the array with the entire world
 
-        //for (int x = 0; x < width * horizontalChunks; x++)
-        //{
-        //    for (int y = 0; y < height * verticalChunks; y++)
-        //    {
-        //        int cavesIndex = x * height * verticalChunks + y;
-        //        worldArray[cavesIndex] = cavesArray[cavesIndex];
-        //    }
-        //}
         for (int x = 0; x < (horizontalChunks * width); x++)
         {
             for (int y = 0; y < height; y++)
@@ -46,7 +38,6 @@ public class DefaultPlanetGeneration : Worldgeneration
                 {
                     worldArray[index] = topLayer[topLayerIndex];
                 }
-
             }
         }
 

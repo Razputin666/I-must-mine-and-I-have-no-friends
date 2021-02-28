@@ -970,8 +970,13 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7558996595812445496, guid: 52e544096f0455c478eb6b371a36a0c1,
         type: 3}
+      propertyPath: range
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7558996595812445496, guid: 52e544096f0455c478eb6b371a36a0c1,
+        type: 3}
       propertyPath: lightStrength
-      value: 0.63
+      value: 0.71
       objectReference: {fileID: 0}
     - target: {fileID: 7558996595812445498, guid: 52e544096f0455c478eb6b371a36a0c1,
         type: 3}

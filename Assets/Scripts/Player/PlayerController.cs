@@ -83,18 +83,13 @@ public class PlayerController : NetworkBehaviour
     {
         if (IsReady)
         {
-            //if (!isLocalPlayer)
-            //{
-            //    //if(camera)
-            //    //    floatingInfo.transform.LookAt(camera.transform);
-            //    return;
-            //}
             if(isLocalPlayer)
             {
                 // Debug.Log("local");
                 if (transform.hasChanged)
                 {
                     MoveCamera();
+
                     UpdateShadows();
                     transform.hasChanged = false;
                 }
@@ -295,7 +290,9 @@ public class PlayerController : NetworkBehaviour
     private void ShadowCasting_OnlightUpdated(object sender, Vector2Int lightPos)
     {
         if (Vector2.Distance(transform.position, lightPos) < playerResWidth || Vector2.Distance(transform.position, lightPos) < playerResHeight)
-        UpdateShadows();
+        {
+            UpdateShadows();
+        }
     }
 
     [Client]
@@ -312,13 +309,12 @@ public class PlayerController : NetworkBehaviour
                 if (TileMapManager.Instance.shadowMap.GetTile(Vector3Int.FloorToInt(transform.position) + temp) == null)
                 {
                     TileMapManager.Instance.shadowMap.SetTile(Vector3Int.FloorToInt(transform.position) + temp, Worldgeneration.Instance.darkTile);
-
+                    
                 }
                 if (!(TileMapManager.Instance.shadowMap.GetColor(Vector3Int.FloorToInt(transform.position + temp)).a == 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]))
                 TileMapManager.Instance.shadowMap.SetColor(Vector3Int.FloorToInt(transform.position + temp), new Color(0, 0, 0, 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]));
             }
         }
-        
     }
 
     //[Client]

@@ -28,11 +28,6 @@ public class ShadowRendererCompute : MonoBehaviour
     //    }
     //}
 
-    private void Start()
-    {
-
-    }
-
     //private void OnRenderImage(RenderTexture source, RenderTexture destination)
     //{
     //    if (shadowMap == null)
