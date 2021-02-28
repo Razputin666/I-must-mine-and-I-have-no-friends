@@ -7,12 +7,9 @@ using Mirror;
 
 public class PlayerController : NetworkBehaviour
 {
-    [SerializeField]
-    LayerMask blockLayerMask;
-
     public enum PlayerStates
     {
-        Idle, Mining, Normal, Building
+        Idle, Mining, Normal, Building, Swinging,
     }
 
     public PlayerStates playerStates { get; private set; }
@@ -21,7 +18,7 @@ public class PlayerController : NetworkBehaviour
     public int playerHP;
 
     public Rigidbody2D rb2d;        //Store a reference to the Rigidbody2D component required to use 2D Physics.
-    public Vector3 mousePosInWorld;
+    [HideInInspector] public Vector3 mousePosInWorld;
     //public Vector3 mousePos;
     //private float distanceFromPlayerx;
     //private float distanceFromPlayery;
@@ -33,11 +30,20 @@ public class PlayerController : NetworkBehaviour
     public Transform item;
     [SerializeField]
     private DeathScreen deathScreen;
-    private Camera _Camera;
+    [SerializeField] private Camera cameraPrefab;
+    private Camera camera;
+
+    private int playerResWidth;
+    private int playerResHeight;
+    private Vector2Int tileScreenSize;
+
+    [SerializeField] private GameObject fovObj;
+    private FovScript fov;
+
 
     private JumpController jumpController;
-    [SerializeField] 
-    private LevelGeneratorLayered mapSize;
+
+    [SerializeField] private GameObject background;
 
     //Network
     [SerializeField]
@@ -49,12 +55,9 @@ public class PlayerController : NetworkBehaviour
     public string playerName;
     [SyncVar(hook = nameof(OnActiveItemChanged))]
     private int activeItemID = -1;
-    [SerializeField]
-    Camera _secondCamera;
 
     private SceneScript sceneScript;
-    [SerializeField]
-    private float itemPickupRange;
+    [SerializeField] private float itemPickupRange;
     private float itemPickupCooldown;
     private const float itemPickupCooldownDefault = 0.5f;
     [SyncVar]
@@ -65,7 +68,7 @@ public class PlayerController : NetworkBehaviour
     {
         //allow all players to run this
         sceneScript = GameObject.FindObjectOfType<SceneScript>();
-        item = gameObject.transform.Find("Gubb_arm").gameObject.transform.Find("ItemHeldInHand");
+        //item = gameObject.transform.Find("Gubb_arm").gameObject.transform.Find("ItemHeldInHand");
 
         ItemHandler = GetComponent<ItemHandler>();
         IsReady = false;
@@ -79,15 +82,20 @@ public class PlayerController : NetworkBehaviour
     {
         if (IsReady)
         {
-            //if (!isLocalPlayer)
-            //{
-            //    //if(camera)
-            //    //    floatingInfo.transform.LookAt(camera.transform);
-            //    return;
-            //}
             if(isLocalPlayer)
             {
+                // Debug.Log("local");
+                if (transform.hasChanged)
+                {
+                    MoveCamera();
+
+                    //UpdateShadows();
+                    transform.hasChanged = false;
+                }
+
                 CheckQuickslotInput();
+
+               // FovChange();
             }
                 
             if(isServer)
@@ -107,52 +115,42 @@ public class PlayerController : NetworkBehaviour
     #region Network
 
     #region Commands
-    /// <summary>
-    /// Sets the active itemID on the server so the sprite can be updatet for the client
-    /// </summary>
-    /// <param name="itemID">Id of the equipped item in hand</param>
+
     [Command]
     public void CmdActiveItemChanged(int itemID)
     {
         activeItemID = itemID;
     }
 
-    //[Command]
-    //public void CmdSetupPlayer(string name)
-    //{
+    [Command]
+    public void CmdSetupPlayer(string name)
+    {
 
-    //    //player info sent to server, then server updates sync vars which handles it on all clients
-    //    playerName = name;
-    //    //sceneScript.statusText = $"{playerName} joined.";
-    //    //sceneScript.canvasStatusText.enabled = true;
-    //    StartCoroutine(FadeServerMessage());
-    //}
+        //player info sent to server, then server updates sync vars which handles it on all clients
+        playerName = name;
+        //sceneScript.statusText = $"{playerName} joined.";
+        //sceneScript.canvasStatusText.enabled = true;
+        StartCoroutine(FadeServerMessage());
+    }
 
-    /// <summary>
-    /// Destroy the Gameobject on the server and on the clients
-    /// </summary>
-    /// <param name="obj">GameObject to be destroyed</param>
     [Command(ignoreAuthority = true)]
     private void CmdRemoveGroundItem(GameObject obj)
     {
         NetworkServer.Destroy(obj);
     }
 
-    //[Command]
-    //public void CmdSendPlayerMessage()
-    //{
-    //    if(sceneScript)
-    //    {
-    //        sceneScript.canvasStatusText.enabled = true;
-    //        sceneScript.statusText = $"{playerName} says hello {Random.Range(10, 99)}";
+    [Command]
+    public void CmdSendPlayerMessage()
+    {
+        if(sceneScript)
+        {
+            sceneScript.canvasStatusText.enabled = true;
+            sceneScript.statusText = $"{playerName} says hello {Random.Range(10, 99)}";
 
-    //        StartCoroutine(FadeServerMessage());
-    //    }
-    //}
+            StartCoroutine(FadeServerMessage());
+        }
+    }
 
-    /// <summary>
-    /// Sends the mouse position from the client to the server
-    /// </summary>
     [Command]
     private void CmdSendMousePos(Vector3 mousePos)
     {
@@ -169,9 +167,6 @@ public class PlayerController : NetworkBehaviour
 
         rb2d = GetComponent<Rigidbody2D>();
     }
-    /// <summary>
-    /// Check if we collide on the server with any items in the world and if so add it to the players inventory
-    /// </summary>
     [Server]
     private void CheckItemCollision()
     {
@@ -182,7 +177,7 @@ public class PlayerController : NetworkBehaviour
             if (collider2D.TryGetComponent<GroundItem>(out GroundItem groundItem))
             {
                 Item newItem = new Item(groundItem.Item);
-                //tell the client to add the item we collided with
+
                 RpcAddItemToPlayer(GetComponent<NetworkIdentity>().connectionToClient, newItem.ID, newItem.Amount);
                 NetworkServer.Destroy(collider2D.gameObject);
             }
@@ -211,7 +206,7 @@ public class PlayerController : NetworkBehaviour
             }
         }
     }
-    //debug used to see item pickup range
+
     //private void OnDrawGizmos()
     //{
     //    Gizmos.color = Color.blue;
@@ -224,26 +219,17 @@ public class PlayerController : NetworkBehaviour
     {
         playerNameText.text = playerName;
     }
-    /// <summary>
-    /// Callback function used when we select another item from our Quickslot bar
-    /// </summary>
-    /// <param name="_Old">the old item ID we had selected before</param>
-    /// <param name="_New">the new Item ID selected</param>
     private void OnActiveItemChanged(int _Old, int _New)
     {
-        //Get itemObject from the database
         ItemObject itemObj = ItemHandler.ItemDatabase.GetItemAt(_New);
         if (itemObj != null)
         {
-            //Change Player state depending on the item we selected
             SetPlayerState(itemObj.ItemType);
-            //Update the sprite we see in our hand
             item.GetComponent<SpriteRenderer>().sprite = itemObj.UIDisplaySprite;
         }
         else
         {
             SetPlayerState(ITEM_TYPE.None);
-            //Update the sprite we see in our hand
             item.GetComponent<SpriteRenderer>().sprite = null;
         }
     }
@@ -252,15 +238,16 @@ public class PlayerController : NetworkBehaviour
     #region Client
     public override void OnStartLocalPlayer()
     {
-        if (_Camera == null)
-            _Camera = Instantiate(Camera.main, transform);
-        
-        Camera.main.GetComponentInParent<AudioListener>().enabled = false;
-        _Camera.GetComponent<AudioListener>().enabled = true;
+        if (camera == null)
+            camera = Instantiate(cameraPrefab);
+        //  camera = Instantiate(Camera.main);
 
-        _Camera.transform.localPosition = new Vector3(0, 0, -20);
+        Camera.main.GetComponentInParent<AudioListener>().enabled = false;
 
         Camera.main.gameObject.SetActive(false);
+
+        background = Instantiate(background, GetComponentInChildren<Canvas>().transform);
+      //  fov = Instantiate(fovObj).GetComponent<FovScript>();
 
         //_camera.transform.position = new Vector3(Mathf.Clamp(rb2d.transform.position.x, (0) + 26.7f, (mapSize.startPosition.x) - 26.7f), rb2d.transform.position.y, -1);
 
@@ -281,21 +268,67 @@ public class PlayerController : NetworkBehaviour
         jumpController = GetComponent<JumpController>();
         ItemHandler = GetComponent<ItemHandler>();
 
+        playerResWidth = Screen.currentResolution.width;
+        playerResHeight = Screen.currentResolution.height;
+        tileScreenSize = new Vector2Int(playerResWidth / 64, playerResHeight / 64);
+
+        ShadowCasting.OnlightUpdated += ShadowCasting_OnlightUpdated;
+
         //mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
 
         StartCoroutine(CoroutineCoordinator());
     }
 
-    /// <summary>
-    /// Send a message to target client with Id and amount of an item to add
-    /// </summary>
-    /// <param name="conn">Connection to the specific client that recieves the message</param>
-    /// <param name="itemID">ID of the item that should be added</param>
-    /// <param name="itemAmount">how many of the item to be added</param>
+    [Client]
+    private void ShadowCasting_OnlightUpdated(object sender, Vector2Int lightPos)
+    {
+        if (Vector2.Distance(transform.position, lightPos) < playerResWidth || Vector2.Distance(transform.position, lightPos) < playerResHeight)
+        {
+            //UpdateShadows();
+        }
+    }
+
+    [Client]
+    private void UpdateShadows()
+    {
+        for (int x = -tileScreenSize.x; x < tileScreenSize.x; x++)
+        {
+            for (int y = -tileScreenSize.y; y < tileScreenSize.y; y++)
+            {
+                Vector3Int temp = new Vector3Int(x, y, 0);
+                if (TileMapManager.Instance.shadowMap.GetTileFlags(Vector3Int.FloorToInt(transform.position) + temp) == TileFlags.LockColor)
+                    TileMapManager.Instance.shadowMap.SetTileFlags(Vector3Int.FloorToInt(transform.position) + temp, TileFlags.None);
+
+                if (TileMapManager.Instance.shadowMap.GetTile(Vector3Int.FloorToInt(transform.position) + temp) == null)
+                {
+                    TileMapManager.Instance.shadowMap.SetTile(Vector3Int.FloorToInt(transform.position) + temp, Worldgeneration.Instance.darkTile);
+                    
+                }
+                if (!(TileMapManager.Instance.shadowMap.GetColor(Vector3Int.FloorToInt(transform.position + temp)).a == 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]))
+                    TileMapManager.Instance.shadowMap.SetColor(Vector3Int.FloorToInt(transform.position + temp), new Color(0, 0, 0, 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]));
+            }
+        }
+    }
+
+    //[Client]
+    //private void FovChange()
+    //{
+    //    Vector3 targetPosition = mousePosInWorld;
+    //    Vector3 aimDir = (targetPosition - transform.position).normalized;
+    //    fov.SetAimDirection(aimDir);
+    //    fov.SetOrigin(transform.position);
+    //}
+
+    [Client]
+    private void MoveCamera()
+    {
+        camera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
+    }
+
     [TargetRpc]
     public void RpcAddItemToPlayer(NetworkConnection conn, int itemID, int itemAmount)
     {
-        //Create a copy of the item from the database
+        //Debug.Log("Adding item. ID: " + itemID + " amount: " + itemAmount);
         ItemObject item = Instantiate(GetInventoryObject.ItemDatabase.GetItemAt(itemID));
         item.Data.Amount = itemAmount;
 
@@ -322,27 +355,28 @@ public class PlayerController : NetworkBehaviour
             if (!isLocalPlayer)
                 return;
 
-            Vector3 mousePos = _Camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y));
+            Vector3 mousePos = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y));
             mousePos.z = 0;
-            //if the server is a client set the variable directly
+
             if (isServer)
                 mousePosInWorld = mousePos;
-            else // else send a message to the server with the variable
+            else
             {
                 CmdSendMousePos(mousePos);
                 mousePosInWorld = mousePos;
             }
                 
-
             if (playerHP <= 0)
             {
                 Die();
             }
+
         }
 
     }
+
     /// <summary>
-    /// Called when active quickslot i changed and sends a message to the server
+    /// Called when active quickslot is changed and sends a message to the server
     /// </summary>
     /// <param name="itemID">ID of the item being equipped in hand</param>
     [Client]
@@ -350,14 +384,15 @@ public class PlayerController : NetworkBehaviour
     {
         CmdActiveItemChanged(itemID);
     }
+
     /// <summary>
     /// Updates active quickslot variable and tell the server that it should update the sprite in the hand slot.
     /// </summary>
     /// <param name="index">Quickslot index that is active</param>
-
     [Client]
     private void QuickslotActiveChanged(int index)
     {
+        Debug.Log("quickslot");
         if (ActiveQuickslot != index)
         {
             ItemObject itemObj = ItemHandler.QuickSlots.Container.InventorySlot[index].ItemObject;
@@ -416,10 +451,10 @@ public class PlayerController : NetworkBehaviour
                 //GetComponent<MiningController>().enabled = false;
                 //item.GetComponent<DefaultGun>().enabled = false;
                 break;
-            case ITEM_TYPE.Weapon:
-                playerStates = PlayerStates.Normal;
+            case ITEM_TYPE.Melee:
+                playerStates = PlayerStates.Swinging;
                 //GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = true;
+                //item.GetComponent<DefaultGun>().enabled = true;
                 break;
             case ITEM_TYPE.MiningLaser:
                 playerStates = PlayerStates.Mining;
@@ -464,15 +499,15 @@ public class PlayerController : NetworkBehaviour
 
     #endregion
 
-    //private IEnumerator FadeServerMessage()
-    //{
-    //    if(sceneScript)
-    //    {
-    //        yield return new WaitForSeconds(5f);
+    private IEnumerator FadeServerMessage()
+    {
+        if(sceneScript)
+        {
+            yield return new WaitForSeconds(5f);
 
-    //        sceneScript.canvasStatusText.enabled = false;
-    //    }
-    //}
+            sceneScript.canvasStatusText.enabled = false;
+        }
+    }
 
     private IEnumerator CoroutineCoordinator()
     {

@@ -17,6 +17,8 @@ MonoBehaviour:
   itemType: 8
   description: 
   data:
-    name: Glass
-    id: -1
+    name: GlassBlock
+    id: 15
     amount: 1
+    type: 
+  maxStackSize: 0

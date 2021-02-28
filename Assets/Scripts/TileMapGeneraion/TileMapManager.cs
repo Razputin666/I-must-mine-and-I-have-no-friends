@@ -21,12 +21,22 @@ public class TileMapManager : NetworkBehaviour
     }
     private Dictionary<string, Tilemap> tilemapss;
 
-    public NativeArray<int> worldArray;
+    // public NativeArray<int> worldArray;
+    public int[,] worldArray;
+    public float[,] shadowArray;
+
+    public ShadowTile[] shadowData;
+    public Tilemap shadowMap;
 
     //private void Update()
     //{
     //    Debug.Log(Worldgeneration.Instance.GetWorldHeight);
     //}
+
+    private void OnApplicationQuit()
+    {
+       // worldArray.Dispose();
+    }
 
     private void Awake()
     {
@@ -62,34 +72,34 @@ public class TileMapManager : NetworkBehaviour
         }
     }
 
-    private IEnumerator GrassGrowth(NativeArray<int> worldArray)
-    {
+    //private IEnumerator GrassGrowth(NativeArray<int> worldArray)
+    //{
         
-        for (int x = 0; x < Worldgeneration.Instance.GetWorldWidth; x++)
-        {
-            yield return new WaitForSeconds(0.01f);
-            for (int y = Worldgeneration.Instance.GetWorldHeight - (Worldgeneration.Instance.GetHeight * 2); y < Worldgeneration.Instance.GetWorldHeight; y++)
-            {
-                yield return new WaitForSeconds(0.01f);
-                if (worldArray[x * Worldgeneration.Instance.GetWorldHeight + y] == (int)BlockTypeConversion.GrassBlock && worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] == (int)BlockTypeConversion.Empty)
-                {
-                    int randomizer = UnityEngine.Random.Range(1, 10);
-                    if (randomizer > 5)
-                    {
-                        worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] = (int)BlockTypeConversion.Plant;
-                    }
-                }
-                else if (worldArray[x * Worldgeneration.Instance.GetWorldHeight + y] == (int)BlockTypeConversion.DirtBlock && worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] == (int)BlockTypeConversion.Empty)
-                {
-                    int randomizer = UnityEngine.Random.Range(1, 10);
-                    if (randomizer > 5)
-                    {
-                        worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] = (int)BlockTypeConversion.GrassBlock;
-                    }
-                }
-            }
-        }
-    }
+    //    for (int x = 0; x < Worldgeneration.Instance.GetWorldWidth; x++)
+    //    {
+    //        yield return new WaitForSeconds(0.01f);
+    //        for (int y = Worldgeneration.Instance.GetWorldHeight - (Worldgeneration.Instance.GetHeight * 2); y < Worldgeneration.Instance.GetWorldHeight; y++)
+    //        {
+    //            yield return new WaitForSeconds(0.01f);
+    //            if (worldArray[x * Worldgeneration.Instance.GetWorldHeight + y] == (int)BlockTypeConversion.GrassBlock && worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] == (int)BlockTypeConversion.Empty)
+    //            {
+    //                int randomizer = UnityEngine.Random.Range(1, 10);
+    //                if (randomizer > 5)
+    //                {
+    //                    worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] = (int)BlockTypeConversion.Plant;
+    //                }
+    //            }
+    //            else if (worldArray[x * Worldgeneration.Instance.GetWorldHeight + y] == (int)BlockTypeConversion.DirtBlock && worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] == (int)BlockTypeConversion.Empty)
+    //            {
+    //                int randomizer = UnityEngine.Random.Range(1, 10);
+    //                if (randomizer > 5)
+    //                {
+    //                    worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] = (int)BlockTypeConversion.GrassBlock;
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 
     public float GetBlockStrength(Vector3Int target, Tilemap tilemap)
     {
@@ -111,14 +121,18 @@ public class TileMapManager : NetworkBehaviour
     {
         target = new Vector3Int(target.x, target.y, 0);
         TileBase targetedBlock = tilemap.GetTile(target);
+       // Debug.Log(dataFromTiles[targetedBlock].blockName);
+       // Debug.Log(targetedBlock);
         
         if (!targetedBlock)
         {
+            Debug.Log("No targetedblock");
             return "";
         }
         TileData check;
         if (dataFromTiles.TryGetValue(targetedBlock, out check))
         {
+            
             return dataFromTiles[targetedBlock].blockName;
         }
         return "";
@@ -173,6 +187,21 @@ public class TileMapManager : NetworkBehaviour
         {
             return null;
         }
+    }
+
+    public Tilemap GetTileChunk(Vector3 worldPosition)
+    {
+        foreach (Tilemap chunk in Tilemaps)
+        {
+            Vector2 worldPos = new Vector2(worldPosition.x, worldPosition.y);
+            BoundsInt bounds = chunk.cellBounds;
+            Vector3 tilemapPos = chunk.transform.position;
+
+            if (IsInside(tilemapPos, bounds.size, worldPos))
+                return chunk;
+
+        }
+        return null;
     }
 
     public bool UpdateTilemap(string tilemapName, Vector3Int tilePositionCell, string tileBaseName)
@@ -242,4 +271,25 @@ public class TileMapManager : NetworkBehaviour
             ts.SetTileData();
         }
     }
+
+    #region Debugging
+    [Server]
+    public void ChangeTileColor(Vector3 TileWorldPosition, Color color)
+    {
+        RpcChangeTileColor(TileWorldPosition, color);
+    }
+    //used for pathfinding debugging atm
+    [ClientRpc]
+    private void RpcChangeTileColor(Vector3 TileWorldPosition, Color color)
+    {
+        Tilemap chunk = GetTileChunk(TileWorldPosition);
+
+        Vector3Int tileCellPosition = chunk.WorldToCell(TileWorldPosition);
+
+        chunk.SetTileFlags(tileCellPosition, TileFlags.None);
+        chunk.SetColor(tileCellPosition, color);
+
+        chunk.SetTileFlags(tileCellPosition, TileFlags.LockColor);
+    }
+    #endregion
 }

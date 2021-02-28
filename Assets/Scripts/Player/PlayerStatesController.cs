@@ -7,7 +7,7 @@ using Mirror;
 public class PlayerStatesController : NetworkBehaviour
 {
     private PlayerController player;
-    private LineController line;
+    [SerializeField] private LineController line;
     private MiningController miningController;
     private BuildingController buildingController;
 
@@ -17,7 +17,7 @@ public class PlayerStatesController : NetworkBehaviour
     {
         player = GetComponent<PlayerController>();
 
-        line = transform.Find("Gubb_arm").GetComponentInChildren<LineController>();
+       // line = transform.Find("Gubb_arm").GetComponentInChildren<LineController>();
         miningController = GetComponent<MiningController>();
         buildingController = GetComponent<BuildingController>();
     }

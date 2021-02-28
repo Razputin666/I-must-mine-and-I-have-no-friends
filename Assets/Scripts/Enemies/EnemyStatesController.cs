@@ -30,9 +30,6 @@ public class EnemyStatesController : MonoBehaviour
         switch (enemy.enemyStates)
         {
             case EnemyController.EnemyStates.FrogMining:
-
-
-
                 Vector3 distanceToTarget = enemy.target;
 
 
@@ -53,8 +50,6 @@ public class EnemyStatesController : MonoBehaviour
                     distanceToTarget.y = -1;
                 }
 
-               
-                
                 Vector3Int enemyIntPos = Vector3Int.FloorToInt(transform.position);
                 targetBlockIntPos = enemyIntPos + new Vector3Int ((int)distanceToTarget.x, (int)distanceToTarget.y, 0);
                 targetBlockIntPos.z = 0;
@@ -70,7 +65,6 @@ public class EnemyStatesController : MonoBehaviour
                         Vector3Int[] newBlockPos = GetNextBlocks(distanceToTarget, j);
                         for (int i = 0; i < newBlockPos.Length; i++)
                         {
-                            
                             chunk = miningMode.GetChunk(newBlockPos[i]);
                             if (chunk != null && chunk.HasTile(chunk.WorldToCell(newBlockPos[i])))
                             {
@@ -129,9 +123,6 @@ public class EnemyStatesController : MonoBehaviour
                 break;
         }
     }
-
-  
-
     public Tilemap TargetedChunk
     {
         get

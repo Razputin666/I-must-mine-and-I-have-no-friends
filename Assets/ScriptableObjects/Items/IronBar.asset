@@ -17,7 +17,8 @@ MonoBehaviour:
   itemType: 12
   description: 
   data:
-    name: Iron Bar
-    id: 15
+    name: IronBar
+    id: 21
     amount: 1
+    type: 
   maxStackSize: 0

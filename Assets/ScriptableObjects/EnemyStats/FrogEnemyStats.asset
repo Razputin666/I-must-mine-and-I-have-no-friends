@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: FrogEnemyStats
   m_EditorClassIdentifier: 
   hitPoints: 10
-  moveSpeed: 10
+  moveSpeed: 35
   strength: 5
   mineStrength: 1
   aggroRange: 30
   maxSpeed: 10
-  maxFallSpeed: 25
+  maxFallSpeed: -25
   range: 4

@@ -11,6 +11,8 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     [SerializeField] private int id = 2;
     [SerializeField] private float coolDownDuration;
     [SerializeField] private CoolDownSystem coolDownSystem;
+    [SerializeField] private Transform arm;
+    [SerializeField] private Transform heldItem;
     //[SerializeField] private Transform[] points;
 
     [SerializeField] private Tilemap chunk;
@@ -38,9 +40,9 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     {
         if (endOfGun == null)
         {
-            Transform arm = gameObject.transform.Find("Gubb_arm");
-            Transform heldItem = arm.Find("ItemHeldInHand");
-            endOfGun = heldItem.Find("EndOfGun");
+            //Transform arm = gameObject.transform.Find("Gubb_arm");
+           // Transform heldItem = arm.Find("ItemHeldInHand");
+            //endOfGun = heldItem.Find("EndOfGun");
         }
 
         spawnManager = GameObject.Find("ItemSpawner").GetComponent<SpawnManager>();
@@ -112,6 +114,7 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     [Server]
     private void ServerMine(Vector3 blockToMine, float miningStr)
     {
+        TileMapManager.Instance.ChangeTileColor(blockToMine, Color.blue);
         chunk = GetChunk(blockToMine);
 
         if (chunk == null)
@@ -140,8 +143,10 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
             blockStr -= miningStr * coolDownDuration;
             blockChecker[blockInCell] = blockStr;
         }
+
         if (blockStr <= 0)
         {
+            Debug.Log("Removed tile: " + blockToMine);
             DropItemFromBlock(blockInCell, blockName, chunk);
             CheckBlockRules(blockInCell, blockName, chunk, blockToMine);
             blockChecker.Remove(blockInCell);
@@ -205,7 +210,7 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     private void DropItemFromBlock(Vector3Int blockPosition, string blockName, Tilemap tilemap)
     {
         ItemObject itemObj = itemDatabase.GetItemOfName(blockName);
-
+       // Debug.Log(blockName);
         if (itemObj != null)
         {
             spawnManager.SpawnItemAt(tilemap.CellToWorld(blockPosition), blockName);
@@ -216,10 +221,10 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     {
         if (!coolDownSystem.IsOnCoolDown(id))
         {
-            if (isClient)
-                CmdMineBlockAt(blockWorldPosition, miningStr);
-            else
+            if (isServer)
                 ServerMine(blockWorldPosition, miningStr);
+            else
+                CmdMineBlockAt(blockWorldPosition, miningStr);
 
             coolDownSystem.PutOnCoolDown(this);
         }  

@@ -17,8 +17,8 @@ MonoBehaviour:
   itemType: 12
   description: 
   data:
-    name: Gold Ore
-    id: 13
+    name: GoldOre
+    id: 19
     amount: 0
     type: Ore
   maxStackSize: 0

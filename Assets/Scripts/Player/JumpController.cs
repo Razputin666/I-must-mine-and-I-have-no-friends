@@ -37,7 +37,7 @@ public class JumpController : NetworkBehaviour, HasCoolDownInterFace
     [Client]
     public void Jump()
     {
-        if (!coolDownSystem.IsOnCoolDown(id))
+        if (!coolDownSystem.IsOnCoolDown(id) && IsGrounded())
         {
             rb2d.AddForce(transform.up * jumpVelocity);
             coolDownSystem.PutOnCoolDown(this);

@@ -8,6 +8,16 @@ using Unity.Burst;
 
 public class PathfindingDots
 {
+    private struct PathData
+    {
+        public EnemyBehaviour targetUnit;
+        public Vector3Int startPostion;
+        public Vector3Int endPosition;
+        public NativeArray<PNode> tempPathNodeArray;
+    }
+
+    private List<PathData> pathsToCalculate;
+    //private Dictionary<EnemyBehaviour, PathData> pathsToCalculate;
     private const int MOVE_STRAIGHT_COST = 10;
     private const int MOVE_DIAGONAL_COST = 14;
     private const int MINING_COST_PER_STR = 15;
@@ -15,18 +25,20 @@ public class PathfindingDots
 
     //public GridGen<GridNode> pathfindingGrid;
 
-    private GridRegion[] pathfindingRegions;
+    //private GridRegion[] pathfindingRegions;
     private NativeArray<PNode> pathNodeArray;
+    private NativeList<JobHandle> jobHandles;
     private int gridWidth;
     private int gridHeight;
     private Vector3 startPosition;
-    private System.Diagnostics.Stopwatch stopwatch;
     public PathfindingDots(int width, int height, Vector3 startPosition)
     {
         if (Instance != this && Instance != null)
-            Debug.Log("Wrong instance");
+            Debug.Log("Wrong instance 'PathfindingDots'");
 
         Instance = this;
+
+        pathsToCalculate = new List<PathData>();
 
         gridWidth = width;
         gridHeight = height;
@@ -34,17 +46,18 @@ public class PathfindingDots
         //pathfindingGrid = new GridGen<GridNode>(width, height, 1f, startPosition, (GridGen<GridNode> grid, int x, int y) => new GridNode(grid, x, y));
 
         pathNodeArray = new NativeArray<PNode>(width * height, Allocator.Persistent);
-
+        jobHandles = new NativeList<JobHandle>(Allocator.Persistent);
         InitializeGrid();
 
         //CreateRegions(width, height, startPosition);
-
-        stopwatch = System.Diagnostics.Stopwatch.StartNew();
     }
-
+    /// <summary>
+    /// Call somewhere when exiting the application to prevent memory leak
+    /// </summary>
     public void OnExit()
     {
         pathNodeArray.Dispose();
+        jobHandles.Dispose();
     }
 
     private void InitializeGrid()
@@ -56,7 +69,7 @@ public class PathfindingDots
                 PNode pathNode = new PNode();
                 pathNode.x = x;
                 pathNode.y = y;
-                pathNode.index = CalculateIndex(x, y, gridWidth);
+                pathNode.index = CalculateIndex(x, y, gridHeight);
 
                 pathNode.gCost = int.MaxValue;
 
@@ -131,7 +144,7 @@ public class PathfindingDots
     {
         //GridNode pathNode = pathfindingGrid.GetGridObject(worldPosition);
         GetXY(worldPosition, out int x, out int y);
-        int index = CalculateIndex(x, y, gridWidth);
+        int index = CalculateIndex(x, y, gridHeight);
         
         PNode pathNode = pathNodeArray[index];
         pathNode.isWalkable = isWalkable;
@@ -139,6 +152,9 @@ public class PathfindingDots
         pathNodeArray[index] = pathNode;
     }
 
+    /// <summary>
+    /// Update the node at worldPosition to 
+    /// </summary>
     public void UpdateGridMineable(Vector3 worldPosition, bool hasBlock)
     {
         //GridNode pathNode = pathfindingGrid.GetGridObject(worldPosition);
@@ -158,49 +174,149 @@ public class PathfindingDots
         //GridNode pathNode = gridRegion.Grid.GetGridObject(worldPosition);
 
         GetXY(worldPosition, out int x, out int y);
-        int index = CalculateIndex(x, y, gridWidth);
+        int index = CalculateIndex(x, y, gridHeight);
 
         PNode pathNode = pathNodeArray[index];
         pathNode.hasBlock = hasBlock;
 
         pathNodeArray[index] = pathNode;
-        //Check if the tile above is inside the grid
-        if(y + 1 < gridHeight)
-        {
-            //Update walkability of the tile above if we added or remove a block
-            UpdateGridWalkable(worldPosition + Vector3.up, hasBlock);
-        }
+        ////Check if the tile above is inside the grid
+        //if(y + 1 < gridHeight)
+        //{
+        //    //Update walkability of the tile above if we added or remove a block
+        //    UpdateGridWalkable(worldPosition + Vector3.up, hasBlock);
+        //}
     }
 
-    //private void StartTimer()
+    /// <summary>
+    /// Returns the node at worldPosition
+    /// </summary>
+    public PNode GetNode(Vector3 worldPosition)
+    {
+        GetXY(worldPosition, out int x, out int y);
+
+        int index = CalculateIndex(x, y, gridHeight);
+
+        return pathNodeArray[index];
+    }
+    /// <summary>
+    /// Check if the worldPosition is inside our pathfinding grid
+    /// </summary>
+    public bool IsInsideGrid(Vector3 worldPosition)
+    {
+        return
+            worldPosition.x >= 0 &&
+            worldPosition.y >= 0 &&
+            worldPosition.x < gridWidth &&
+            worldPosition.y < gridHeight;
+    }
+
+    //public void CalculatePaths(EnemyBehaviour enemy, Vector3Int startPos, Vector3Int endPos)
     //{
-    //    stopwatch.Restart();
-    //    stopwatch.Start();
+    //    Utils.Timer.StartTimer("copy array");
+
+    //    NativeArray<PNode> temp = new NativeArray<PNode>(pathNodeArray.Length, Allocator.TempJob);
+    //    //pathNodeArray.CopyTo(temp);
+
+    //    Utils.Timer.StopTimer("copy array");
+    //    Utils.Timer.PrintTimer("copy array");
+
+    //    PathData pathData = new PathData
+    //    {
+    //        targetUnit = enemy,
+    //        startPostion = startPos,
+    //        endPosition = endPos,
+    //        tempPathNodeArray = temp
+    //    };
+
+    //    pathsToCalculate.Add(pathData);
+
+    //    FindPath(pathData);
     //}
 
-    //private void StopTimer(string text)
+    //private void FindPath(PathData pathData)
     //{
-    //    stopwatch.Stop();
+    //    int2 gridSize = new int2(gridWidth, gridHeight);
 
-    //    PrintTime(text);
+    //    GetXY(pathData.startPostion, out int startX, out int startY);
+    //    GetXY(pathData.startPostion, out int endX, out int endY);
+
+    //    int2 startPosition = new int2(startX, startY);
+    //    int2 endPosition = new int2(endX, endY);
+
+    //    CopyArrayJob copyArrayJob = new CopyArrayJob
+    //    {
+    //        copy = pathData.tempPathNodeArray,
+    //        original = pathNodeArray
+    //    };
+
+    //    JobHandle copyArrayHandle = copyArrayJob.Schedule();
+
+    //    jobHandles.Add(copyArrayHandle);
+
+    //    FindPathJob findPathJob = new FindPathJob
+    //    {
+    //        gridSize = gridSize,
+    //        pathNodeArray = pathData.tempPathNodeArray,
+    //        startPosition = startPosition,
+    //        endPosition = endPosition,
+    //    };
+
+    //    jobHandles.Add(findPathJob.Schedule(copyArrayHandle));
     //}
 
-    //private void PrintTime(string text)
+    //public void CompleteJobs()
     //{
-    //    System.TimeSpan timeTaken = stopwatch.Elapsed;
-    //    Debug.Log(text + timeTaken.ToString(@"m\:ss\.fff"));
-    //}
+    //    if (pathsToCalculate.Count == 0)
+    //        return;
 
+    //    Utils.Timer.StartTimer("Pathfinding");
+
+    //    JobHandle.CompleteAll(jobHandles);
+
+    //    foreach (PathData pathData in pathsToCalculate)
+    //    {
+    //        int endNodeIndex = CalculateIndex(pathData.endPosition.x, pathData.endPosition.y, gridHeight);
+    //        PNode endNode = pathData.tempPathNodeArray[endNodeIndex];
+
+    //        NativeList<int2> pathNative = CalculatePath(pathData.tempPathNodeArray, endNode);
+
+    //        List<Vector3> path = new List<Vector3>();
+    //        for (int i = 0; i < pathNative.Length; i++)
+    //        {
+    //            Vector3 worldPosition = GetWorldPosition(pathNative[i].x, pathNative[i].y);
+    //            path.Add(new Vector3(worldPosition.x, worldPosition.y));
+    //        }
+
+    //        path.Reverse();
+    //        FrogBehaviour fb = pathData.targetUnit.GetComponent<FrogBehaviour>();
+    //        if (fb != null)
+    //        {
+    //            fb.SetPath(path);
+    //        }
+    //        pathNative.Dispose();
+    //        pathData.tempPathNodeArray.Dispose();
+    //    }
+    //    pathsToCalculate.Clear();
+    //    jobHandles.Clear();
+    //    Utils.Timer.StopTimer("Pathfinding");
+    //    Utils.Timer.PrintTimer("Pathfinding");
+    //}
+    /// <summary>
+    /// Find a path from the startWorldPosition to the endWorldPosition
+    /// </summary>
     public List<Vector3> FindPath(Vector3Int startWorldPosition, Vector3Int endWorldPosition)
     {
         int2 gridSize = new int2(gridWidth, gridHeight);
-
+        
+        //Get gridX and GridY for start and end positions
         GetXY(startWorldPosition, out int startX, out int startY);
         GetXY(endWorldPosition, out int endX, out int endY);
 
         int2 startPosition = new int2(startX, startY);
         int2 endPosition = new int2(endX, endY);
 
+        //Create a Job for pathfinding
         FindPathJob findPathJob = new FindPathJob
         {
             gridSize = gridSize,
@@ -212,12 +328,16 @@ public class PathfindingDots
         JobHandle jobHandle = findPathJob.Schedule();
 
         jobHandle.Complete();
+        //Calculate the index for the end node
+        int endNodeIndex = CalculateIndex(endPosition.x, endPosition.y, gridHeight);
 
-        int endNodeIndex = CalculateIndex(endPosition.x, endPosition.y, gridWidth);
+        //Get the end node
         PNode endNode = pathNodeArray[endNodeIndex];
         
+        //Create a list of our path
         NativeList<int2> pathNative = CalculatePath(pathNodeArray, endNode);
         
+        //Convert the list from a int2 to a Vector3 list.
         List<Vector3> path = new List<Vector3>();
         for (int i = 0; i < pathNative.Length; i++)
         {
@@ -225,6 +345,7 @@ public class PathfindingDots
             path.Add(new Vector3(worldPosition.x, worldPosition.y));
         }
 
+        //Reverse our list so we get the start position first.
         path.Reverse();
         pathNative.Dispose();
 
@@ -264,26 +385,38 @@ public class PathfindingDots
     //    return pathNodeArray;
     //}
 
-    [BurstCompile]
-    private struct InitPathNodeArrayJob : IJobParallelFor
-    {
-        public NativeArray<PNode> pathNodeArray;
+    //[BurstCompile]
+    //private struct InitPathNodeArrayJob : IJobParallelFor
+    //{
+    //    public NativeArray<PNode> pathNodeArray;
 
-        public int2 endPosition;
-        public void Execute(int index)
-        {
-            PNode pathNode = pathNodeArray[index];
-            pathNode.hCost = CalculateDistanceCost(new int2(pathNode.x, pathNode.y), endPosition);
-            pathNode.gCost = int.MaxValue;
-            pathNode.cameFromNodeIndex = -1;
+    //    public int2 endPosition;
+    //    public void Execute(int index)
+    //    {
+    //        PNode pathNode = pathNodeArray[index];
+    //        pathNode.hCost = CalculateDistanceCost(new int2(pathNode.x, pathNode.y), endPosition);
+    //        pathNode.gCost = int.MaxValue;
+    //        pathNode.cameFromNodeIndex = -1;
 
-            pathNode.openListIndex = -1;
-            pathNode.isOnClosedList = false;
-            pathNode.isOnOpenList = false;
+    //        pathNode.openListIndex = -1;
+    //        pathNode.isOnClosedList = false;
+    //        pathNode.isOnOpenList = false;
 
-            pathNodeArray[index] = pathNode;
-        }
-    }
+    //        pathNodeArray[index] = pathNode;
+    //    }
+    //}
+
+    //[BurstCompile]
+    //private struct CopyArrayJob : IJob
+    //{
+    //    public NativeArray<PNode> original;
+    //    public NativeArray<PNode> copy;
+
+    //    public void Execute()
+    //    {
+    //        original.CopyTo(copy);
+    //    }
+    //}
 
     [BurstCompile]
     private struct FindPathJob : IJob
@@ -317,12 +450,12 @@ public class PathfindingDots
             neighbourOffsetArray[5] = new int2(+1, -1); // Down Right
             neighbourOffsetArray[6] = new int2(+1, +1); // Up Right
 
-            int endNodeIndex = CalculateIndex(endPosition.x, endPosition.y, gridSize.x);
+            int endNodeIndex = CalculateIndex(endPosition.x, endPosition.y, gridSize.y);
 
             NativeList<int> openList = new NativeList<int>(Allocator.Temp);
             NativeList<int> closedList = new NativeList<int>(Allocator.Temp);
 
-            PNode startNode = pathNodeArray[CalculateIndex(startPosition.x, startPosition.y, gridSize.x)];
+            PNode startNode = pathNodeArray[CalculateIndex(startPosition.x, startPosition.y, gridSize.y)];
             startNode.gCost = 0;
             if(!startNode.isInitialized)
             {
@@ -355,7 +488,7 @@ public class PathfindingDots
 
                 openList.RemoveAtSwapBack(currentNode.openListIndex);
 
-                closedList.Add(currentNodeIndex); //Kanske kan tas bort
+                closedList.Add(currentNodeIndex);
 
                 currentNode.isOnClosedList = true;
                 currentNode.isOnOpenList = false;
@@ -370,7 +503,7 @@ public class PathfindingDots
                     if (!IsPositionInsideGrid(neighbourNodePosition, gridSize))
                         continue; // Continue to the next Neighbour
 
-                    int neighboutNodeIndex = CalculateIndex(neighbourNodePosition.x, neighbourNodePosition.y, gridSize.x);
+                    int neighboutNodeIndex = CalculateIndex(neighbourNodePosition.x, neighbourNodePosition.y, gridSize.y);
                     
                     PNode neighbourNode = pathNodeArray[neighboutNodeIndex];
 
@@ -440,215 +573,217 @@ public class PathfindingDots
         }
     }
 
-    private struct FindPathJobOld : IJob
-    {
-        public int2 gridSize;
-        public NativeArray<PNode> pathNodeArray;
+    //private struct FindPathJobOld : IJob
+    //{
+    //    public int2 gridSize;
+    //    public NativeArray<PNode> pathNodeArray;
 
-        public int2 startPosition;
-        public int2 endPosition;
-        public void Execute()
-        {
-            for (int i = 0; i < pathNodeArray.Length; i++)
-            {
-                PNode pathNode = pathNodeArray[i];
-                pathNode.hCost = CalculateDistanceCost(new int2(pathNode.x, pathNode.y), endPosition);
-                pathNode.cameFromNodeIndex = -1;
+    //    public int2 startPosition;
+    //    public int2 endPosition;
+    //    public void Execute()
+    //    {
+    //        for (int i = 0; i < pathNodeArray.Length; i++)
+    //        {
+    //            PNode pathNode = pathNodeArray[i];
+    //            pathNode.hCost = CalculateDistanceCost(new int2(pathNode.x, pathNode.y), endPosition);
+    //            pathNode.cameFromNodeIndex = -1;
 
-                pathNodeArray[i] = pathNode;
-            }
-            NativeArray<int2> neighbourOffsetArray = new NativeArray<int2>(8, Allocator.Temp);
-            neighbourOffsetArray[0] = new int2(-1, 0); // Left
-            neighbourOffsetArray[1] = new int2(+1, 0); // Right
-            neighbourOffsetArray[2] = new int2(0, -1); // Down
-            neighbourOffsetArray[3] = new int2(-1, -1); // Down Left
-            neighbourOffsetArray[4] = new int2(-1, +1); // Up left
-            neighbourOffsetArray[5] = new int2(+1, -1); // Down Right
-            neighbourOffsetArray[6] = new int2(+1, +1); // Up Right
+    //            pathNodeArray[i] = pathNode;
+    //        }
+    //        NativeArray<int2> neighbourOffsetArray = new NativeArray<int2>(8, Allocator.Temp);
+    //        neighbourOffsetArray[0] = new int2(-1, 0); // Left
+    //        neighbourOffsetArray[1] = new int2(+1, 0); // Right
+    //        neighbourOffsetArray[2] = new int2(0, -1); // Down
+    //        neighbourOffsetArray[3] = new int2(-1, -1); // Down Left
+    //        neighbourOffsetArray[4] = new int2(-1, +1); // Up left
+    //        neighbourOffsetArray[5] = new int2(+1, -1); // Down Right
+    //        neighbourOffsetArray[6] = new int2(+1, +1); // Up Right
 
-            int endNodeIndex = CalculateIndex(endPosition.x, endPosition.y, gridSize.x);
+    //        int endNodeIndex = CalculateIndex(endPosition.x, endPosition.y, gridSize.y);
 
-            PNode startNode = pathNodeArray[CalculateIndex(startPosition.x, startPosition.y, gridSize.x)];
-            startNode.gCost = 0;
-            //startNode.CalculateFCost();
-            pathNodeArray[startNode.index] = startNode;
+    //        PNode startNode = pathNodeArray[CalculateIndex(startPosition.x, startPosition.y, gridSize.y)];
+    //        startNode.gCost = 0;
+    //        //startNode.CalculateFCost();
+    //        pathNodeArray[startNode.index] = startNode;
 
-            NativeList<int> openList = new NativeList<int>(Allocator.Temp);
-            NativeList<int> closedList = new NativeList<int>(Allocator.Temp);
+    //        NativeList<int> openList = new NativeList<int>(Allocator.Temp);
+    //        NativeList<int> closedList = new NativeList<int>(Allocator.Temp);
 
-            openList.Add(startNode.index);
+    //        openList.Add(startNode.index);
 
-            while (openList.Length > 0)
-            {
-                int currentNodeIndex = GetLowestFCostNodeIndex(openList, pathNodeArray);
+    //        while (openList.Length > 0)
+    //        {
+    //            int currentNodeIndex = GetLowestFCostNodeIndex(openList, pathNodeArray);
 
-                PNode currentNode = pathNodeArray[currentNodeIndex];
+    //            PNode currentNode = pathNodeArray[currentNodeIndex];
 
-                if (currentNodeIndex == endNodeIndex)
-                {
-                    //Reached our destination
-                    break;
-                }
+    //            if (currentNodeIndex == endNodeIndex)
+    //            {
+    //                //Reached our destination
+    //                break;
+    //            }
 
-                //Remove current Node from Open List
-                for (int i = 0; i < openList.Length; i++)
-                {
-                    if (openList[i] == currentNodeIndex)
-                    {
-                        openList.RemoveAtSwapBack(i);
-                        break;
-                    }
-                }
+    //            //Remove current Node from Open List
+    //            for (int i = 0; i < openList.Length; i++)
+    //            {
+    //                if (openList[i] == currentNodeIndex)
+    //                {
+    //                    openList.RemoveAtSwapBack(i);
+    //                    break;
+    //                }
+    //            }
 
-                closedList.Add(currentNodeIndex);
+    //            closedList.Add(currentNodeIndex);
 
-                for (int i = 0; i < neighbourOffsetArray.Length; i++)
-                {
-                    int2 neighbourOffset = neighbourOffsetArray[i];
-                    int2 neighbourPosition = new int2(currentNode.x + neighbourOffset.x, currentNode.y + neighbourOffset.y);
+    //            for (int i = 0; i < neighbourOffsetArray.Length; i++)
+    //            {
+    //                int2 neighbourOffset = neighbourOffsetArray[i];
+    //                int2 neighbourPosition = new int2(currentNode.x + neighbourOffset.x, currentNode.y + neighbourOffset.y);
 
-                    if (!IsPositionInsideGrid(neighbourPosition, gridSize))
-                        continue; // Continue to the next Neighbour
+    //                if (!IsPositionInsideGrid(neighbourPosition, gridSize))
+    //                    continue; // Continue to the next Neighbour
 
-                    int neighboutNodeIndex = CalculateIndex(neighbourPosition.x, neighbourPosition.y, gridSize.x);
+    //                int neighboutNodeIndex = CalculateIndex(neighbourPosition.x, neighbourPosition.y, gridSize.y);
 
-                    if (closedList.Contains(neighboutNodeIndex))
-                        continue; // Already Searched this Node
+    //                if (closedList.Contains(neighboutNodeIndex))
+    //                    continue; // Already Searched this Node
 
-                    PNode neighbourNode = pathNodeArray[neighboutNodeIndex];
+    //                PNode neighbourNode = pathNodeArray[neighboutNodeIndex];
 
-                    if (!neighbourNode.isWalkable)
-                        continue; // Not walkable
+    //                if (!neighbourNode.isWalkable)
+    //                    continue; // Not walkable
 
-                    //Check if the node below can be walked on
-                    //if (neighbourPosition.y - 1 >= 0)
-                    //{
-                    //    int groundIndex = CalculateIndex(neighbourPosition.x, neighbourPosition.y - 1, gridSize.x);
-                    //    PNode node = pathNodeArray[groundIndex];
-                    //    if (!node.hasBlock)
-                    //    {
-                    //        closedList.Add(neighboutNodeIndex);
-                    //        continue;
-                    //    }
-                    //}
-                    //int nodesNeededToMine = GetNodesNeededToMine(pathNodeArray, currentNode, neighbourNode, gridSize);
+    //                //Check if the node below can be walked on
+    //                //if (neighbourPosition.y - 1 >= 0)
+    //                //{
+    //                //    int groundIndex = CalculateIndex(neighbourPosition.x, neighbourPosition.y - 1, gridSize.x);
+    //                //    PNode node = pathNodeArray[groundIndex];
+    //                //    if (!node.hasBlock)
+    //                //    {
+    //                //        closedList.Add(neighboutNodeIndex);
+    //                //        continue;
+    //                //    }
+    //                //}
+    //                //int nodesNeededToMine = GetNodesNeededToMine(pathNodeArray, currentNode, neighbourNode, gridSize);
 
-                    int2 currentNodePosition = new int2(currentNode.x, currentNode.y);
+    //                int2 currentNodePosition = new int2(currentNode.x, currentNode.y);
 
-                    int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNodePosition, neighbourPosition);
+    //                int tentativeGCost = currentNode.gCost + CalculateDistanceCost(currentNodePosition, neighbourPosition);
 
-                    //tentativeGCost += nodesNeededToMine * MINING_COST_PER_STR;
+    //                //tentativeGCost += nodesNeededToMine * MINING_COST_PER_STR;
 
-                    if (tentativeGCost < neighbourNode.gCost)
-                    {
-                        neighbourNode.cameFromNodeIndex = currentNodeIndex;
-                        neighbourNode.gCost = tentativeGCost;
-                        //neighbourNode.CalculateFCost();
-                        pathNodeArray[neighboutNodeIndex] = neighbourNode;
+    //                if (tentativeGCost < neighbourNode.gCost)
+    //                {
+    //                    neighbourNode.cameFromNodeIndex = currentNodeIndex;
+    //                    neighbourNode.gCost = tentativeGCost;
+    //                    //neighbourNode.CalculateFCost();
+    //                    pathNodeArray[neighboutNodeIndex] = neighbourNode;
 
-                        if (!openList.Contains(neighbourNode.index))
-                            openList.Add(neighbourNode.index);
-                    }
+    //                    if (!openList.Contains(neighbourNode.index))
+    //                        openList.Add(neighbourNode.index);
+    //                }
 
-                }
-            }
-            openList.Dispose();
-            closedList.Dispose();
-            neighbourOffsetArray.Dispose();
-        }
-    }
+    //            }
+    //        }
+    //        openList.Dispose();
+    //        closedList.Dispose();
+    //        neighbourOffsetArray.Dispose();
+    //    }
+    //}
 
-    private static int GetNodesNeededToMine(NativeArray<PNode> pathNodeArray, PNode currentNode, PNode neighbourNode, int2 gridSize)
-    {
-        int nodesNeededToMine = 0;
+    //private static int GetNodesNeededToMine(NativeArray<PNode> pathNodeArray, PNode currentNode, PNode neighbourNode, int2 gridSize)
+    //{
+    //    int nodesNeededToMine = 0;
 
-        // if we are checking a node on the same height (to the left or right of the current node)
-        if (currentNode.y == neighbourNode.y)
-        {
-            //Check if the node to the left or right is the neighbour node
-            if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x)
-            {
-                //Check if 1 node above needs mining
-                if (neighbourNode.y + 1 < gridSize.y)
-                {
-                    int neighbourUpIndex = CalculateIndex(neighbourNode.x, neighbourNode.y + 1, gridSize.x);
-                    PNode upNode = pathNodeArray[neighbourUpIndex];
-                    if (upNode.hasBlock)
-                        nodesNeededToMine++;
+    //    // if we are checking a node on the same height (to the left or right of the current node)
+    //    if (currentNode.y == neighbourNode.y)
+    //    {
+    //        //Check if the node to the left or right is the neighbour node
+    //        if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x)
+    //        {
+    //            //Check if 1 node above needs mining
+    //            if (neighbourNode.y + 1 < gridSize.y)
+    //            {
+    //                int neighbourUpIndex = CalculateIndex(neighbourNode.x, neighbourNode.y + 1, gridSize.y);
+    //                PNode upNode = pathNodeArray[neighbourUpIndex];
+    //                if (upNode.hasBlock)
+    //                    nodesNeededToMine++;
 
-                }
-                //Check if 2 node above needs mining
-                if (neighbourNode.y + 2 < gridSize.y)
-                {
-                    int neighbourUpIndex = CalculateIndex(neighbourNode.x, neighbourNode.y + 2, gridSize.x);
-                    PNode up2Node = pathNodeArray[neighbourUpIndex];
-                    if (up2Node.hasBlock)
-                        nodesNeededToMine++;
-                }
-            }
-        }
-        else if (currentNode.y + 1 == neighbourNode.y) //Check if we are going up
-        {
-            if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x) // Check if the neightbour is to the left or right of the current node
-            {
-                for (int i = 0; i < 4; i++) //Check nodes 4 tiles up if they need to be mined in order to be able to move
-                {
-                    if (neighbourNode.y + i < gridSize.y)
-                    {
-                        int neighbourUpIndex = CalculateIndex(neighbourNode.x, neighbourNode.y + i, gridSize.x);
-                        PNode upNode = pathNodeArray[neighbourUpIndex];
-                        if (upNode.hasBlock)
-                            nodesNeededToMine++;
-                    }
-                }
-            }
-        }
-        else if (currentNode.y - 1 == neighbourNode.y) // Check if the neighbourNode is below us
-        {
-            if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x)
-            {
-                for (int i = 0; i < 4; i++) //Check nodes 4 tiles up if the need to be mined in order to be able to move
-                {
-                    if (neighbourNode.y + i < gridSize.y)
-                    {
-                        int neighbourUpIndex = CalculateIndex(neighbourNode.x, neighbourNode.y + i, gridSize.x);
-                        PNode upNode = pathNodeArray[neighbourUpIndex];
-                        if(upNode.hasBlock)
-                            nodesNeededToMine++;
-                    }
-                }
-            }
-            else
-            {
-                //Check if the node to the left and right below us needs mining
-                if (neighbourNode.x - 1 >= 0)
-                {
-                    int neighbourLeftIndex = CalculateIndex(neighbourNode.x - 1, neighbourNode.y, gridSize.x);
-                    PNode leftNode = pathNodeArray[neighbourLeftIndex];
-                    if(leftNode.hasBlock)
-                        nodesNeededToMine++;
-                }
-                if (neighbourNode.x + 1 < gridSize.x)
-                {
-                    int neighbourRightIndex = CalculateIndex(neighbourNode.x + 1, neighbourNode.y, gridSize.x);
-                    PNode rightNode = pathNodeArray[neighbourRightIndex];
-                    if (rightNode.hasBlock)
-                        nodesNeededToMine++;
-                }
-            }
-        }
-        return nodesNeededToMine;
-    }
+    //            }
+    //            //Check if 2 node above needs mining
+    //            if (neighbourNode.y + 2 < gridSize.y)
+    //            {
+    //                int neighbourUpIndex = CalculateIndex(neighbourNode.x, neighbourNode.y + 2, gridSize.y);
+    //                PNode up2Node = pathNodeArray[neighbourUpIndex];
+    //                if (up2Node.hasBlock)
+    //                    nodesNeededToMine++;
+    //            }
+    //        }
+    //    }
+    //    else if (currentNode.y + 1 == neighbourNode.y) //Check if we are going up
+    //    {
+    //        if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x) // Check if the neightbour is to the left or right of the current node
+    //        {
+    //            for (int i = 0; i < 4; i++) //Check nodes 4 tiles up if they need to be mined in order to be able to move
+    //            {
+    //                if (neighbourNode.y + i < gridSize.y)
+    //                {
+    //                    int neighbourUpIndex = CalculateIndex(neighbourNode.x, neighbourNode.y + i, gridSize.y);
+    //                    PNode upNode = pathNodeArray[neighbourUpIndex];
+    //                    if (upNode.hasBlock)
+    //                        nodesNeededToMine++;
+    //                }
+    //            }
+    //        }
+    //    }
+    //    else if (currentNode.y - 1 == neighbourNode.y) // Check if the neighbourNode is below us
+    //    {
+    //        if (currentNode.x + 1 == neighbourNode.x || currentNode.x - 1 == neighbourNode.x)
+    //        {
+    //            for (int i = 0; i < 4; i++) //Check nodes 4 tiles up if the need to be mined in order to be able to move
+    //            {
+    //                if (neighbourNode.y + i < gridSize.y)
+    //                {
+    //                    int neighbourUpIndex = CalculateIndex(neighbourNode.x, neighbourNode.y + i, gridSize.y);
+    //                    PNode upNode = pathNodeArray[neighbourUpIndex];
+    //                    if(upNode.hasBlock)
+    //                        nodesNeededToMine++;
+    //                }
+    //            }
+    //        }
+    //        else
+    //        {
+    //            //Check if the node to the left and right below us needs mining
+    //            if (neighbourNode.x - 1 >= 0)
+    //            {
+    //                int neighbourLeftIndex = CalculateIndex(neighbourNode.x - 1, neighbourNode.y, gridSize.y);
+    //                PNode leftNode = pathNodeArray[neighbourLeftIndex];
+    //                if(leftNode.hasBlock)
+    //                    nodesNeededToMine++;
+    //            }
+    //            if (neighbourNode.x + 1 < gridSize.x)
+    //            {
+    //                int neighbourRightIndex = CalculateIndex(neighbourNode.x + 1, neighbourNode.y, gridSize.y);
+    //                PNode rightNode = pathNodeArray[neighbourRightIndex];
+    //                if (rightNode.hasBlock)
+    //                    nodesNeededToMine++;
+    //            }
+    //        }
+    //    }
+    //    return nodesNeededToMine;
+    //}
 
+    /// <summary>
+    /// Create a list of the path from our end node
+    /// </summary>
     private static NativeList<int2> CalculatePath(NativeArray<PNode> pathNodeArray, PNode endNode)
     {
         if (endNode.cameFromNodeIndex == -1)
         {
             return new NativeList<int2>(Allocator.Temp);
         }
-        else
+        else //Found Path
         {
-            //Found Path
             NativeList<int2> path = new NativeList<int2>(Allocator.Temp);
             path.Add(new int2(endNode.x, endNode.y));
 
@@ -659,6 +794,7 @@ public class PathfindingDots
                 path.Add(new int2(cameFromNode.x, cameFromNode.y));
                 currentNode = cameFromNode;
             }
+
             return path;
         }
     }
@@ -672,9 +808,9 @@ public class PathfindingDots
             gridPosition.y < gridSize.y;
     }
 
-    private static int CalculateIndex(int x, int y, int gridWidth)
+    private static int CalculateIndex(int x, int y, int gridHeight)
     {
-        return x + y * gridWidth;
+        return x * gridHeight + y;
     }
 
     private static int CalculateDistanceCost(int2 aPosition, int2 bPosition)

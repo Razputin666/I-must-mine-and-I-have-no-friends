@@ -17,7 +17,7 @@ MonoBehaviour:
   itemType: 12
   description: 
   data:
-    name: Coal Ore
+    name: CoalOre
     id: 4
     amount: 1
     type: Ore

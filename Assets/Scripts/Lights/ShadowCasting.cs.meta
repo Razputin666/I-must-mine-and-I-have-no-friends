@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3f8bea8db1d0f4f44b2c9f858498ed9f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - quadrant: {instanceID: 0}
+  - computeShader: {fileID: 7200000, guid: 7bb4542fd7d15894995387d2aa38e316, type: 3}
+  - darkTile: {fileID: 11400000, guid: ed2bdcdaeedd7cf47ab22f3aae557a11, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 public class Pathfinder : NetworkBehaviour
 {
@@ -10,119 +11,151 @@ public class Pathfinder : NetworkBehaviour
     private int currentPathIndex;
     public Vector2 Direction { get; private set; }
 
+    [HideInInspector]public bool pathCompleted;
+
+    private MiningController miningController;
+    private EnemyBehaviour enemyController;
     public override void OnStartServer()
     {
+        pathVectorList = null;
+        pathCompleted = false;
         currentPathIndex = 0;
+        miningController = GetComponent<MiningController>();
+        enemyController = GetComponent<EnemyBehaviour>();
     }
 
-    public void CalculatePath(Vector3 startWorldPositon, Vector3 targetWorldPosition)
+    public bool CalculatePath(Vector3 startWorldPositon, Vector3 targetWorldPosition)
     {
+        if(pathVectorList != null && pathVectorList.Count > 0)
+        {
+            //Debugging
+            //Go through every Node in our previous path and reset the color.
+            for (int i = 0; i < pathVectorList.Count; i++)
+            {
+                TileMapManager.Instance.ChangeTileColor(pathVectorList[i], Color.white);
+            }
+        }
+
         currentPathIndex = 0;
-        System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        stopwatch.Start();
-
-        pathVectorList = Pathfinding.Instance.FindPath(
-            startWorldPositon,
-            targetWorldPosition);
-
-        stopwatch.Stop();
-
-        System.TimeSpan timeTaken = stopwatch.Elapsed;
-        Debug.Log("Time taken: " + timeTaken.ToString(@"m\:ss\.fff"));
-
-        stopwatch.Reset();
-
-        stopwatch.Start();
-        List<Vector3> path = PathfindingDots.Instance.FindPath(
+        
+        Utils.Timer.StartTimer("Pathfinding");
+        pathVectorList = PathfindingDots.Instance.FindPath(
             Vector3Int.FloorToInt(startWorldPositon), 
             Vector3Int.FloorToInt(targetWorldPosition));
 
-        stopwatch.Stop();
+        Utils.Timer.StopTimer("Pathfinding");
 
-        timeTaken = stopwatch.Elapsed;
-        Debug.Log("Time taken dots: " + timeTaken.ToString(@"m\:ss\.fff"));
+        Utils.Timer.PrintTimer("Pathfinding");
 
-        //for (int i = 0; i < path.Count; i++)
-        //{
-        //    Debug.Log(i + " path1: " + path[i] + " path2: " + pathVectorList[i]);
-        //}
+        //Debugging
+        //Go through every node in our path and set the color to green for debugging.
+        for (int i = 1; i < pathVectorList.Count; i++)
+        {
+            TileMapManager.Instance.ChangeTileColor(pathVectorList[i], Color.green);
+        }
 
+        //If we found a path then remove the first node since it is our current position.
         if (pathVectorList != null && pathVectorList.Count > 1)
+        {
             pathVectorList.RemoveAt(0);
+            pathCompleted = false;
+            return true;
+        }
+
+        return false;
     }
+
+    //public bool SetPath(List<Vector3> path)
+    //{
+    //    pathVectorList = path;
+    //    if (pathVectorList != null && pathVectorList.Count > 1)
+    //    {
+    //        pathVectorList.RemoveAt(0);
+    //        pathCompleted = false;
+    //        return true;
+    //    }
+    //    return false;
+    //}
 
     public void Move()
     {
         if (pathVectorList == null)
             return;
+        // If we have gone through the pathfinding then the path is complete
+        if(currentPathIndex >= pathVectorList.Count)
+        {
+            pathVectorList = null;
+            Direction = Vector2.zero;
+            pathCompleted = true;
+            return;
+        }
 
         Vector3 targetPosition = pathVectorList[currentPathIndex];
-        Vector3Int adjustedTransform = Vector3Int.FloorToInt(transform.position + Vector3.down);
+        Vector3Int adjustedTransform = Vector3Int.FloorToInt(transform.position + Vector3.zero);
         if (PathRequiresMining(targetPosition))
         {
-
+            Debug.Log("Mining");
         }
-        else if (Vector3.Distance(adjustedTransform, targetPosition) > 1.0f)
+        else if (Vector3.Distance(adjustedTransform, targetPosition) > 1.0f) // if the distance is to far away. Move closer
         {
-            Debug.Log(targetPosition + " " + adjustedTransform);
+            //Debug.Log(targetPosition);
+            //if(PathfindingDots.Instance.GetNode(targetPosition).hasBlock)
+            //{
+            //    PathRequiresMining(targetPosition);
+            //}
+            //else
+            //{
+            Debug.Log("moving");
             Vector3 moveDir = (targetPosition - adjustedTransform).normalized;
-
-            if (moveDir.y > 0.5f)
-                GetComponent<PlayerMovementController>().IsJumping = true;
-            else
-                GetComponent<PlayerMovementController>().IsJumping = false;
+            if (moveDir.y > 0.4f) // if the direction is upwards then jump.
+                GetComponent<JumpController>().Jump();
 
             moveDir.y = 0;
             Direction = moveDir;
-            float distanceBefore = Vector3.Distance(transform.position, targetPosition);
-            //rb2d.velocity += new Vector2(moveDir.x, moveDir.y) * movementSpeed;
-            //transform.position += moveDir * 5f * Time.deltaTime;
+            //}
+            
+            //float distanceBefore = Vector3.Distance(transform.position, targetPosition);
         }
         else
         {
             currentPathIndex++;
-            if (currentPathIndex >= pathVectorList.Count)
-            {
-                GetComponent<PlayerMovementController>().IsJumping = false;
-                pathVectorList = null;
-                Direction = Vector2.zero;
-            }
         }
     }
+    /// <summary>
+    /// Check tiles on our next location if it needs to be mined and then check nearby tiles so it's walkable for the unit
+    /// </summary>
     private bool PathRequiresMining(Vector3 targetPosition)
     {
-        PathNode currentNode = Pathfinding.Instance.GetNode(targetPosition);
+        float unitHeight = 4f;
+        PNode currentNode = PathfindingDots.Instance.GetNode(targetPosition);
         if (currentNode.hasBlock)
         {
             Debug.Log("Mining 1 " + targetPosition);
-            GetComponent<MiningController>().Mine(targetPosition, GetComponent<PlayerController>().MiningStrength);
+            miningController.Mine(targetPosition, enemyController.MiningStrength);
 
             return true;
         }
         else
         {
             Vector3Int adjustedTransform = Vector3Int.FloorToInt(transform.position + Vector3.down);
-            Debug.Log(targetPosition);
-            Debug.Log(adjustedTransform);
-            Vector3 moveDir = (targetPosition - adjustedTransform).normalized;
-            Debug.Log(moveDir);
-
-            Vector3 pos;
 
             if (adjustedTransform.y + 1 == targetPosition.y)//Check if we are moving upwards diagonally
             {
                 if (targetPosition.x == adjustedTransform.x + 1 || targetPosition.x == adjustedTransform.x - 1)
                 {
-                    for (int i = 0; i < 4; i++) // Then remove blocks 4 tiles high so we can move
+                    for (int i = 0; i < unitHeight; i++) // Then remove blocks 4 tiles high so we can move
                     {
-                        pos = targetPosition + Vector3.up * (i + 1);
-                        PathNode upNeighbour = Pathfinding.Instance.GetNode(pos);
+                        Vector3 pos = targetPosition + Vector3.up * (i + 1);
+                        //Check if we are inside the grid
+                        if (!PathfindingDots.Instance.IsInsideGrid(pos))
+                            continue;
 
-                        Debug.Log(upNeighbour);
-                        if (upNeighbour != null && upNeighbour.hasBlock)
+                        PNode upNeighbour = PathfindingDots.Instance.GetNode(pos);
+
+                        if (upNeighbour.hasBlock)
                         {
                             Debug.Log("Mining 2 " + pos);
-                            GetComponent<MiningController>().Mine(pos, GetComponent<PlayerController>().MiningStrength);
+                            miningController.Mine(pos, enemyController.MiningStrength);
                             return true;
                         }
                     }
@@ -132,53 +165,74 @@ public class Pathfinder : NetworkBehaviour
             {
                 if (targetPosition.x == adjustedTransform.x + 1 || targetPosition.x == adjustedTransform.x - 1) // if we are moving diagonally downwards
                 {
-                    for (int i = 0; i < 4; i++) // Then remove blocks 4 tiles high so we can move
+                    for (int i = 0; i < unitHeight; i++) // Then remove blocks 4 tiles high so we can move
                     {
-                        pos = targetPosition + Vector3.up * (i + 1);
-                        PathNode upNeighbour = Pathfinding.Instance.GetNode(pos);
+                        Vector3 pos = targetPosition + Vector3.up * (i + 1);
 
-                        Debug.Log(upNeighbour);
-                        if (upNeighbour != null && upNeighbour.hasBlock)
+                        //Check if we are inside the grid
+                        if (!PathfindingDots.Instance.IsInsideGrid(pos))
+                            continue;
+
+                        PNode upNeighbour = PathfindingDots.Instance.GetNode(pos);
+
+                        if (upNeighbour.hasBlock)
                         {
                             Debug.Log("Mining 3 " + pos);
-                            GetComponent<MiningController>().Mine(pos, GetComponent<PlayerController>().MiningStrength);
+                            miningController.Mine(pos, enemyController.MiningStrength);
                             return true;
                         }
                     }
                 }
                 else // if we are moving straight down
                 {
-                    pos = targetPosition + Vector3.right;
-                    //Then remove 1 block to the left and right of our target 
-                    PathNode rightNeighbour = Pathfinding.Instance.GetNode(pos);
-                    if (rightNeighbour != null && rightNeighbour.hasBlock)
+                    Vector3 pos = targetPosition + Vector3.right;
+
+                    //Check if we are inside the grid
+                    if (PathfindingDots.Instance.IsInsideGrid(pos))
                     {
-                        Debug.Log("Mining 4 " + pos);
-                        GetComponent<MiningController>().Mine(pos, GetComponent<PlayerController>().MiningStrength);
-                        return true;
+                        //Then remove 1 block to the left and right of our target 
+                        PNode rightNeighbour = PathfindingDots.Instance.GetNode(pos);
+                        if (rightNeighbour.hasBlock)
+                        {
+                            Debug.Log("Mining 4 " + pos);
+                            miningController.Mine(pos, enemyController.MiningStrength);
+                            return true;
+                        }
                     }
+
                     pos = targetPosition + Vector3.left;
-                    PathNode leftNeighbour = Pathfinding.Instance.GetNode(pos);
-                    if (leftNeighbour != null && leftNeighbour.hasBlock)
+
+                    //Check if we are inside the grid
+                    if (PathfindingDots.Instance.IsInsideGrid(pos))
                     {
-                        Debug.Log("Mining 5 " + pos);
-                        GetComponent<MiningController>().Mine(pos, GetComponent<PlayerController>().MiningStrength);
-                        return true;
+                        PNode leftNeighbour = PathfindingDots.Instance.GetNode(pos);
+                        if (leftNeighbour.hasBlock)
+                        {
+                            Debug.Log("Mining 5 " + pos);
+                            miningController.Mine(pos, enemyController.MiningStrength);
+                            return true;
+                        }
                     }
                 }
-
             }
-            else //if we are not moving up or down we are moving straight sideways
+            else if (targetPosition.y == adjustedTransform.y)//if we are not moving up or down we are moving straight sideways
             {
-                for (int i = 0; i < 4; i++) //Then remove block 2 tiles up from target
+                if (targetPosition.x == adjustedTransform.x + 1 || targetPosition.x == adjustedTransform.x - 1)
                 {
-                    pos = targetPosition + Vector3.up * (i + 1);
-                    PathNode upNeighbour = Pathfinding.Instance.GetNode(pos);
-                    if (upNeighbour != null && upNeighbour.hasBlock)
+                    for (int i = 0; i < unitHeight; i++) //Then remove block 2 tiles up from target
                     {
-                        Debug.Log("Mining 6 " + pos);
-                        GetComponent<MiningController>().Mine(pos, GetComponent<PlayerController>().MiningStrength);
-                        return true;
+                        Vector3 pos = targetPosition + Vector3.up * (i + 1);
+                        //Check if we are inside the grid
+                        if (PathfindingDots.Instance.IsInsideGrid(pos))
+                        {
+                            PNode upNeighbour = PathfindingDots.Instance.GetNode(pos);
+                            if (upNeighbour.hasBlock)
+                            {
+                                Debug.Log("Mining 6 " + pos);
+                                miningController.Mine(pos, enemyController.MiningStrength);
+                                return true;
+                            }
+                        }
                     }
                 }
             }

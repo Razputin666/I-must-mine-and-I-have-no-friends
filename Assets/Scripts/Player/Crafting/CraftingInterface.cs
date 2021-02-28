@@ -7,17 +7,12 @@ using UnityEngine.UIElements;
 
 public class CraftingInterface : UserInterface
 {
-    [SerializeField]
-    private GameObject inventoryPrefab;
-    [SerializeField]
-    private GameObject recipePrefab;
-    [SerializeField]
-    private GameObject[] materialSlots;
-    [SerializeField]
-    private GameObject resultSlot;
-
-    [SerializeField]
-    private InventoryObject playerInventory;
+    [SerializeField] private GameObject inventoryPrefab;
+    [SerializeField] private GameObject recipePrefab;
+    [SerializeField] private GameObject[] materialSlots;
+    [SerializeField] private GameObject resultSlot;
+    [SerializeField] private GameObject craftName;
+    [SerializeField] private InventoryObject playerInventory;
     private CraftingChecker craftChecker;
 
     private CraftingRecipeObject selectedRecipe;
@@ -84,7 +79,7 @@ public class CraftingInterface : UserInterface
         }
 
         slotsOnInterface[resultSlot].UpdateSlot(new Item(Instantiate(startCraft.ResultObject.ItemObject)), startCraft.ResultObject.Amount);
-        gameObject.transform.GetChild(7).GetComponentInChildren<TextMeshProUGUI>().text = startCraft.name;
+        craftName.GetComponentInChildren<TextMeshProUGUI>().text = startCraft.name;
     }
 
     private void OnRecipeSelectionChanged(GameObject obj)
@@ -107,11 +102,11 @@ public class CraftingInterface : UserInterface
             }
         }
         slotsOnInterface[resultSlot].UpdateSlot(new Item(Instantiate(craft.ResultObject.ItemObject)), craft.ResultObject.Amount);
-        
+
         //resultSlot.GetComponentInChildren<UnityEngine.UI.Image>().sprite = craft.ResultObject.ItemObject.UIDisplaySprite;
         //resultSlot.GetComponentInChildren<UnityEngine.UI.Image>().color = new Color(1, 1, 1, 1);
         //resultSlot.GetComponentInChildren<TextMeshProUGUI>().text = craft.ResultObject.Amount == 1 ? "" : craft.ResultObject.Amount.ToString("n0");
-        gameObject.transform.GetChild(7).GetComponentInChildren<TextMeshProUGUI>().text = craft.name;
+        craftName.GetComponentInChildren<TextMeshProUGUI>().text = craft.name;
     }
 
     private void Update()

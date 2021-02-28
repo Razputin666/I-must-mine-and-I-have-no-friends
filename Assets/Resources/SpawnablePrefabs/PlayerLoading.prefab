@@ -530,6 +530,8 @@ MonoBehaviour:
   loadingScreenProgressBar: {fileID: 1068908631}
   playerPrefab: {fileID: 8181247841218053072, guid: 8892c9d624d2feb46b4740620f1e0891,
     type: 3}
+  drillPrefab: {fileID: 341371013522475759, guid: 5b8edf420734f8c4aa2cf8129c145dd5,
+    type: 3}
 --- !u!114 &2429210586901609883
 MonoBehaviour:
   m_ObjectHideFlags: 0

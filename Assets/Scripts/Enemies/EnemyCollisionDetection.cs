@@ -24,15 +24,15 @@ public class EnemyCollisionDetection : MonoBehaviour
         {
             EnemyController ally = collision.collider.gameObject.GetComponentInParent<EnemyController>();
 
-            if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x > 0f)
-            {
-                enemy.rb2d.AddForceAtPosition(ally.enemyKnockBack, transform.position);
-            }
+            //if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x > 0f)
+            //{
+            //    enemy.rb2d.AddForceAtPosition(ally.enemyKnockBack, transform.position);
+            //}
 
-            else if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x < 0f)
-            {
-                enemy.rb2d.AddForceAtPosition(-ally.enemyKnockBack, transform.position);
-            }
+            //else if (collision.otherCollider.transform.position.x - collision.collider.transform.position.x < 0f)
+            //{
+            //    enemy.rb2d.AddForceAtPosition(-ally.enemyKnockBack, transform.position);
+            //}
 
         }
 
