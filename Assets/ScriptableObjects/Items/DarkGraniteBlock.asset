@@ -17,6 +17,8 @@ MonoBehaviour:
   itemType: 8
   description: 
   data:
-    name: Dark Granite
-    id: -1
+    name: DarkGranite
+    id: 10
     amount: 1
+    type: 
+  maxStackSize: 0

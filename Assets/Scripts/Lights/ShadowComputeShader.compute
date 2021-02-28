@@ -1,0 +1,30 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+struct LitTile
+{
+    int2 position;
+    float clarity;
+
+};
+
+//RWStructuredBuffer<int> buffer;
+//RWTexture2D<float4> texture;
+//float resolution;
+RWTexture2D<float4> Result;
+RWStructuredBuffer<LitTile> litTiles;
+float resolution;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    //LitTile light = litTiles[id.xy];
+    //light.clarity = 1.0;
+
+    //litTiles[id.xy] = light;
+
+    Result[id.xy] = float4(1, 0, 0, 0.5);
+}

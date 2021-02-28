@@ -17,8 +17,8 @@ MonoBehaviour:
   itemType: 9
   description: 
   data:
-    name: Iron Block
-    id: 16
+    name: IronBlock
+    id: 22
     amount: 1
     type: Ore
   maxStackSize: 0

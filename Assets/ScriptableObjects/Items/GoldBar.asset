@@ -17,7 +17,8 @@ MonoBehaviour:
   itemType: 12
   description: 
   data:
-    name: Gold Bar
-    id: 11
+    name: GoldBar
+    id: 17
     amount: 1
+    type: 
   maxStackSize: 0

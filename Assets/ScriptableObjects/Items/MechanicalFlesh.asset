@@ -17,7 +17,8 @@ MonoBehaviour:
   itemType: 12
   description: 
   data:
-    name: Mechanical Flesh
-    id: 18
+    name: MechanicalFlesh
+    id: 24
     amount: 1
+    type: 
   maxStackSize: 0

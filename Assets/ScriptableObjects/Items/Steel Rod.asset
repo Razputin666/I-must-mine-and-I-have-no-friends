@@ -17,8 +17,8 @@ MonoBehaviour:
   itemType: 11
   description: 
   data:
-    name: Steel Rod
-    id: -1
+    name: SteelRod
+    id: 27
     amount: 1
     type: Ore
   maxStackSize: 0

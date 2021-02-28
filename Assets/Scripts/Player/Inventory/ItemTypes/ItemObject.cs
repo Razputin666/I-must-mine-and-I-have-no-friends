@@ -14,7 +14,7 @@ public enum ITEM_TYPE
     LightMod,
     WeaponMod,
     TileBlock,
-    Weapon,
+    Melee,
     MiningLaser,
     Component,
     Ore

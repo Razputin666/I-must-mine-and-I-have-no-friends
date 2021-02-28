@@ -17,8 +17,8 @@ MonoBehaviour:
   itemType: 9
   description: 
   data:
-    name: Coal Block
-    id: 5
+    name: CoalBlock
+    id: 3
     amount: 1
     type: Ore
   maxStackSize: 0

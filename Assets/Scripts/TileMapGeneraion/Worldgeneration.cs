@@ -12,9 +12,12 @@ public class Worldgeneration : NetworkBehaviour
 {
     #region Serializefields
     [SerializeField] protected GameObject grid;
+    [SerializeField] protected GameObject background;
     [SerializeField] protected int horizontalChunks;
     [SerializeField] protected int verticalChunks;
     [SerializeField] protected GameObject chunkPrefab;
+    [SerializeField] protected GameObject foreGroundPrefab;
+     public TileBase darkTile;
     [SerializeField] protected MapSettings defaultChunk;
     [Range(100, 1)]
     [SerializeField] protected int oreAmount;
@@ -34,6 +37,9 @@ public class Worldgeneration : NetworkBehaviour
     [HideInInspector] public TileBase[] blocks;
     [HideInInspector] public Dictionary<string, TileBase> tilebaseLookup;
     private BlockTypeConversion blockTypeConversion;
+    protected GameObject sightBlock;
+   // [HideInInspector] public RenderTexture shadowMap;
+    //public ComputeShader computeShader;
     public static Worldgeneration Instance { get; private set; }
 
     [SerializeField] protected GameObject enemyPrefab;
@@ -47,6 +53,13 @@ public class Worldgeneration : NetworkBehaviour
         {
             tilebaseLookup.Add(tilebase.name, tilebase);
         }
+
+        sightBlock = Instantiate(foreGroundPrefab, grid.transform);
+        sightBlock.GetComponent<TilemapSyncer>().SetName("Vision Chunk");
+        //TileMapManager.Instance.AddTileChunk(sightBlock.GetComponent<Tilemap>());
+        NetworkServer.Spawn(sightBlock);
+        sightBlock.transform.position = new Vector2(startPosition.x, startPosition.y);
+
 
         for (int x = 0; x < horizontalChunks; x++)
         {
@@ -63,8 +76,17 @@ public class Worldgeneration : NetworkBehaviour
             }
             startPosition.x += width;
         }
-        blockTypeConversion = (BlockTypeConversion)Enum.Parse(typeof(BlockTypeConversion), "CoalBlock");
     }
+
+    //public void RenderShadowMap()
+    //{
+    //    shadowMap = new RenderTexture(GetWorldWidth, GetWorldHeight, 1);
+    //    shadowMap.enableRandomWrite = true;
+    //    shadowMap.Create();
+
+    //    computeShader.SetTexture(0, "Result", shadowMap);
+    //    computeShader.Dispatch(0, shadowMap.width / 8, shadowMap.height / 8, 1);
+    //}
 
     protected virtual void GenerateJobs(NativeArray<int> chunkArray)
     {
@@ -88,6 +110,7 @@ public class Worldgeneration : NetworkBehaviour
         {
             RenderMapJobs(chunkArray[i], TileMapManager.Instance.GetTileChunk(i));
         }
+        
     }
 
     protected virtual void UpdatePathfinding(NativeArray<int>[] chunkArray)
@@ -199,7 +222,27 @@ public class Worldgeneration : NetworkBehaviour
             }
         }
         chunk.SetTiles(tilepositions, tileArray);
-       
+        RenderForeGround(sightBlock.GetComponent<Tilemap>());
+
+    }
+    public void RenderForeGround(Tilemap sightBlock)
+    {
+        Vector3Int[] tilepositions = new Vector3Int[GetWorldWidth * GetWorldHeight];
+        TileBase[] tileArray = new TileBase[GetWorldWidth * GetWorldHeight];
+
+        //for (int x = 0; x < GetWorldWidth; x++) //Loop through the width of the map
+        //{
+        //    for (int y = 0; y < GetWorldHeight; y++) //Loop through the height of the map
+        //    {
+        //        int index = x * GetWorldHeight + y;
+        //        tilepositions[index] = new Vector3Int(x, y, 0);
+        //        tileArray[index] = darkTile;
+        //        sightBlock.SetTileFlags(new Vector3Int(x, y, 0), TileFlags.None);
+        //    }
+        //}
+
+        sightBlock.SetTiles(tilepositions, tileArray);
+        TileMapManager.Instance.shadowMap = sightBlock;
     }
     protected virtual void RemoveLoneBlocks(Tilemap chunk)
     {

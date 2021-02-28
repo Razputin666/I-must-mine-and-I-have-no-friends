@@ -17,8 +17,8 @@ MonoBehaviour:
   itemType: 12
   description: 
   data:
-    name: Iron Ore
-    id: 17
+    name: IronOre
+    id: 23
     amount: 1
     type: Ore
   maxStackSize: 0

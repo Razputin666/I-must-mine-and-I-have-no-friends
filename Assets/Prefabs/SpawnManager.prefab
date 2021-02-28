@@ -41,6 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5537858990851743220}
   - component: {fileID: 5537858990851743221}
+  - component: {fileID: 8630555671406207591}
   m_Layer: 0
   m_Name: ItemSpawner
   m_TagString: Untagged
@@ -74,3 +75,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a79f1fa93298d8f40bd0eab8ecef9f68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+--- !u!114 &8630555671406207591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5537858990851743219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 1
+  m_AssetId: 
+  hasSpawned: 0

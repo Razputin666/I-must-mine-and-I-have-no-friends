@@ -7,7 +7,7 @@ public class LineController : MonoBehaviour
 
     private LineRenderer lr;
     private Transform[] points;
-    private MiningController miningLaser;
+    [SerializeField] private MiningController miningLaser;
     private Vector3[] laserPoints;
     private PlayerController player;
     private float timer;
@@ -16,7 +16,7 @@ public class LineController : MonoBehaviour
     void Awake()
     {
         player = transform.parent.GetComponentInParent<PlayerController>();
-        miningLaser = transform.parent.GetComponentInParent<MiningController>();
+        //miningLaser = transform.parent.GetComponentInParent<MiningController>();
         lr = GetComponent<LineRenderer>();
     }
 
