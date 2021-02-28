@@ -16,7 +16,12 @@ public class TileMapManager : NetworkBehaviour
 
     public List<Tilemap> Tilemaps { get; private set; }
 
-    public NativeArray<int> worldArray;
+    // public NativeArray<int> worldArray;
+    public int[,] worldArray;
+    public float[,] shadowArray;
+
+    public ShadowTile[] shadowData;
+    public Tilemap shadowMap;
 
     //private void Update()
     //{
@@ -25,7 +30,7 @@ public class TileMapManager : NetworkBehaviour
 
     private void OnApplicationQuit()
     {
-        worldArray.Dispose();
+       // worldArray.Dispose();
     }
 
     private void Awake()
@@ -62,34 +67,34 @@ public class TileMapManager : NetworkBehaviour
         }
     }
 
-    private IEnumerator GrassGrowth(NativeArray<int> worldArray)
-    {
+    //private IEnumerator GrassGrowth(NativeArray<int> worldArray)
+    //{
         
-        for (int x = 0; x < Worldgeneration.Instance.GetWorldWidth; x++)
-        {
-            yield return new WaitForSeconds(0.01f);
-            for (int y = Worldgeneration.Instance.GetWorldHeight - (Worldgeneration.Instance.GetHeight * 2); y < Worldgeneration.Instance.GetWorldHeight; y++)
-            {
-                yield return new WaitForSeconds(0.01f);
-                if (worldArray[x * Worldgeneration.Instance.GetWorldHeight + y] == (int)BlockTypeConversion.GrassBlock && worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] == (int)BlockTypeConversion.Empty)
-                {
-                    int randomizer = UnityEngine.Random.Range(1, 10);
-                    if (randomizer > 5)
-                    {
-                        worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] = (int)BlockTypeConversion.Plant;
-                    }
-                }
-                else if (worldArray[x * Worldgeneration.Instance.GetWorldHeight + y] == (int)BlockTypeConversion.DirtBlock && worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] == (int)BlockTypeConversion.Empty)
-                {
-                    int randomizer = UnityEngine.Random.Range(1, 10);
-                    if (randomizer > 5)
-                    {
-                        worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] = (int)BlockTypeConversion.GrassBlock;
-                    }
-                }
-            }
-        }
-    }
+    //    for (int x = 0; x < Worldgeneration.Instance.GetWorldWidth; x++)
+    //    {
+    //        yield return new WaitForSeconds(0.01f);
+    //        for (int y = Worldgeneration.Instance.GetWorldHeight - (Worldgeneration.Instance.GetHeight * 2); y < Worldgeneration.Instance.GetWorldHeight; y++)
+    //        {
+    //            yield return new WaitForSeconds(0.01f);
+    //            if (worldArray[x * Worldgeneration.Instance.GetWorldHeight + y] == (int)BlockTypeConversion.GrassBlock && worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] == (int)BlockTypeConversion.Empty)
+    //            {
+    //                int randomizer = UnityEngine.Random.Range(1, 10);
+    //                if (randomizer > 5)
+    //                {
+    //                    worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] = (int)BlockTypeConversion.Plant;
+    //                }
+    //            }
+    //            else if (worldArray[x * Worldgeneration.Instance.GetWorldHeight + y] == (int)BlockTypeConversion.DirtBlock && worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] == (int)BlockTypeConversion.Empty)
+    //            {
+    //                int randomizer = UnityEngine.Random.Range(1, 10);
+    //                if (randomizer > 5)
+    //                {
+    //                    worldArray[x * Worldgeneration.Instance.GetWorldHeight + y + 1] = (int)BlockTypeConversion.GrassBlock;
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 
     public float GetBlockStrength(Vector3Int target, Tilemap tilemap)
     {
@@ -111,8 +116,8 @@ public class TileMapManager : NetworkBehaviour
     {
         target = new Vector3Int(target.x, target.y, 0);
         TileBase targetedBlock = tilemap.GetTile(target);
-        Debug.Log(dataFromTiles[targetedBlock].blockName);
-        Debug.Log(targetedBlock);
+       // Debug.Log(dataFromTiles[targetedBlock].blockName);
+       // Debug.Log(targetedBlock);
         
         if (!targetedBlock)
         {

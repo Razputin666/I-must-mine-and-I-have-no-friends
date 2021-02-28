@@ -42,7 +42,7 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
         {
             //Transform arm = gameObject.transform.Find("Gubb_arm");
            // Transform heldItem = arm.Find("ItemHeldInHand");
-            endOfGun = heldItem.Find("EndOfGun");
+            //endOfGun = heldItem.Find("EndOfGun");
         }
 
         spawnManager = GameObject.Find("ItemSpawner").GetComponent<SpawnManager>();
@@ -208,7 +208,7 @@ public class MiningController : NetworkBehaviour, HasCoolDownInterFace
     private void DropItemFromBlock(Vector3Int blockPosition, string blockName, Tilemap tilemap)
     {
         ItemObject itemObj = itemDatabase.GetItemOfName(blockName);
-        Debug.Log(blockName);
+       // Debug.Log(blockName);
         if (itemObj != null)
         {
             spawnManager.SpawnItemAt(tilemap.CellToWorld(blockPosition), blockName);

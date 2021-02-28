@@ -7,9 +7,6 @@ using Mirror;
 
 public class PlayerController : NetworkBehaviour
 {
-    [SerializeField]
-    LayerMask blockLayerMask;
-
     public enum PlayerStates
     {
         Idle, Mining, Normal, Building, Swinging,
@@ -21,7 +18,7 @@ public class PlayerController : NetworkBehaviour
     public int playerHP;
 
     public Rigidbody2D rb2d;        //Store a reference to the Rigidbody2D component required to use 2D Physics.
-    public Vector3 mousePosInWorld;
+    [HideInInspector] public Vector3 mousePosInWorld;
     //public Vector3 mousePos;
     //private float distanceFromPlayerx;
     //private float distanceFromPlayery;
@@ -33,12 +30,20 @@ public class PlayerController : NetworkBehaviour
     public Transform item;
     [SerializeField]
     private DeathScreen deathScreen;
+    [SerializeField] private Camera cameraPrefab;
     private Camera camera;
 
-    private JumpController jumpController;
-    [SerializeField] 
-    private LevelGeneratorLayered mapSize;
+    private int playerResWidth;
+    private int playerResHeight;
+    private Vector2Int tileScreenSize;
 
+    [SerializeField] private GameObject fovObj;
+    private FovScript fov;
+
+
+    private JumpController jumpController;
+
+    [SerializeField] private GameObject background;
 
     //Network
     [SerializeField]
@@ -50,8 +55,6 @@ public class PlayerController : NetworkBehaviour
     public string playerName;
     [SyncVar(hook = nameof(OnActiveItemChanged))]
     private int activeItemID = -1;
-    [SerializeField]
-    Camera _secondCamera;
 
     private SceneScript sceneScript;
     [SerializeField]
@@ -88,8 +91,17 @@ public class PlayerController : NetworkBehaviour
             //}
             if(isLocalPlayer)
             {
-               // Debug.Log("local");
+                // Debug.Log("local");
+                if (transform.hasChanged)
+                {
+                    MoveCamera();
+                    UpdateShadows();
+                    transform.hasChanged = false;
+                }
+
                 CheckQuickslotInput();
+
+               // FovChange();
             }
                 
             if(isServer)
@@ -236,14 +248,18 @@ public class PlayerController : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         if (camera == null)
-            camera = Instantiate(Camera.main);
-        
+            camera = Instantiate(cameraPrefab);
+        //  camera = Instantiate(Camera.main);
+
         Camera.main.GetComponentInParent<AudioListener>().enabled = false;
         camera.GetComponent<AudioListener>().enabled = true;
 
         camera.transform.localPosition = new Vector3(0, 0, -20);
 
         Camera.main.gameObject.SetActive(false);
+
+        background = Instantiate(background, GetComponentInChildren<Canvas>().transform);
+      //  fov = Instantiate(fovObj).GetComponent<FovScript>();
 
         //_camera.transform.position = new Vector3(Mathf.Clamp(rb2d.transform.position.x, (0) + 26.7f, (mapSize.startPosition.x) - 26.7f), rb2d.transform.position.y, -1);
 
@@ -264,15 +280,66 @@ public class PlayerController : NetworkBehaviour
         jumpController = GetComponent<JumpController>();
         ItemHandler = GetComponent<ItemHandler>();
 
+        playerResWidth = Screen.currentResolution.width;
+        playerResHeight = Screen.currentResolution.height;
+        tileScreenSize = new Vector2Int(playerResWidth / 64, playerResHeight / 64);
+
+        ShadowCasting.OnlightUpdated += ShadowCasting_OnlightUpdated;
+
         //mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
 
         StartCoroutine(CoroutineCoordinator());
     }
 
+    [Client]
+    private void ShadowCasting_OnlightUpdated(object sender, Vector2Int lightPos)
+    {
+        if (Vector2.Distance(transform.position, lightPos) < playerResWidth || Vector2.Distance(transform.position, lightPos) < playerResHeight)
+        UpdateShadows();
+    }
+
+    [Client]
+    private void UpdateShadows()
+    {
+        for (int x = -tileScreenSize.x; x < tileScreenSize.x; x++)
+        {
+            for (int y = -tileScreenSize.y; y < tileScreenSize.y; y++)
+            {
+                Vector3Int temp = new Vector3Int(x, y, 0);
+                if (TileMapManager.Instance.shadowMap.GetTileFlags(Vector3Int.FloorToInt(transform.position) + temp) == TileFlags.LockColor)
+                TileMapManager.Instance.shadowMap.SetTileFlags(Vector3Int.FloorToInt(transform.position) + temp, TileFlags.None);
+
+                if (TileMapManager.Instance.shadowMap.GetTile(Vector3Int.FloorToInt(transform.position) + temp) == null)
+                {
+                    TileMapManager.Instance.shadowMap.SetTile(Vector3Int.FloorToInt(transform.position) + temp, Worldgeneration.Instance.darkTile);
+
+                }
+                if (!(TileMapManager.Instance.shadowMap.GetColor(Vector3Int.FloorToInt(transform.position + temp)).a == 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]))
+                TileMapManager.Instance.shadowMap.SetColor(Vector3Int.FloorToInt(transform.position + temp), new Color(0, 0, 0, 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]));
+            }
+        }
+        
+    }
+
+    //[Client]
+    //private void FovChange()
+    //{
+    //    Vector3 targetPosition = mousePosInWorld;
+    //    Vector3 aimDir = (targetPosition - transform.position).normalized;
+    //    fov.SetAimDirection(aimDir);
+    //    fov.SetOrigin(transform.position);
+    //}
+
+    [Client]
+    private void MoveCamera()
+    {
+        camera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
+    }
+
     [TargetRpc]
     public void RpcAddItemToPlayer(NetworkConnection conn, int itemID, int itemAmount)
     {
-        Debug.Log("Adding item. ID: " + itemID + " amount: " + itemAmount);
+        //Debug.Log("Adding item. ID: " + itemID + " amount: " + itemAmount);
         ItemObject item = Instantiate(GetInventoryObject.ItemDatabase.GetItemAt(itemID));
         item.Data.Amount = itemAmount;
 
@@ -299,8 +366,6 @@ public class PlayerController : NetworkBehaviour
         {
             if (!isLocalPlayer)
                 return;
-
-            camera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
             Vector3 mousePos = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y));
             mousePos.z = 0;
 
@@ -389,10 +454,10 @@ public class PlayerController : NetworkBehaviour
                 //GetComponent<MiningController>().enabled = false;
                 //item.GetComponent<DefaultGun>().enabled = false;
                 break;
-            case ITEM_TYPE.Weapon:
-                playerStates = PlayerStates.Normal;
+            case ITEM_TYPE.Melee:
+                playerStates = PlayerStates.Swinging;
                 //GetComponent<MiningController>().enabled = false;
-                item.GetComponent<DefaultGun>().enabled = true;
+                //item.GetComponent<DefaultGun>().enabled = true;
                 break;
             case ITEM_TYPE.MiningLaser:
                 playerStates = PlayerStates.Mining;

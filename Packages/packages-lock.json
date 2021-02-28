@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.birdiepeep.unitylight2d": {
+      "version": "https://github.com/BirdiePeep/UnityLight2d.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.render-pipelines.universal": "7.1.8"
+      },
+      "hash": "40d84cc071d0150cba7951ed024150a0a9e62534"
+    },
     "com.unity.2d.animation": {
       "version": "4.2.6",
       "depth": 0,
@@ -134,7 +143,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.3",
+      "version": "2.0.5",
       "depth": 0,
       "source": "registry",
       "dependencies": {},

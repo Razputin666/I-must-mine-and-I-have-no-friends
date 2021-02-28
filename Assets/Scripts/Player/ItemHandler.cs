@@ -30,6 +30,7 @@ public class ItemHandler : NetworkBehaviour
         if (!isLocalPlayer)
             return;
 
+
         equipment = Instantiate(equipment);
         equipment.Clear();
 
@@ -52,27 +53,28 @@ public class ItemHandler : NetworkBehaviour
 
     public void ShowGUI()
     {
-        GameObject canvas = Instantiate(playerUIsPrefab, transform);
+        GameObject canvas = GetComponentInChildren<Canvas>().gameObject;
+        GameObject playerUI = Instantiate(playerUIsPrefab, canvas.transform);
 
-        GameObject inventoryUI = canvas.transform.Find("InventoryScreen").gameObject;
+        GameObject inventoryUI = playerUI.transform.Find("InventoryScreen").gameObject;
 
         DynamicInterface inventoryUserInterface = inventoryUI.GetComponent<DynamicInterface>();
         inventoryUserInterface.Inventory = inventory;
         inventoryUserInterface.enabled = true;
 
-        GameObject equipmentUI = canvas.gameObject.transform.Find("EquipmentScreen").gameObject;
+        GameObject equipmentUI = playerUI.gameObject.transform.Find("EquipmentScreen").gameObject;
 
         StaticInterface equipmentUserInterface = equipmentUI.GetComponent<StaticInterface>();
         equipmentUserInterface.Inventory = equipment;
         equipmentUserInterface.enabled = true;
 
-        GameObject quickSlotsUI = canvas.gameObject.transform.Find("QuickSlotScreen").gameObject;
+        GameObject quickSlotsUI = playerUI.gameObject.transform.Find("QuickSlotScreen").gameObject;
 
         StaticInterface quickslotsUserInterface = quickSlotsUI.GetComponent<StaticInterface>();
         quickslotsUserInterface.Inventory = quickSlots;
         quickslotsUserInterface.enabled = true;
         //Hides Gui's
-        GameObject craftingUI = canvas.gameObject.transform.Find("CraftingScreen").gameObject;
+        GameObject craftingUI = playerUI.gameObject.transform.Find("CraftingScreen").gameObject;
 
         CraftingInterface CraftingUserInterface = craftingUI.GetComponent<CraftingInterface>();
         //CraftingUserInterface.Inventory.ToggleVisibility();

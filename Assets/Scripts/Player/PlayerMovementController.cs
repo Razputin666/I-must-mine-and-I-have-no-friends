@@ -7,8 +7,9 @@ using System;
 public class PlayerMovementController : NetworkBehaviour
 {
     [SerializeField] private float movementSpeed = 1f;
-    [SerializeField] Rigidbody2D rb2d;
+    [SerializeField] private Rigidbody2D rb2d;
     [SerializeField] private Transform armTransform;
+    [SerializeField] private PlayerController player;
     private JumpController jumpController;
     //private FaceMouse faceMouse;
 
@@ -101,60 +102,39 @@ public class PlayerMovementController : NetworkBehaviour
         //}
     }
     
-    private IEnumerator SwingAt(Transform arm)
+    private IEnumerator SwingAt()
     {
         int heavyness = 10; // represents how heavy a melee weapon is. Should be brought along with a parameter
         float strength = 1; // represents strength of user
         swingInMotion = true;
         swingTimer = 1f;
 
-        PlayerController player = GetComponent<PlayerController>();
+        
         Vector3 difference = backSwingTarget.position - armTransform.position;
         difference.Normalize();
-
         float rotationZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
-        float backswingRotation = 100f;
-        while (isSwinging)
+        Quaternion backswing = Quaternion.Euler(armTransform.rotation.x, armTransform.rotation.y, rotationZ);
+        while (isSwinging || Mathf.Abs(Quaternion.Dot(armTransform.rotation, backswing)) < 0.9999f)
         {
-            Quaternion backswing = Quaternion.Euler(0, 0, rotationZ);
-            armTransform.rotation = Quaternion.Lerp(armTransform.rotation, backswing, strength * Time.deltaTime);
+            difference = backSwingTarget.position - armTransform.position;
+            difference.Normalize();
+            rotationZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
+            backswing = Quaternion.Euler(armTransform.rotation.x, armTransform.rotation.y, rotationZ);
+
+            armTransform.rotation = Quaternion.Lerp(armTransform.rotation, backswing, (heavyness - strength) * Time.deltaTime);
+           // Debug.Log(Mathf.Abs(Quaternion.Dot(armTransform.rotation, backswing)));
             yield return null;
         }
-        
-        //while (isSwinging) //|| Quaternion.Dot(arm.rotation, backswing) < 0.9999f)
-        //{
-        //    backswingRotation = 100f;
-        //    // Debug.Log(Vector2.Dot(arm.up, direction));
-        //    // direction = new Vector2(backSwingTarget.position.x - arm.position.x, backSwingTarget.position.y - arm.position.y);
-        //    // arm.up = Vector2.Lerp(arm.up, direction, 1 * Time.deltaTime);
-        //    Quaternion.Lerp(arm.rotation, backswing, strength * Time.deltaTime);
-        //    yield return null;
-        //}
-        //PlayerController player = GetComponent<PlayerController>();
-        //direction = new Vector2(
-        //Mathf.Clamp(Mathf.Abs(player.mousePosInWorld.x), 0, 1f),
-        // Mathf.Clamp(Mathf.Abs(player.mousePosInWorld.y), 0, 1f));
-
-        //while (Mathf.Abs(Vector2.Dot(arm.up, direction)) < 1f)
-        //{
-            
-        //    arm.up = Vector2.Lerp(arm.up, direction, Mathf.Clamp(heavyness - strength, 1f, 100f) * Time.deltaTime);
-        //    yield return null;
-        //}
-        // Mathf.Clamp(heavyness - strength, 1f, 100f)
-        // }
-        //swingTimer = 0f;
-        //// direction = new Vector2(frontSwingTarget.position.x - arm.position.x, frontSwingTarget.position.y - arm.position.y);
-        //PlayerController player = GetComponent<PlayerController>();
-        //direction = new Vector2(player.mousePosInWorld.x - arm.position.x, player.mousePosInWorld.y - arm.position.y);
-        //while (swingTimer < heavyness * Time.deltaTime)
-        //{
-        //    arm.up = Vector2.Lerp(arm.up, direction, strength * Time.deltaTime);
-        //    swingTimer += strength * Time.deltaTime;
-        //    yield return null;
-        //}
-
-
+        difference = player.mousePosInWorld - armTransform.position;
+        difference.Normalize();
+        rotationZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
+        Quaternion targetSwing = Quaternion.Euler(armTransform.rotation.x, armTransform.rotation.y, rotationZ);
+        while (Mathf.Abs(Quaternion.Dot(armTransform.rotation, targetSwing)) < 0.9999f)
+        {
+            armTransform.rotation = Quaternion.Lerp(armTransform.rotation, targetSwing, heavyness * Time.deltaTime);
+            Debug.Log(Mathf.Abs(Quaternion.Dot(armTransform.rotation, targetSwing)));
+            yield return null;
+        }
         swingInMotion = false;
 
     }
@@ -367,7 +347,7 @@ public class PlayerMovementController : NetworkBehaviour
                 RotateArm();
             else if (!swingInMotion)
             {
-                StartCoroutine(SwingAt(armTransform));
+                StartCoroutine(SwingAt());
             }
             //PathfindingTest();
 
@@ -375,7 +355,7 @@ public class PlayerMovementController : NetworkBehaviour
 
         if (isLocalPlayer)
         {
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0) && player.playerStates == PlayerController.PlayerStates.Swinging)
             {
                 CmdSwingAt(true);
                 isSwinging = true;
@@ -482,8 +462,7 @@ public class PlayerMovementController : NetworkBehaviour
 
     public void RotateArm()
     {
-        PlayerController player = GetComponent<PlayerController>();
-        //Transform armTransform = transform.Find("Gubb_arm");
+        
         //Vector2 direction = 
         //player.mousePosInWorld - armTransform.position;
 
@@ -491,22 +470,21 @@ public class PlayerMovementController : NetworkBehaviour
         Vector3 difference = player.mousePosInWorld - armTransform.position;
         difference.Normalize();
 
-        float rotationZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
+        float rotationz = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
 
-        armTransform.rotation = Quaternion.Euler(0, 0, rotationZ);
-        
-        if (rotationZ < -90 || rotationZ > 90)
-        {
-            if (player.transform.eulerAngles.y == 0)
-            {
-                armTransform.localRotation = Quaternion.Euler(180, 0, -rotationZ);
-            }
-            else if (player.transform.eulerAngles.y == 180)
-            {
-                armTransform.localRotation = Quaternion.Euler(180, 180, -rotationZ);
-            }
-        }
-        Debug.Log(rotationZ);
+        armTransform.rotation = Quaternion.Euler(0, 0, rotationz);
+
+        //if (rotationz < -90 || rotationz > 90)
+        //{
+        //    if (player.transform.eulerangles.y == 0)
+        //    {
+        //        armtransform.localrotation = quaternion.Euler(180, 0, -rotationZ);
+        //    }
+        //    else if (player.transform.eulerAngles.y == 180)
+        //    {
+        //        armTransform.localRotation = Quaternion.Euler(180, 180, -rotationZ);
+        //    }
+        //}
     }
 
     private bool IsJumping

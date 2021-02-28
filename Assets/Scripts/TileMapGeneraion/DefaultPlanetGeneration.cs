@@ -86,8 +86,20 @@ public class DefaultPlanetGeneration : Worldgeneration
         topLayer.Dispose();
 
         // Skapar en ny persistent array som skickas till tilemapmanager för att kunna uppdateras. Vet inte om det här behöver nån nätverkgrej?
-        TileMapManager.Instance.worldArray = new NativeArray<int>(worldArray, Allocator.Persistent);
-
+        // TileMapManager.Instance.worldArray = new NativeArray<int>(worldArray, Allocator.Persistent);
+        int[,] worldAs2D = new int[GetWorldWidth, GetWorldHeight];
+        ShadowTile[] data = new ShadowTile[GetWorldWidth * GetWorldHeight];
+        for (int x = 0; x < worldAs2D.GetUpperBound(0); x++)
+        {
+            for (int y = 0; y < worldAs2D.GetUpperBound(1); y++)
+            {
+                worldAs2D[x, y] = worldArray[x * GetWorldHeight + y];
+                data[x * GetWorldHeight + y].position = new Vector2Int(x, y);
+            }
+        }
+        TileMapManager.Instance.worldArray = worldAs2D;
+        TileMapManager.Instance.shadowArray = new float[GetWorldWidth, GetWorldHeight];
+        TileMapManager.Instance.shadowData = data;
         worldArray.Dispose();
       //  InvokeRepeating("UpdateMap", 1f, 1f);
 

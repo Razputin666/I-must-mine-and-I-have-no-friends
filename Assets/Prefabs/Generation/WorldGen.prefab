@@ -88,12 +88,18 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   grid: {fileID: 0}
+  background: {fileID: 0}
   horizontalChunks: 8
   verticalChunks: 8
   chunkPrefab: {fileID: 4802906064719502046, guid: f1fc65f761491f74abdd69e1daf070b8,
     type: 3}
+  foreGroundPrefab: {fileID: 4802906064719502046, guid: ac2b2400ae683ae4c92c4bd8946c85ed,
+    type: 3}
+  darkTile: {fileID: 11400000, guid: ed2bdcdaeedd7cf47ab22f3aae557a11, type: 2}
   defaultChunk: {fileID: 11400000, guid: 142c074dbc6f1554eb927690b627468c, type: 2}
   oreAmount: 80
   useJobs: 1
   chunks: []
   blocks: []
+  shadowMap: {fileID: 0}
+  computeShader: {fileID: 7200000, guid: 7bb4542fd7d15894995387d2aa38e316, type: 3}
