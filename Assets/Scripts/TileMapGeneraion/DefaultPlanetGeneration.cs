@@ -79,7 +79,6 @@ public class DefaultPlanetGeneration : Worldgeneration
         }
         topLayer.Dispose();
 
-        
         // Skapar en ny persistent array som skickas till tilemapmanager för att kunna uppdateras. Vet inte om det här behöver nån nätverkgrej?
         // TileMapManager.Instance.worldArray = new NativeArray<int>(worldArray, Allocator.Persistent);
         int[,] worldAs2D = new int[GetWorldWidth, GetWorldHeight];
@@ -131,11 +130,11 @@ public class DefaultPlanetGeneration : Worldgeneration
 
         Vector3 spawnPos = new Vector3(xStart, yStart);
 
-        ClearAreaAroundEnemyBase(worldArray, spawnPos);
+        //ClearAreaAroundEnemyBase(worldArray, spawnPos);
 
-        GameObject enemy = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
-        Debug.Log("Enemy base spawned at: " + enemy.transform.position);
-        NetworkServer.Spawn(enemy);
+        //GameObject enemy = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
+        //Debug.Log("Enemy base spawned at: " + enemy.transform.position);
+        //NetworkServer.Spawn(enemy);
                 
         //for (int y = (verticalChunks * height) - 1; y >= 0; y--)
         //{

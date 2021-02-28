@@ -22,11 +22,7 @@ public class PlayerMovementController : NetworkBehaviour
     float heightTimer;
     float widthTimer;
     //float jumpTimer;
-    private bool facingRight = true;
     private bool isJumping = false;
-
-    private int currentPathIndex;
-    private List<Vector3> pathVectorList;
 
     //Swinging stuff
     [SerializeField] private Transform backSwingTarget;

@@ -98,16 +98,16 @@ public class BaseBehaviour : NetworkBehaviour, HasCoolDownInterFace
         oreList = new List<Vector3>();
         Vector2Int startSearch = new Vector2Int((int)transform.position.x, (int)transform.position.y);
 
-        Unity.Collections.NativeArray<int> worldArray = TileMapManager.Instance.worldArray;
+        int[,] worldArray = TileMapManager.Instance.worldArray;
         for (int x = startSearch.x - oreSearchDistance; x < startSearch.x + oreSearchDistance; x++)
         {
             for (int y = startSearch.y - oreSearchDistance; y < startSearch.y + oreSearchDistance; y++)
             {
                 int index = x * 50 + y;
                 if (
-                    worldArray[index] == (int)BlockTypeConversion.IronBlock ||
-                    worldArray[index] == (int)BlockTypeConversion.GoldBlock ||
-                    worldArray[index] == (int)BlockTypeConversion.CopperBlock)
+                    worldArray[x, y] == (int)BlockTypeConversion.IronBlock ||
+                    worldArray[x, y] == (int)BlockTypeConversion.GoldBlock ||
+                    worldArray[x, y] == (int)BlockTypeConversion.CopperBlock)
                 {
                     oreList.Add(new Vector3(x, y, 0));
                 }

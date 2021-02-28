@@ -89,7 +89,7 @@ public class PlayerController : NetworkBehaviour
                 {
                     MoveCamera();
 
-                    UpdateShadows();
+                    //UpdateShadows();
                     transform.hasChanged = false;
                 }
 
@@ -284,7 +284,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (Vector2.Distance(transform.position, lightPos) < playerResWidth || Vector2.Distance(transform.position, lightPos) < playerResHeight)
         {
-            UpdateShadows();
+            //UpdateShadows();
         }
     }
 
@@ -297,7 +297,7 @@ public class PlayerController : NetworkBehaviour
             {
                 Vector3Int temp = new Vector3Int(x, y, 0);
                 if (TileMapManager.Instance.shadowMap.GetTileFlags(Vector3Int.FloorToInt(transform.position) + temp) == TileFlags.LockColor)
-                TileMapManager.Instance.shadowMap.SetTileFlags(Vector3Int.FloorToInt(transform.position) + temp, TileFlags.None);
+                    TileMapManager.Instance.shadowMap.SetTileFlags(Vector3Int.FloorToInt(transform.position) + temp, TileFlags.None);
 
                 if (TileMapManager.Instance.shadowMap.GetTile(Vector3Int.FloorToInt(transform.position) + temp) == null)
                 {
@@ -305,7 +305,7 @@ public class PlayerController : NetworkBehaviour
                     
                 }
                 if (!(TileMapManager.Instance.shadowMap.GetColor(Vector3Int.FloorToInt(transform.position + temp)).a == 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]))
-                TileMapManager.Instance.shadowMap.SetColor(Vector3Int.FloorToInt(transform.position + temp), new Color(0, 0, 0, 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]));
+                    TileMapManager.Instance.shadowMap.SetColor(Vector3Int.FloorToInt(transform.position + temp), new Color(0, 0, 0, 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]));
             }
         }
     }

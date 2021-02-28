@@ -5,22 +5,14 @@ using Mirror;
 
 public class ItemHandler : NetworkBehaviour
 {
-    [SerializeField]
-    private InventoryObject inventory;
-    [SerializeField]
-    private InventoryObject equipment;
-    [SerializeField]
-    private InventoryObject quickSlots;
-
-    //[SerializeField]
-    //private GameObject inventoryUI;
-    //[SerializeField]
-    //private GameObject equipmentUI;
-    //[SerializeField]
-    //private GameObject quickSlotsUI;
-
-    [SerializeField]
-    private GameObject playerUIsPrefab;
+    [SerializeField] private InventoryObject inventory;
+    [SerializeField] private InventoryObject equipment;
+    [SerializeField] private InventoryObject quickSlots;
+    private GameObject inventoryUI;
+    private GameObject equipmentUI;
+    private GameObject quickSlotsUI;
+    private GameObject craftingUI;
+    [SerializeField] private GameObject playerUIsPrefab;
 
     private void Start()
     {
@@ -56,27 +48,27 @@ public class ItemHandler : NetworkBehaviour
         GameObject canvas = GetComponentInChildren<Canvas>().gameObject;
         GameObject playerUI = Instantiate(playerUIsPrefab, canvas.transform);
 
-        GameObject inventoryUI = playerUI.transform.Find("InventoryScreen").gameObject;
+        inventoryUI = playerUI.transform.Find("InventoryScreen").gameObject;
 
         DynamicInterface inventoryUserInterface = inventoryUI.GetComponent<DynamicInterface>();
         inventoryUserInterface.Inventory = inventory;
         inventoryUserInterface.enabled = true;
 
-        GameObject equipmentUI = playerUI.gameObject.transform.Find("EquipmentScreen").gameObject;
+        equipmentUI = playerUI.gameObject.transform.Find("EquipmentScreen").gameObject;
 
         StaticInterface equipmentUserInterface = equipmentUI.GetComponent<StaticInterface>();
         equipmentUserInterface.Inventory = equipment;
         equipmentUserInterface.enabled = true;
 
-        GameObject quickSlotsUI = playerUI.gameObject.transform.Find("QuickSlotScreen").gameObject;
+        quickSlotsUI = playerUI.gameObject.transform.Find("QuickSlotScreen").gameObject;
+
 
         StaticInterface quickslotsUserInterface = quickSlotsUI.GetComponent<StaticInterface>();
         quickslotsUserInterface.Inventory = quickSlots;
         quickslotsUserInterface.enabled = true;
         //Hides Gui's
-        GameObject craftingUI = playerUI.gameObject.transform.Find("CraftingScreen").gameObject;
+        craftingUI = playerUI.gameObject.transform.Find("CraftingScreen").gameObject;
 
-        CraftingInterface CraftingUserInterface = craftingUI.GetComponent<CraftingInterface>();
         //CraftingUserInterface.Inventory.ToggleVisibility();
         //inventory.ToggleVisibility();
         //equipment.ToggleVisibility();
@@ -201,7 +193,7 @@ public class ItemHandler : NetworkBehaviour
         if (!isLocalPlayer)
             return;
 
-        if(Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             inventory.Save();
             quickSlots.Save();
@@ -215,11 +207,23 @@ public class ItemHandler : NetworkBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.I))
         {
-            inventory.ToggleVisibility();
+            inventoryUI.SetActive(!inventoryUI.activeSelf);
+        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            equipmentUI.SetActive(!equipmentUI.activeSelf);
         }
         else if (Input.GetKeyDown(KeyCode.O))
         {
-            equipment.ToggleVisibility();
+            craftingUI.SetActive(!craftingUI.activeSelf);
+        }
+        else if (Input.GetKeyDown(KeyCode.X))
+        {
+            craftingUI.SetActive(!quickSlotsUI.activeSelf);
+            inventoryUI.SetActive(!quickSlotsUI.activeSelf);
+            equipmentUI.SetActive(!quickSlotsUI.activeSelf);
+            quickSlotsUI.SetActive(!quickSlotsUI.activeSelf);
+            
         }
     }
 
