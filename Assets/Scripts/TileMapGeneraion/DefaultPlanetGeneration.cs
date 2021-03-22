@@ -5,16 +5,65 @@ using UnityEngine.Tilemaps;
 using Mirror;
 using Unity.Jobs;
 using Unity.Collections;
+using Unity.Mathematics;
 
 public class DefaultPlanetGeneration : Worldgeneration
 {
+    private const int skyChunks = 5;
 
+    protected override void Init()
+    {
+        base.Init();
+
+        tilebaseLookup = new Dictionary<string, TileBase>();
+        blocks = Resources.LoadAll<TileBase>("Tilebase");
+        foreach (var tilebase in blocks)
+        {
+            tilebaseLookup.Add(tilebase.name, tilebase);
+        }
+
+        sightBlock = Instantiate(foreGroundPrefab, grid.transform);
+        sightBlock.GetComponent<TilemapSyncer>().SetName("Vision Chunk");
+        NetworkServer.Spawn(sightBlock);
+        sightBlock.transform.position = new Vector2(startPosition.x, startPosition.y);
+
+
+        for (int x = 0; x < horizontalChunks; x++)
+        {
+            startPosition.y = 0;
+            for (int y = 0; y < verticalChunks; y++)
+            {
+                int index = x * verticalChunks + y;
+                GameObject chunk = Instantiate(chunkPrefab, grid.transform);
+                chunk.GetComponent<TilemapSyncer>().SetName("Chunk_" + index);
+                TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
+                NetworkServer.Spawn(chunk);
+                chunk.transform.position = new Vector2(startPosition.x, startPosition.y);
+                startPosition.y += height;
+                //if (y == verticalChunks - 1)
+                //{
+                //    for (int i = 0; i < verticalChunks; i++)
+                //    {
+                //        GameObject chunkSky = Instantiate(chunkPrefab, grid.transform);
+                //        chunkSky.GetComponent<TilemapSyncer>().SetName("Chunk_" + index * i + 1);
+                //        TileMapManager.Instance.AddTileChunk(chunkSky.GetComponent<Tilemap>());
+                //        NetworkServer.Spawn(chunkSky);
+                //        chunkSky.transform.position = new Vector2(startPosition.x, startPosition.y);
+                //        startPosition.y += height;
+                //    }
+                //}
+            }
+            startPosition.x += width;
+        }
+    }
     public override void OnStartServer()
     {
         Init();
 
-        NativeArray<int> worldArray = new NativeArray<int>(horizontalChunks * width * verticalChunks * height, Allocator.TempJob);
-        NativeArray<int> topLayer = new NativeArray<int>(horizontalChunks * width * height, Allocator.TempJob);
+
+        NativeArray<int> worldArray = new NativeArray<int>(GetWorldWidth * GetWorldHeight, Allocator.TempJob);
+        //NativeArray<int> worldArrayHalf = new NativeArray<int>(GetWorldWidth * GetWorldHeight / 2, Allocator.TempJob);
+        NativeArray<int> topLayer = new NativeArray<int>(GetWorldWidth * height, Allocator.TempJob);
         NativeArray<int>[] chunkArray = new NativeArray<int>[horizontalChunks * verticalChunks];
 
         GenerateJobs(worldArray);
@@ -28,12 +77,12 @@ public class DefaultPlanetGeneration : Worldgeneration
 
         //Copy values from the array with the topWalk values to the array with the entire world
 
-        for (int x = 0; x < (horizontalChunks * width); x++)
+        for (int x = 0; x < (GetWorldWidth); x++)
         {
             for (int y = 0; y < height; y++)
             {
                 int topLayerIndex = x * height + y;
-                int index = x * verticalChunks * height + y + (verticalChunks - 1) * height;
+                int index = x * GetWorldHeight + y + (verticalChunks - 1) * height;
                 if (topLayer[topLayerIndex] == (int)BlockTypeConversion.Empty)
                 {
                     worldArray[index] = topLayer[topLayerIndex];
@@ -59,7 +108,7 @@ public class DefaultPlanetGeneration : Worldgeneration
                         //Calculate the indexPosition of the Tiles
                         int chunkIndexPos = x * height + y;
                         //Calculate the index position from the array that has the entire world
-                        int index = x * verticalChunks * height + y + j * height + i * verticalChunks * height * width;
+                        int index = x * (GetWorldHeight) + y + j * height + i * (GetWorldHeight) * width;
                         //Copy Tile from the world array to the chunkArray
                         currentChunk[chunkIndexPos] = worldArray[index];
                     }
@@ -69,28 +118,50 @@ public class DefaultPlanetGeneration : Worldgeneration
 
         Render(chunkArray);
 
+        int skyHeight = skyChunks * height;
+        int[,] worldAs2D = new int[GetWorldWidth, GetWorldHeight + skyHeight];
+        NativeArray<int> fullArray = new NativeArray<int>(worldArray.Length + (skyHeight * GetWorldWidth), Allocator.Persistent);
+        startPosition = new Vector2Int(0, GetWorldHeight);
+        for (int x = 0; x < horizontalChunks; x++)
+        {
+            startPosition.y = GetWorldHeight - 1;
+            for (int y = 0; y < skyChunks; y++)
+            {
+                int index = (x * (verticalChunks) + y) + verticalChunks * horizontalChunks;
+                GameObject chunk = Instantiate(chunkPrefab, grid.transform);
+                chunk.GetComponent<TilemapSyncer>().SetName("SkyChunk_" + index);
+                TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
+                NetworkServer.Spawn(chunk);
+                chunk.transform.position = new Vector2(startPosition.x, startPosition.y);
+                startPosition.y += height;
+            }
+            startPosition.x += width;
+        }
+        for (int x = 0; x < GetWorldWidth; x++)
+        {
+            for (int y = 0; y < GetWorldHeight; y++)
+            {
+                worldAs2D[x, y] = worldArray[x * GetWorldHeight + y];
+                fullArray[(x * GetWorldHeight + y) + (x * skyHeight)] = worldArray[x * GetWorldHeight + y];
+            }
+        }
+
+
+        // worldAs2D = new int[worldAs2D.GetUpperBound(0),worldAs2D.GetUpperBound(1) + (skyChunks * height)];
+        verticalChunks += skyChunks;
+        //int[] skyChunkArray = new int[GetWorldWidth * (skyChunks * height)];
+        // worldArray.CopyFrom(skyChunkArray);
+        TileMapManager.Instance.shadowArray = new NativeArray<float3>(GetWorldWidth * GetWorldHeight, Allocator.Persistent);
+        TileMapManager.Instance.worldArray = worldAs2D;
+        TileMapManager.Instance.nativeWorldArray = fullArray;
+        TileMapManager.Instance.shadowArray2D = new float[GetWorldWidth, GetWorldHeight];
+        
         //Cleanup
         for (int i = 0; i < chunkArray.Length; i++)
         {
             chunkArray[i].Dispose();
         }
         topLayer.Dispose();
-
-        // Skapar en ny persistent array som skickas till tilemapmanager för att kunna uppdateras. Vet inte om det här behöver nån nätverkgrej?
-        // TileMapManager.Instance.worldArray = new NativeArray<int>(worldArray, Allocator.Persistent);
-        int[,] worldAs2D = new int[GetWorldWidth, GetWorldHeight];
-        ShadowTile[] data = new ShadowTile[GetWorldWidth * GetWorldHeight];
-        for (int x = 0; x < worldAs2D.GetUpperBound(0); x++)
-        {
-            for (int y = 0; y < worldAs2D.GetUpperBound(1); y++)
-            {
-                worldAs2D[x, y] = worldArray[x * GetWorldHeight + y];
-                data[x * GetWorldHeight + y].position = new Vector2Int(x, y);
-            }
-        }
-        TileMapManager.Instance.worldArray = worldAs2D;
-        TileMapManager.Instance.shadowArray = new float[GetWorldWidth, GetWorldHeight];
-        TileMapManager.Instance.shadowData = data;
         worldArray.Dispose();
       //  InvokeRepeating("UpdateMap", 1f, 1f);
 
@@ -102,30 +173,30 @@ public class DefaultPlanetGeneration : Worldgeneration
         //float rnd = Random.Range(0.01f, 0.2f);
         const float modifier = 0.15f;
         int newPoint;
-        for (int x = 0; x < width * horizontalChunks; x++)
+        for (int x = 0; x < GetWorldWidth; x++)
         {
-            for (int y = 0; y < height * verticalChunks; y++)
+            for (int y = 0; y < GetWorldHeight; y++)
             {
-                int edgeWall = Random.Range(0, 1);
-                if ((x == 0 || y == 0 || x == width * horizontalChunks - 1 || y == height * verticalChunks - 1) && edgeWall > 0)
+                int edgeWall = UnityEngine.Random.Range(0, 1);
+                if ((x == 0 || y == 0 || x == GetWorldWidth - 1 || y == GetWorldHeight - 1) && edgeWall > 0)
                 {
                     //Keep the edges as walls
-                    mapCoords[x * height * verticalChunks + y] = (int)BlockTypeConversion.StoneBlock;
+                    mapCoords[x * GetWorldHeight + y] = (int)BlockTypeConversion.StoneBlock;
                 }
                 else
                 {
                     //Generate a new point using perlin noise, then round it to a value of either 0 or 1
-                    int intRnd = Random.Range(0, height * verticalChunks * 2);
+                    int intRnd = UnityEngine.Random.Range(0, GetWorldHeight * 2);
                     // int clampedHeight = Mathf.Clamp(y, height * verticalChunks / 2, height * verticalChunks);
                     newPoint = Mathf.RoundToInt(Mathf.PerlinNoise(x * modifier, y * modifier));
-                    if (newPoint == 1 && mapCoords[x * height * verticalChunks + y] > 0 && intRnd > y)
+                    if (newPoint == 1 && mapCoords[x * GetWorldHeight + y] > 0 && intRnd > y)
                     {
 
-                        mapCoords[x * height * verticalChunks + y] = (int)BlockTypeConversion.StoneBlock;
+                        mapCoords[x * GetWorldHeight + y] = (int)BlockTypeConversion.StoneBlock;
                     }
-                    else if (mapCoords[x * height * verticalChunks + y] > 0)
+                    else if (mapCoords[x * GetWorldHeight + y] > 0)
                     {
-                        mapCoords[x * height * verticalChunks + y] = (int)BlockTypeConversion.DirtBlock;
+                        mapCoords[x * GetWorldHeight + y] = (int)BlockTypeConversion.DirtBlock;
                     }
 
                 }
@@ -151,8 +222,8 @@ public class DefaultPlanetGeneration : Worldgeneration
 
     private NativeArray<int> AddOreBlocks(NativeArray<int> mapCoords, int block)
     {
-        int worldWidth = horizontalChunks * width;
-        int worldHeight = verticalChunks * height;
+        int worldWidth = GetWorldWidth;
+        int worldHeight = GetWorldHeight;
         int modifier = OreModifier(block);
 
 
@@ -162,9 +233,9 @@ public class DefaultPlanetGeneration : Worldgeneration
         System.Random rand = new System.Random(seed.GetHashCode());
 
         //Define our start x position
-        int floorX = Random.Range(0, (worldWidth) - 1);
+        int floorX = UnityEngine.Random.Range(0, (worldWidth) - 1);
         //Define our start y position
-        int floorY = Random.Range(0, (worldHeight * modifier / copperModifier) - 1);
+        int floorY = UnityEngine.Random.Range(0, (worldHeight * modifier / copperModifier) - 1);
         //Determine our required floorAmount
         int reqFloorAmount = modifier / oreAmount; //(worldHeight * worldWidth) / modifier;
         //Debug.Log(reqFloorAmount);
@@ -181,8 +252,8 @@ public class DefaultPlanetGeneration : Worldgeneration
 
         for (int i = 0; i < numberOfLoops * modifier / copperModifier; i++)
         {
-            floorX = Random.Range(0, (worldWidth) - 1);
-            floorY = Random.Range(0, (worldHeight * modifier / copperModifier) - 1);
+            floorX = UnityEngine.Random.Range(0, (worldWidth) - 1);
+            floorY = UnityEngine.Random.Range(0, (worldHeight * modifier / copperModifier) - 1);
             floorCount = 1;
             maxLoops = numberOfLoops;
 
@@ -375,7 +446,7 @@ public class DefaultPlanetGeneration : Worldgeneration
         System.Random rand = new System.Random(seed.GetHashCode());
 
         //Determine the start position
-        int lastHeight = Random.Range(height - heighRandomize, height);
+        int lastHeight = UnityEngine.Random.Range(height - heighRandomize, height);
 
         //Used to determine which direction to go
         int nextMove;
@@ -383,18 +454,18 @@ public class DefaultPlanetGeneration : Worldgeneration
         int sectionWidth = 0;
 
         //Work through the array width
-        for (int x = 0; x < horizontalChunks * width; x++)
+        for (int x = 0; x < GetWorldWidth; x++)
         {
             //Determine the next move
             nextMove = rand.Next(2);
 
             //Only change the height if we have used the current height more than the minimum required section width
-            if (nextMove == 0 && lastHeight > 0 && sectionWidth > Random.Range(3, 6))
+            if (nextMove == 0 && lastHeight > 0 && sectionWidth > UnityEngine.Random.Range(3, 6))
             {
                 lastHeight--;
                 sectionWidth = 0;
             }
-            else if (nextMove == 1 && lastHeight < height - 1 && sectionWidth > Random.Range(3, 6))
+            else if (nextMove == 1 && lastHeight < height - 1 && sectionWidth > UnityEngine.Random.Range(3, 6))
             {
                 lastHeight++;
                 sectionWidth = 0;
@@ -420,17 +491,17 @@ public class DefaultPlanetGeneration : Worldgeneration
 
     private NativeArray<int> CreateCaveTerrain(NativeArray<int> mapCoords)
     {
-        int worldWidth = horizontalChunks * width;
-        int worldHeight = verticalChunks * height;
+        int worldWidth = GetWorldWidth;
+        int worldHeight = GetWorldHeight;
 
         float seed = UnityEngine.Random.Range(0f, 1f);
         //Seed our random
         System.Random rand = new System.Random(seed.GetHashCode());
 
         //Define our start x position
-        int floorX = Random.Range(0, (worldWidth) - 1);
+        int floorX = UnityEngine.Random.Range(0, (worldWidth) - 1);
         //Define our start y position
-        int floorY = Random.Range(0, (worldHeight) - 1);
+        int floorY = UnityEngine.Random.Range(0, (worldHeight) - 1);
         //Determine our required floorAmount
         int reqFloorAmount = (worldHeight * worldWidth) * 20 / 100;
         //Debug.Log(reqFloorAmount);
@@ -446,8 +517,8 @@ public class DefaultPlanetGeneration : Worldgeneration
 
         for (int i = 0; i < numberOfLoops; i++)
         {
-            floorX = Random.Range(0, (worldWidth) - 1);
-            floorY = Random.Range(0, (worldHeight) - 1);
+            floorX = UnityEngine.Random.Range(0, (worldWidth) - 1);
+            floorY = UnityEngine.Random.Range(0, (worldHeight) - 1);
             maxLoops = numberOfLoops;
 
             while (floorCount < reqFloorAmount && maxLoops > 0)
@@ -695,7 +766,7 @@ public class DefaultPlanetGeneration : Worldgeneration
         System.Random rand = new System.Random(seed.GetHashCode());
 
         //Determine the start position
-        int lastHeight = Random.Range(map.GetUpperBound(1) - randomizedRange, map.GetUpperBound(1));
+        int lastHeight = UnityEngine.Random.Range(map.GetUpperBound(1) - randomizedRange, map.GetUpperBound(1));
 
         //Used to determine which direction to go
         int nextMove = 0;

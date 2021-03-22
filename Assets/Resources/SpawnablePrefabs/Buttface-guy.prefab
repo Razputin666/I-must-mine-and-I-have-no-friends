@@ -761,6 +761,8 @@ MonoBehaviour:
     type: 3}
   cameraPrefab: {fileID: 2166173121343658041, guid: 6bdb7717de694f1419dc1acb28b6dc7b,
     type: 3}
+  shadowCameraPrefab: {fileID: 6203464524966895919, guid: ef5be5e4f11a991409bfd556d8ef1346,
+    type: 3}
   fovObj: {fileID: 5148427663268473720, guid: 381496dcc7eafd8498fad0478ab5e82f, type: 3}
   background: {fileID: 6500138196384648450, guid: f7d84d7966fe80741a75b9cc713d7fc7,
     type: 3}

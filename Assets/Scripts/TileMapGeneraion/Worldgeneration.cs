@@ -47,36 +47,7 @@ public class Worldgeneration : NetworkBehaviour
     protected virtual void Init()
     {
         Instance = this;
-        tilebaseLookup = new Dictionary<string, TileBase>();
-        blocks = Resources.LoadAll<TileBase>("Tilebase");
-        foreach (var tilebase in blocks)
-        {
-            tilebaseLookup.Add(tilebase.name, tilebase);
-        }
 
-        sightBlock = Instantiate(foreGroundPrefab, grid.transform);
-        sightBlock.GetComponent<TilemapSyncer>().SetName("Vision Chunk");
-        //TileMapManager.Instance.AddTileChunk(sightBlock.GetComponent<Tilemap>());
-        NetworkServer.Spawn(sightBlock);
-        sightBlock.transform.position = new Vector2(startPosition.x, startPosition.y);
-
-
-        for (int x = 0; x < horizontalChunks; x++)
-        {
-            startPosition.y = 0;
-            for (int y = 0; y < verticalChunks; y++)
-            {
-                int index = x * verticalChunks + y;
-                GameObject chunk = Instantiate(chunkPrefab, grid.transform);
-                chunk.GetComponent<TilemapSyncer>().SetName("Chunk_" + index);
-                TileMapManager.Instance.AddTileChunk(chunk.GetComponent<Tilemap>());
-                NetworkServer.Spawn(chunk);
-                chunk.transform.position = new Vector2(startPosition.x, startPosition.y);
-                startPosition.y += height;
-            }
-            startPosition.x += width;
-        }
-       
     }
 
     //public void RenderShadowMap()

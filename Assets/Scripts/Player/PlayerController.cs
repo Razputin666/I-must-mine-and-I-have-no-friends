@@ -31,7 +31,9 @@ public class PlayerController : NetworkBehaviour
     [SerializeField]
     private DeathScreen deathScreen;
     [SerializeField] private Camera cameraPrefab;
+    [SerializeField] private Camera shadowCameraPrefab;
     private Camera camera;
+   // private Camera shadowCamera;
 
     private int playerResWidth;
     private int playerResHeight;
@@ -245,11 +247,14 @@ public class PlayerController : NetworkBehaviour
         if (camera == null)
             camera = Instantiate(cameraPrefab);
         //  camera = Instantiate(Camera.main);
+        //if (shadowCamera == null)
+        //    shadowCamera = Instantiate(shadowCameraPrefab);
 
         Camera.main.GetComponentInParent<AudioListener>().enabled = false;
         camera.GetComponent<AudioListener>().enabled = true;
 
         camera.transform.localPosition = new Vector3(0, 0, -20);
+      //  shadowCamera.transform.localPosition = new Vector3(0, 0, -20);
 
         Camera.main.gameObject.SetActive(false);
 
@@ -276,10 +281,10 @@ public class PlayerController : NetworkBehaviour
         ItemHandler = GetComponent<ItemHandler>();
 
         playerResWidth = Screen.currentResolution.width;
-        playerResHeight = Screen.currentResolution.height;
+        playerResHeight = Screen.currentResolution.height;           // GÖR EN FUNKTION FÖR OM SPELAREN ÄNDRAR SCREEN SIZE
         tileScreenSize = new Vector2Int(playerResWidth / 64, playerResHeight / 64);
 
-        ShadowCasting.OnlightUpdated += ShadowCasting_OnlightUpdated;
+        LightGeneration.OnlightUpdated += ShadowCasting_OnlightUpdated;
 
         //mapSize = GameObject.Find("LevelGeneration").GetComponent<LevelGeneratorLayered>();
 
@@ -304,16 +309,20 @@ public class PlayerController : NetworkBehaviour
             {
                 Vector3Int temp = new Vector3Int(x, y, 0);
                 if (TileMapManager.Instance.shadowMap.GetTileFlags(Vector3Int.FloorToInt(transform.position) + temp) == TileFlags.LockColor)
-                TileMapManager.Instance.shadowMap.SetTileFlags(Vector3Int.FloorToInt(transform.position) + temp, TileFlags.None);
+                    TileMapManager.Instance.shadowMap.SetTileFlags(Vector3Int.FloorToInt(transform.position) + temp, TileFlags.None);
 
                 if (TileMapManager.Instance.shadowMap.GetTile(Vector3Int.FloorToInt(transform.position) + temp) == null)
                 {
                     TileMapManager.Instance.shadowMap.SetTile(Vector3Int.FloorToInt(transform.position) + temp, Worldgeneration.Instance.darkTile);
-                    
                 }
-                if (!(TileMapManager.Instance.shadowMap.GetColor(Vector3Int.FloorToInt(transform.position + temp)).a == 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]))
-                TileMapManager.Instance.shadowMap.SetColor(Vector3Int.FloorToInt(transform.position + temp), new Color(0, 0, 0, 1f - TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x) + x, Mathf.FloorToInt(transform.position.y) + y]));
+                if (!(TileMapManager.Instance.shadowMap.GetColor(Vector3Int.FloorToInt(transform.position + temp)).a == 1f - TileMapManager.Instance.shadowArray[((Mathf.FloorToInt(transform.position.x) + x) * Worldgeneration.Instance.GetWorldHeight) + (Mathf.FloorToInt(transform.position.y) + y)].z))
+                {
+                    TileMapManager.Instance.shadowMap.SetColor(Vector3Int.FloorToInt(transform.position + temp), new Color(0, 0, 0, 1f - TileMapManager.Instance.shadowArray[((Mathf.FloorToInt(transform.position.x) + x) * Worldgeneration.Instance.GetWorldHeight) + (Mathf.FloorToInt(transform.position.y) + y)].z));
+                }
+
+
             }
+            // ANVÄND DRAWMESHINSTANCED ISTÄLLET!!!!
         }
     }
 
@@ -330,6 +339,7 @@ public class PlayerController : NetworkBehaviour
     private void MoveCamera()
     {
         camera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
+      //  shadowCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
     }
 
     [TargetRpc]

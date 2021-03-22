@@ -121,15 +121,16 @@ public class TilemapSyncer : NetworkBehaviour
     public bool UpdateTilemap(Vector3Int tilePositionCell, string tilebaseName)
     {
         Vector3Int worldTile = Vector3Int.FloorToInt(tilemap.CellToWorld(tilePositionCell));
-        if (tilebaseName == string.Empty)
+        if (tilebaseName == string.Empty) 
         {
 
             if (isServer)
             {
                 //Vector3 tileWorldPos = tilemap.CellToWorld(tilePositionCell);
                 RpcUpdateTilemap(tilePositionCell, tilebaseName);
+                TileMapManager.Instance.nativeWorldArray[worldTile.x * Worldgeneration.Instance.GetWorldHeight + worldTile.y] = (int)BlockTypeConversion.Empty;
                 // TileMapManager.Instance.worldArray[(int)tileWorldPos.x * Worldgeneration.Instance.GetWorldHeight + (int)tileWorldPos.y] = (int)BlockTypeConversion.Empty;
-                TileMapManager.Instance.worldArray[worldTile.x, worldTile.y] = (int)BlockTypeConversion.Empty;
+                //TileMapManager.Instance.worldArray[worldTile.x, worldTile.y] = (int)BlockTypeConversion.Empty;
             }
 
 
@@ -149,8 +150,11 @@ public class TilemapSyncer : NetworkBehaviour
                     if (isServer)
                     {
                         BlockTypeConversion block = (BlockTypeConversion)Enum.Parse(typeof(BlockTypeConversion), tileAsset.name);
+                        TileMapManager.Instance.nativeWorldArray[worldTile.x * Worldgeneration.Instance.GetWorldHeight + worldTile.y] = (int)block;
                         // TileMapManager.Instance.worldArray[tilePositionCell.x * Worldgeneration.Instance.GetWorldHeight + tilePositionCell.y] = (int)block;
-                        TileMapManager.Instance.worldArray[worldTile.x, worldTile.y] = (int)block;
+                        //TileMapManager.Instance.worldArray[worldTile.x, worldTile.y] = (int)block; T
+                        
+                        //Tror inte worldArray har nån funktion?
                     }
 
                     

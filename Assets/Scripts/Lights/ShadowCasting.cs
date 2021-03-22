@@ -52,6 +52,8 @@ public class ShadowCasting : NetworkBehaviour
         temporaryLight = new List<float>();
     }
 
+
+
     private void TilemapSyncer_OnTileMapUpdated(object sender, Vector3 updatedTile)
     {
         if (Vector3.Distance(transform.position, updatedTile) < range)
@@ -59,6 +61,8 @@ public class ShadowCasting : NetworkBehaviour
             ComputeLight();
         }
     }
+
+    
 
     private void OnDisable()
     {
@@ -106,7 +110,7 @@ public class ShadowCasting : NetworkBehaviour
             return false;
         }
         Vector2Int tileToCheck =  quadrant.QuadTransform(tile);
-        return TileMapManager.Instance.worldArray[Mathf.Clamp(tileToCheck.x, 0, TileMapManager.Instance.shadowArray.GetUpperBound(0)), Mathf.Clamp(tileToCheck.y, 0, TileMapManager.Instance.shadowArray.GetUpperBound(1))] >= 1;
+        return TileMapManager.Instance.worldArray[Mathf.Clamp(tileToCheck.x, 0, TileMapManager.Instance.shadowArray2D.GetUpperBound(0)), Mathf.Clamp(tileToCheck.y, 0, TileMapManager.Instance.shadowArray2D.GetUpperBound(1))] >= 1;
     }
     private bool IsFloor(Vector2Int tile)
     {
@@ -115,24 +119,28 @@ public class ShadowCasting : NetworkBehaviour
             return false;
         }
         Vector2Int tileToCheck = quadrant.QuadTransform(tile);
-        return !(TileMapManager.Instance.worldArray[Mathf.Clamp(tileToCheck.x, 0, TileMapManager.Instance.shadowArray.GetUpperBound(0)), Mathf.Clamp(tileToCheck.y, 0, TileMapManager.Instance.shadowArray.GetUpperBound(1))] >= 1);
+        return !(TileMapManager.Instance.worldArray[Mathf.Clamp(tileToCheck.x, 0, TileMapManager.Instance.shadowArray2D.GetUpperBound(0)), Mathf.Clamp(tileToCheck.y, 0, TileMapManager.Instance.shadowArray2D.GetUpperBound(1))] >= 1);
     }
     private float Slope(Vector2Int tile)
     {
         return (2f * tile.y - 1f) / (2f * tile.x);
     }
     #endregion
+
+    private void RefreshShadows()
+    {
+        
+    }
     private void ComputeLight()
     {
 
-        if (transform.position.x > TileMapManager.Instance.shadowArray.GetUpperBound(0) && transform.position.y > TileMapManager.Instance.shadowArray.GetUpperBound(1))
-            return;
+        //if (transform.position.x > TileMapManager.Instance.shadowArray.GetUpperBound(0) && transform.position.y > TileMapManager.Instance.shadowArray.GetUpperBound(1))
+        //    return;
 
         quadrant = new Quadrant(transform);
-
         for (int i = 0; i < visibleTiles.Count; i++)
         {
-            TileMapManager.Instance.shadowArray[Mathf.Clamp(visibleTiles[i].x, 0, TileMapManager.Instance.shadowArray.GetUpperBound(0)), Mathf.Clamp(visibleTiles[i].y, 0, TileMapManager.Instance.shadowArray.GetUpperBound(1))] -= Mathf.Clamp(lightStrength - temporaryLight[i], 0, 1f);
+            TileMapManager.Instance.shadowArray2D[Mathf.Clamp(visibleTiles[i].x, 0, TileMapManager.Instance.shadowArray2D.GetUpperBound(0)), Mathf.Clamp(visibleTiles[i].y, 0, TileMapManager.Instance.shadowArray2D.GetUpperBound(1))] -= Mathf.Clamp(lightStrength - temporaryLight[i], 0, 1f);
         }
 
         visibleTiles.Clear();
@@ -148,7 +156,7 @@ public class ShadowCasting : NetworkBehaviour
 
 
         visibleTiles.Add(Vector2Int.FloorToInt(transform.position));
-        TileMapManager.Instance.shadowArray[Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(transform.position.y)] += Mathf.Clamp(lightStrength, 0, 1f);
+        TileMapManager.Instance.shadowArray2D[Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(transform.position.y)] += Mathf.Clamp(lightStrength, 0, 1f);
         temporaryLight.Add(0);
         OnlightUpdated?.Invoke(this, Vector2Int.FloorToInt(transform.position));
         
@@ -176,7 +184,7 @@ public class ShadowCasting : NetworkBehaviour
                 temporaryLight.Add(diminish);
                 visibleTiles.Add(quadrant.QuadTransform(tiles[i]));
 
-                TileMapManager.Instance.shadowArray[Mathf.Clamp(quadrant.QuadTransform(tiles[i]).x, 0 , TileMapManager.Instance.shadowArray.GetUpperBound(0)), Mathf.Clamp(quadrant.QuadTransform(tiles[i]).y, 0, TileMapManager.Instance.shadowArray.GetUpperBound(1))] += Mathf.Clamp(lightStrength - diminish, 0 , 1f);
+                TileMapManager.Instance.shadowArray2D[Mathf.Clamp(quadrant.QuadTransform(tiles[i]).x, 0 , TileMapManager.Instance.shadowArray2D.GetUpperBound(0)), Mathf.Clamp(quadrant.QuadTransform(tiles[i]).y, 0, TileMapManager.Instance.shadowArray2D.GetUpperBound(1))] += Mathf.Clamp(lightStrength - diminish, 0 , 1f);
 
             }
             if (IsWall(prevTile) && IsFloor(tiles[i]))
@@ -199,7 +207,7 @@ public class ShadowCasting : NetworkBehaviour
     }
 
 }
-public class Quadrant : MonoBehaviour
+public class Quadrant
 {
     public LightDirections direction;
     private Transform source;
@@ -227,7 +235,7 @@ public class Quadrant : MonoBehaviour
         }
     }
 }
-public class Row
+public struct Row
 {
     public float startSlope;
     public float endSlope;
@@ -245,8 +253,18 @@ public class Row
         Row nextRow = new Row(depth + 1, startSlope, endSlope); ;
         return nextRow;
     }
+    public Vector2Int[] Tiles(Row row)
+    {
+        int minColumn = Mathf.FloorToInt((row.depth * row.startSlope) + 0.5f);
+        int maxColumn = Mathf.CeilToInt((row.depth * row.endSlope) - 0.5f);
 
-
+        Vector2Int[] tiles = new Vector2Int[maxColumn + 1 - minColumn];
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            tiles[i] = new Vector2Int(row.depth, minColumn + i);
+        }
+        return tiles;
+    }
 }
 
 

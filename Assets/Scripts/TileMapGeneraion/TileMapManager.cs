@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 using Mirror;
 using UnityEngine.Events;
 using Unity.Collections;
+using Unity.Mathematics;
 
 public class TileMapManager : NetworkBehaviour
 {
@@ -18,9 +19,10 @@ public class TileMapManager : NetworkBehaviour
 
     // public NativeArray<int> worldArray;
     public int[,] worldArray;
-    public float[,] shadowArray;
+    public NativeArray<int> nativeWorldArray;
+    public float[,] shadowArray2D;
+    public NativeArray<float3> shadowArray; // X, Y värde står för koordinaterna medans Z-värdet står för ljuset på tilen.
 
-    public ShadowTile[] shadowData;
     public Tilemap shadowMap;
 
     //private void Update()
@@ -219,5 +221,27 @@ public class TileMapManager : NetworkBehaviour
             ts.hasTilemap = true;
             ts.SetTileData();
         }
+    }
+}
+
+public struct HF
+{
+
+    // Helperfunktioner för att fort komma åt index i en flattenad array genom vectors
+    public static int I(Vector2Int tile)
+    {
+        return tile.x * Worldgeneration.Instance.GetWorldHeight + tile.y;
+    }
+    public static int I(Vector2 tile)
+    {
+        return Mathf.FloorToInt(tile.x) * Worldgeneration.Instance.GetWorldHeight + Mathf.FloorToInt(tile.y);
+    }
+    public static int I(Vector3 tile)
+    {
+        return Mathf.FloorToInt(tile.x) * Worldgeneration.Instance.GetWorldHeight + Mathf.FloorToInt(tile.y);
+    }
+    public static int I(Vector3Int tile)
+    {
+        return Mathf.FloorToInt(tile.x) * Worldgeneration.Instance.GetWorldHeight + Mathf.FloorToInt(tile.y);
     }
 }
